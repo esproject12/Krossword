@@ -15,7 +15,6 @@ async function generateCrosswordWithGemini() {
     );
   }
 
-  // Correct initialization for @google/genai v1.5.1
   const ai = new GoogleGenAI({ apiKey });
   const today = new Date().toISOString().split("T")[0];
 
@@ -41,7 +40,6 @@ async function generateCrosswordWithGemini() {
     8. Focus on common and recognizable words related to India.
     `;
 
-  // Correct API call pattern for v1.5.1
   const result = await ai.models.generateContent({
     model: GEMINI_MODEL_NAME,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -51,20 +49,28 @@ async function generateCrosswordWithGemini() {
     },
   });
 
-  // Correct response handling for the result object from generateContent
+  // --- THIS IS THE CORRECTED LOGIC ---
+  // Based on the successful log output, we now know the exact path to the text.
   if (
     !result ||
-    !result.response ||
-    typeof result.response.text !== "function"
+    !result.candidates ||
+    !result.candidates[0] ||
+    !result.candidates[0].content ||
+    !result.candidates[0].content.parts ||
+    !result.candidates[0].content.parts[0] ||
+    !result.candidates[0].content.parts[0].text
   ) {
     console.error(
       "Unexpected response structure from Gemini API:",
       JSON.stringify(result, null, 2)
     );
-    throw new Error("Failed to get a valid response from Gemini API.");
+    throw new Error(
+      "Failed to get a valid text part from the Gemini API response."
+    );
   }
 
-  let jsonStr = result.response.text().trim();
+  let jsonStr = result.candidates[0].content.parts[0].text.trim();
+  // --- END OF CORRECTED LOGIC ---
 
   // Clean up markdown fences if they exist
   const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
