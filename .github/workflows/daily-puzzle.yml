@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Generate new puzzle file
-        run: node scripts/generate-puzzle.mjs
+        run: npx tsx scripts/generate-puzzle.mjs
         env:
           GEMINI_API_KEY_FROM_SECRET: ${{ secrets.GEMINI_API_KEY }}
 
