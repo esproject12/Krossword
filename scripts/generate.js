@@ -5,6 +5,7 @@ import path from "path";
 
 // --- Configuration ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
+const EXPECTED_GRID_SIZE = 6;
 
 // --- Main Generation Logic ---
 async function generateCrosswordWithGemini() {
@@ -30,11 +31,11 @@ async function generateCrosswordWithGemini() {
       "solutionGrid": []
     }
     Key requirements:
-    1. Grid size must be 6x6.
-    2. 'words' array must contain all words placed. Each word must have a unique 'id'.
+    1. Grid size MUST be exactly 6x6.
+    2. 'words' array MUST contain all words placed and not be empty. Each word must have a unique 'id', a 'clue', and an 'answer'.
     3. 'answer' must be all uppercase and match the letters in 'solutionGrid'.
     4. 'startPosition' is 0-indexed {row, col}.
-    5. 'solutionGrid' must be a 6x6 array and accurately represent the solved puzzle, with 'null' for black squares.
+    5. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle, with 'null' for black squares.
     6. The puzzle must be solvable and logical. Answers should be single words.
     7. Generate a unique puzzle for the date ${today}.
     8. Focus on common and recognizable words related to India.
@@ -45,12 +46,10 @@ async function generateCrosswordWithGemini() {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
-      temperature: 0.8,
+      temperature: 0.85, // Slightly higher temp might encourage more creative and valid layouts
     },
   });
 
-  // --- THIS IS THE CORRECTED LOGIC ---
-  // Based on the successful log output, we now know the exact path to the text.
   if (
     !result ||
     !result.candidates ||
@@ -70,7 +69,6 @@ async function generateCrosswordWithGemini() {
   }
 
   let jsonStr = result.candidates[0].content.parts[0].text.trim();
-  // --- END OF CORRECTED LOGIC ---
 
   // Clean up markdown fences if they exist
   const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
@@ -81,10 +79,26 @@ async function generateCrosswordWithGemini() {
 
   const data = JSON.parse(jsonStr);
 
-  // Final validation
-  if (!data || !data.words || !data.solutionGrid) {
-    throw new Error("Invalid data structure received from Gemini API.");
+  // --- ROBUST VALIDATION STEP ---
+  if (!data || !data.gridSize || data.gridSize !== EXPECTED_GRID_SIZE) {
+    throw new Error(
+      `Validation failed: Generated puzzle gridSize is ${data.gridSize}, expected ${EXPECTED_GRID_SIZE}.`
+    );
   }
+  if (!data.solutionGrid || data.solutionGrid.length !== EXPECTED_GRID_SIZE) {
+    throw new Error(
+      `Validation failed: solutionGrid does not have ${EXPECTED_GRID_SIZE} rows.`
+    );
+  }
+  if (!data.words || data.words.length === 0) {
+    throw new Error("Validation failed: 'words' array is empty.");
+  }
+  console.log(
+    `Validation passed: Received a ${data.gridSize}x${data.gridSize} puzzle with ${data.words.length} words.`
+  );
+  // --- END OF VALIDATION ---
+
+  // Final normalization
   data.words.forEach((word) => (word.answer = word.answer.toUpperCase()));
   data.solutionGrid.forEach((row) => {
     if (row) {
