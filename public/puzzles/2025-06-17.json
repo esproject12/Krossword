@@ -1,0 +1,151 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-17",
+  "words": [
+    {
+      "id": 1,
+      "answer": "GANGES",
+      "clue": "River in India",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "answer": "TANDOOR",
+      "clue": "Indian clay oven",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 3,
+      "answer": "MASALA",
+      "clue": "Indian spice blend",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 4,
+      "answer": "CURRY",
+      "clue": "Popular Indian dish",
+      "startPosition": {
+        "row": 2,
+        "col": 5
+      }
+    },
+    {
+      "id": 5,
+      "answer": "YOGA",
+      "clue": "Indian spiritual practice",
+      "startPosition": {
+        "row": 4,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "answer": "DELHI",
+      "clue": "Capital of India",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "answer": "RICE",
+      "clue": "Staple food in India",
+      "startPosition": {
+        "row": 5,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "G",
+      "A",
+      "N",
+      "G",
+      "E",
+      "S"
+    ],
+    [
+      "A",
+      "M",
+      "A",
+      "L",
+      "A",
+      "R"
+    ],
+    [
+      "S",
+      "A",
+      "L",
+      "E",
+      "T",
+      "Y"
+    ],
+    [
+      "A",
+      null,
+      null,
+      null,
+      null,
+      "C"
+    ],
+    [
+      "Y",
+      "O",
+      "G",
+      "A",
+      "D",
+      "U"
+    ],
+    [
+      "R",
+      null,
+      "R",
+      "I",
+      "C",
+      "R"
+    ],
+    [
+      "R",
+      null,
+      "I",
+      "C",
+      "E",
+      "R"
+    ],
+    [
+      "Y",
+      null,
+      "C",
+      "E",
+      null,
+      "R"
+    ],
+    [
+      " ",
+      null,
+      "E",
+      null,
+      null,
+      "R"
+    ],
+    [
+      " ",
+      null,
+      null,
+      null,
+      null,
+      "Y"
+    ]
+  ]
+}
