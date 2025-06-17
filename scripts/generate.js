@@ -3,25 +3,25 @@ import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
 
-// --- Configuration copied from constants.ts ---
+// --- Configuration ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 
-// --- Logic copied and adapted from geminiService.ts ---
-
-const getTodayDateString = () => {
-  return new Date().toISOString().split("T")[0];
-};
-
+// --- Main Generation Logic ---
 async function generateCrosswordWithGemini() {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
   if (!apiKey) {
     throw new Error(
-      "GEMINI_API_KEY_FROM_SECRET is not set in the environment."
+      "CRITICAL: GEMINI_API_KEY_FROM_SECRET is not set in the environment."
     );
   }
 
-  const ai = new GoogleGenAI({ apiKey });
-  const today = getTodayDateString();
+  // Step 1: Initialize the GenAI client
+  const genAI = new GoogleGenAI(apiKey);
+
+  // Step 2: Get the specific generative model
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
+
+  const today = new Date().toISOString().split("T")[0];
   const prompt = `
     You are a crossword puzzle creator.
     Create a 6x6 crossword puzzle. The theme must be related to India (culture, common knowledge, places, food, etc.).
@@ -44,8 +44,8 @@ async function generateCrosswordWithGemini() {
     8. Focus on common and recognizable words related to India.
     `;
 
-  const result = await ai.models.generateContent({
-    model: GEMINI_MODEL_NAME,
+  // Step 3: Generate content using the model
+  const generationResult = await model.generateContent({
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
@@ -53,7 +53,11 @@ async function generateCrosswordWithGemini() {
     },
   });
 
-  let jsonStr = result.response.text().trim();
+  // Step 4: Await the response and extract the text
+  const response = await generationResult.response;
+  let jsonStr = response.text().trim();
+
+  // Clean up markdown fences if they exist
   const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
   const match = jsonStr.match(fenceRegex);
   if (match && match[1]) {
@@ -63,6 +67,9 @@ async function generateCrosswordWithGemini() {
   const data = JSON.parse(jsonStr);
 
   // Final validation and normalization
+  if (!data || !data.words || !data.solutionGrid) {
+    throw new Error("Invalid data structure received from Gemini API.");
+  }
   data.words.forEach((word) => (word.answer = word.answer.toUpperCase()));
   data.solutionGrid.forEach((row) => {
     if (row) {
@@ -75,8 +82,9 @@ async function generateCrosswordWithGemini() {
   return data;
 }
 
+// --- File Saving Logic ---
 async function generateAndSave() {
-  const today = getTodayDateString();
+  const today = new Date().toISOString().split("T")[0];
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${today}.json`);
 
