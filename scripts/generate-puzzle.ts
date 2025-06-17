@@ -1,5 +1,5 @@
 // scripts/generate-puzzle.mjs
-import { generateCrosswordWithGemini } from "../src/services/geminiService";
+import { generateCrosswordWithGemini } from "../src/services/geminiService.js";
 import fs from "fs";
 import path from "path";
 
