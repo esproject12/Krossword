@@ -1,4 +1,4 @@
-// This is a self-contained script. It does not import from the /src directory.
+// This is a self-contained script.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -15,13 +15,10 @@ async function generateCrosswordWithGemini() {
     );
   }
 
-  // Step 1: Initialize the GenAI client
-  const genAI = new GoogleGenAI(apiKey);
-
-  // Step 2: Get the specific generative model
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL_NAME });
-
+  // Correct initialization for @google/genai v1.5.1
+  const ai = new GoogleGenAI({ apiKey });
   const today = new Date().toISOString().split("T")[0];
+
   const prompt = `
     You are a crossword puzzle creator.
     Create a 6x6 crossword puzzle. The theme must be related to India (culture, common knowledge, places, food, etc.).
@@ -44,8 +41,9 @@ async function generateCrosswordWithGemini() {
     8. Focus on common and recognizable words related to India.
     `;
 
-  // Step 3: Generate content using the model
-  const generationResult = await model.generateContent({
+  // Correct API call pattern for v1.5.1
+  const result = await ai.models.generateContent({
+    model: GEMINI_MODEL_NAME,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
@@ -53,9 +51,20 @@ async function generateCrosswordWithGemini() {
     },
   });
 
-  // Step 4: Await the response and extract the text
-  const response = await generationResult.response;
-  let jsonStr = response.text().trim();
+  // Correct response handling for the result object from generateContent
+  if (
+    !result ||
+    !result.response ||
+    typeof result.response.text !== "function"
+  ) {
+    console.error(
+      "Unexpected response structure from Gemini API:",
+      JSON.stringify(result, null, 2)
+    );
+    throw new Error("Failed to get a valid response from Gemini API.");
+  }
+
+  let jsonStr = result.response.text().trim();
 
   // Clean up markdown fences if they exist
   const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
@@ -66,7 +75,7 @@ async function generateCrosswordWithGemini() {
 
   const data = JSON.parse(jsonStr);
 
-  // Final validation and normalization
+  // Final validation
   if (!data || !data.words || !data.solutionGrid) {
     throw new Error("Invalid data structure received from Gemini API.");
   }
