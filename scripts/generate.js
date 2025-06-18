@@ -7,6 +7,24 @@ import path from "path";
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const EXPECTED_GRID_SIZE = 6;
 
+// --- TIMEZONE-AWARE DATE FUNCTION ---
+const getTodayDateString = () => {
+  // Create a date object based on current time
+  const now = new Date();
+  // Convert it to an IST-specific string (UTC+5:30)
+  // toLocaleString is a standard way to get timezone-specific dates
+  const istDateString = now.toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  // Create a new date object from this IST string to avoid timezone-offset issues
+  const istDate = new Date(istDateString);
+  // Format it into YYYY-MM-DD
+  const year = istDate.getFullYear();
+  const month = String(istDate.getMonth() + 1).padStart(2, "0");
+  const day = String(istDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 // --- Main Generation Logic ---
 async function generateCrosswordWithGemini() {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
@@ -17,11 +35,11 @@ async function generateCrosswordWithGemini() {
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDateString(); // This will now correctly get the IST date
 
   const prompt = `
     You are a crossword puzzle creator.
-    Create a 6x6 crossword puzzle. The theme must be related to India (culture, common knowledge, places, food, etc.).
+    Create a 6x6 crossword puzzle for the date ${today}. The theme must be related to India.
     The puzzle must be valid, fully-interlocking, and have a reasonable density of words.
     Provide the output as a single JSON object. The JSON must strictly follow this structure:
     {
@@ -32,13 +50,10 @@ async function generateCrosswordWithGemini() {
     }
     Key requirements:
     1. Grid size MUST be exactly 6x6.
-    2. 'words' array MUST contain all words placed and not be empty. Each word must have a unique 'id', a 'clue', and an 'answer'.
-    3. 'answer' must be all uppercase and match the letters in 'solutionGrid'.
+    2. 'words' array MUST contain all words placed and not be empty.
+    3. 'answer' must be all uppercase and match 'solutionGrid'.
     4. 'startPosition' is 0-indexed {row, col}.
-    5. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle, with 'null' for black squares.
-    6. The puzzle must be solvable and logical. Answers should be single words.
-    7. Generate a unique puzzle for the date ${today}.
-    8. Focus on common and recognizable words related to India.
+    5. 'solutionGrid' MUST be a 6x6 array.
     `;
 
   const result = await ai.models.generateContent({
@@ -46,7 +61,7 @@ async function generateCrosswordWithGemini() {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
-      temperature: 0.85, // Slightly higher temp might encourage more creative and valid layouts
+      temperature: 0.85,
     },
   });
 
@@ -69,36 +84,26 @@ async function generateCrosswordWithGemini() {
   }
 
   let jsonStr = result.candidates[0].content.parts[0].text.trim();
-
-  // Clean up markdown fences if they exist
   const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
   const match = jsonStr.match(fenceRegex);
   if (match && match[1]) {
     jsonStr = match[1].trim();
   }
-
   const data = JSON.parse(jsonStr);
 
-  // --- ROBUST VALIDATION STEP ---
-  if (!data || !data.gridSize || data.gridSize !== EXPECTED_GRID_SIZE) {
-    throw new Error(
-      `Validation failed: Generated puzzle gridSize is ${data.gridSize}, expected ${EXPECTED_GRID_SIZE}.`
-    );
-  }
-  if (!data.solutionGrid || data.solutionGrid.length !== EXPECTED_GRID_SIZE) {
-    throw new Error(
-      `Validation failed: solutionGrid does not have ${EXPECTED_GRID_SIZE} rows.`
-    );
-  }
-  if (!data.words || data.words.length === 0) {
-    throw new Error("Validation failed: 'words' array is empty.");
+  if (
+    !data ||
+    data.gridSize !== EXPECTED_GRID_SIZE ||
+    !data.solutionGrid ||
+    data.solutionGrid.length !== EXPECTED_GRID_SIZE ||
+    !data.words ||
+    data.words.length === 0
+  ) {
+    throw new Error(`Validation failed for generated puzzle.`);
   }
   console.log(
     `Validation passed: Received a ${data.gridSize}x${data.gridSize} puzzle with ${data.words.length} words.`
   );
-  // --- END OF VALIDATION ---
-
-  // Final normalization
   data.words.forEach((word) => (word.answer = word.answer.toUpperCase()));
   data.solutionGrid.forEach((row) => {
     if (row) {
@@ -107,13 +112,12 @@ async function generateCrosswordWithGemini() {
       });
     }
   });
-
   return data;
 }
 
 // --- File Saving Logic ---
 async function generateAndSave() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDateString(); // This will get the correct IST date
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${today}.json`);
 
@@ -122,11 +126,13 @@ async function generateAndSave() {
   }
 
   if (fs.existsSync(puzzlePath)) {
-    console.log(`Puzzle for ${today} already exists. Skipping generation.`);
+    console.log(
+      `Puzzle for ${today} (IST) already exists. Skipping generation.`
+    );
     return;
   }
 
-  console.log(`Generating new puzzle for ${today}...`);
+  console.log(`Generating new puzzle for ${today} (IST)...`);
   try {
     const crosswordData = await generateCrosswordWithGemini();
     fs.writeFileSync(puzzlePath, JSON.stringify(crosswordData, null, 2));
