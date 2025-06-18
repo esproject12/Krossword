@@ -7,7 +7,7 @@ import path from "path";
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const EXPECTED_GRID_SIZE = 6;
 
-// --- NEW "PARANOID" VALIDATION FUNCTION ---
+// --- "Paranoid" Validation Function ---
 function validatePuzzleData(data) {
   if (!data) {
     throw new Error("Validation failed: Received data is null or undefined.");
@@ -56,18 +56,47 @@ function validatePuzzleData(data) {
   return true;
 }
 
-// --- Main Generation Logic ---
-async function generateCrosswordWithGemini() {
-  const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
-  if (!apiKey) {
+// --- NEW SELF-CORRECTION FUNCTION ---
+async function selfCorrectJson(ai, brokenJson) {
+  console.log("Attempting to self-correct invalid JSON...");
+  const correctionPrompt = `The following text is supposed to be a single, valid JSON object, but it has a syntax error. Please fix it and return only the corrected, valid JSON object with no other text or markdown fences.\n\nInvalid JSON:\n${brokenJson}`;
+
+  const result = await ai.models.generateContent({
+    model: GEMINI_MODEL_NAME,
+    contents: [{ role: "user", parts: [{ text: correctionPrompt }] }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.0, // Set temp to 0 for deterministic correction
+    },
+  });
+
+  if (
+    !result ||
+    !result.candidates ||
+    !result.candidates[0] ||
+    !result.candidates[0].content ||
+    !result.candidates[0].content.parts[0] ||
+    !result.candidates[0].content.parts[0].text
+  ) {
     throw new Error(
-      "CRITICAL: GEMINI_API_KEY_FROM_SECRET is not set in the environment."
+      "Self-correction failed: Did not receive a valid response from the correction API call."
     );
   }
 
-  const ai = new GoogleGenAI({ apiKey });
-  const today = new Date().toISOString().split("T")[0];
+  console.log("Self-correction successful, re-parsing...");
+  return result.candidates[0].content.parts[0].text.trim();
+}
 
+// --- Main Generation Logic ---
+async function generateCrosswordWithGemini() {
+  const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
+  if (!apiKey)
+    throw new Error(
+      "CRITICAL: GEMINI_API_KEY_FROM_SECRET is not set in the environment."
+    );
+
+  const ai = new GoogleGenAI({ apiKey });
+  const today = new Date().toISOString().split("T")[0]; // Use UTC date for prompt consistency
   const prompt = `
     You are a crossword puzzle creator.
     Create a 6x6 crossword puzzle for the date ${today}. The theme must be related to India.
@@ -100,30 +129,30 @@ async function generateCrosswordWithGemini() {
   if (
     !result ||
     !result.candidates ||
-    !result.candidates[0] ||
-    !result.candidates[0].content ||
-    !result.candidates[0].content.parts ||
-    !result.candidates[0].content.parts[0] ||
-    !result.candidates[0].content.parts[0].text
+    !result.candidates[0]?.content?.parts[0]?.text
   ) {
-    console.error(
-      "Unexpected response structure from Gemini API:",
-      JSON.stringify(result, null, 2)
-    );
     throw new Error(
       "Failed to get a valid text part from the Gemini API response."
     );
   }
 
   let jsonStr = result.candidates[0].content.parts[0].text.trim();
-  const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
-  const match = jsonStr.match(fenceRegex);
-  if (match && match[1]) {
-    jsonStr = match[1].trim();
-  }
-  const data = JSON.parse(jsonStr);
+  let data;
 
-  // Run the new, strict validation
+  try {
+    const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
+    const match = jsonStr.match(fenceRegex);
+    if (match && match[1]) {
+      jsonStr = match[1].trim();
+    }
+    data = JSON.parse(jsonStr);
+  } catch (error) {
+    console.warn("Initial JSON.parse failed. Error:", error.message);
+    const correctedJsonStr = await selfCorrectJson(ai, jsonStr);
+    data = JSON.parse(correctedJsonStr); // Let it throw an error if correction also fails
+  }
+
+  // Run the strict validation
   validatePuzzleData(data);
 
   // Normalize data
@@ -140,13 +169,16 @@ async function generateCrosswordWithGemini() {
 
 // --- File Saving Logic ---
 async function generateAndSave() {
-  const today = new Date()
-    .toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    .split(",")[0];
-  const [month, day, year] = today.split("/");
-  const todayStr = `${year}-${String(month).padStart(2, "0")}-${String(
-    day
-  ).padStart(2, "0")}`;
+  // Use IST for the filename
+  const now = new Date();
+  const istDateString = now.toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  const istDate = new Date(istDateString);
+  const year = istDate.getFullYear();
+  const month = String(istDate.getMonth() + 1).padStart(2, "0");
+  const day = String(istDate.getDate()).padStart(2, "0");
+  const todayStr = `${year}-${month}-${day}`;
 
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
@@ -155,13 +187,9 @@ async function generateAndSave() {
     fs.mkdirSync(puzzleDir, { recursive: true });
   }
 
-  // To allow for re-running the test, we will delete the file for today if it exists.
-  // In production, the schedule only runs once, so this is safe.
   if (fs.existsSync(puzzlePath)) {
-    console.log(
-      `A puzzle for ${todayStr} already exists. Deleting it to generate a new one for this test run.`
-    );
-    fs.unlinkSync(puzzlePath);
+    console.log(`A puzzle for ${todayStr} (IST) already exists. Skipping.`);
+    return;
   }
 
   console.log(`Generating new puzzle for ${todayStr} (IST)...`);
