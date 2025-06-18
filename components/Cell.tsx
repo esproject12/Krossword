@@ -2,7 +2,7 @@ import React from "react";
 import type { CellCheckState } from "../types";
 
 interface CellProps {
-  value: string | null; // User's input, null for black square
+  value: string | null;
   clueNumber?: number;
   isBlackSquare: boolean;
   isActive: boolean;
@@ -11,7 +11,6 @@ interface CellProps {
   onChange: (value: string) => void;
   onFocus: () => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  onClick: () => void;
   inputRef?: React.RefCallback<HTMLInputElement>;
 }
 
@@ -25,7 +24,6 @@ const Cell: React.FC<CellProps> = ({
   onChange,
   onFocus,
   onKeyDown,
-  onClick,
   inputRef,
 }) => {
   if (isBlackSquare) {
@@ -34,8 +32,7 @@ const Cell: React.FC<CellProps> = ({
     );
   }
 
-  // Determine cell background color with a clear priority order
-  let cellBgColor = "bg-white"; // Default
+  let cellBgColor = "bg-white";
   if (isWordActive) cellBgColor = "bg-blue-100";
   if (isActive) cellBgColor = "bg-blue-200";
   if (checkState === "incorrect") cellBgColor = "bg-red-200";
@@ -48,7 +45,7 @@ const Cell: React.FC<CellProps> = ({
   return (
     <div
       className={`${baseClasses} ${cellBgColor} ${ringClass}`}
-      onClick={onClick}
+      onClick={onFocus} // Changed to onFocus to trigger cell activation
     >
       {clueNumber && (
         <span className="absolute top-0 left-0.5 text-xs text-gray-600 font-normal select-none pointer-events-none">
@@ -60,12 +57,11 @@ const Cell: React.FC<CellProps> = ({
         type="text"
         maxLength={1}
         value={value || ""}
-        onChange={(e) => onChange(e.target.value.toUpperCase())}
+        onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onKeyDown={onKeyDown}
         className="w-full h-full text-center p-0 m-0 border-0 text-inherit"
         aria-label={`cell input ${clueNumber ? `clue ${clueNumber}` : ""}`}
-        // disabled={checkState === 'correct'} // Optionally disable correct cells
       />
     </div>
   );
