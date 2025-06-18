@@ -58,7 +58,7 @@ const App: React.FC = () => {
       direction: Orientation,
       data: CrosswordData | null = crosswordData
     ): WordDefinition | undefined => {
-      if (!data) return undefined;
+      if (!data || !cell) return undefined;
       return data.words.find((word) => {
         if (word.orientation !== direction) return false;
         if (direction === "ACROSS") {
@@ -83,49 +83,14 @@ const App: React.FC = () => {
     if (activeCell) {
       const word = findWordAtCell(activeCell, activeDirection);
       setActiveWord(word || null);
+    } else {
+      setActiveWord(null);
     }
   }, [activeCell, activeDirection, findWordAtCell]);
 
-  useEffect(() => {
-    if (isTimerRunning && !isPuzzleSolved) {
-      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isTimerRunning, isPuzzleSolved]);
-
-  const checkPuzzleSolved = useCallback(() => {
-    if (!userGrid || !crosswordData?.solutionGrid) return false;
-    for (let r = 0; r < crosswordData.gridSize; r++) {
-      for (let c = 0; c < crosswordData.gridSize; c++) {
-        if (
-          crosswordData.solutionGrid[r]?.[c] &&
-          userGrid[r]?.[c]?.toUpperCase() !==
-            crosswordData.solutionGrid[r]?.[c]?.toUpperCase()
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }, [userGrid, crosswordData]);
-
-  useEffect(() => {
-    if (checkPuzzleSolved()) {
-      setIsPuzzleSolved(true);
-      setIsTimerRunning(false);
-      if (crosswordData?.solutionGrid) {
-        setCellCheckGrid(
-          crosswordData.solutionGrid.map((row) =>
-            row.map((cell) => (cell ? "correct" : null))
-          )
-        );
-      }
-    }
-  }, [checkPuzzleSolved, crosswordData]);
+  const startTimer = () => {
+    if (!isTimerRunning && !isPuzzleSolved) setIsTimerRunning(true);
+  };
 
   const initializeGrids = (data: CrosswordData) => {
     setUserGrid(
@@ -133,7 +98,7 @@ const App: React.FC = () => {
     );
     setCellCheckGrid(
       data.solutionGrid.map((row) =>
-        row.map((cell) => (cell ? "unchecked" : null))
+        row.map((cell) => (cell ? ("unchecked" as CellCheckState) : null))
       )
     );
     setIsPuzzleSolved(false);
@@ -155,7 +120,6 @@ const App: React.FC = () => {
       setCrosswordData(data);
       initializeGrids(data);
     } catch (err) {
-      console.warn(`Failed to load puzzle for ${today}. Trying sample.`);
       try {
         const sampleData = await fetchPreGeneratedCrossword(
           SAMPLE_PUZZLE_DATE_STRING
@@ -166,7 +130,6 @@ const App: React.FC = () => {
           `Today's puzzle (${today}) was not found. Displaying a sample puzzle.`
         );
       } catch (sampleErr) {
-        console.error("Failed to load sample puzzle:", sampleErr);
         setError(`Failed to load any puzzles. Please try again later.`);
       }
     } finally {
@@ -178,23 +141,66 @@ const App: React.FC = () => {
     loadCrossword();
   }, [loadCrossword]);
 
-  const startTimer = () => {
-    if (!isTimerRunning && !isPuzzleSolved) setIsTimerRunning(true);
-  };
+  useEffect(() => {
+    if (isTimerRunning && !isPuzzleSolved) {
+      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isTimerRunning, isPuzzleSolved]);
+
+  const checkPuzzleSolved = useCallback(() => {
+    if (!userGrid || !crosswordData?.solutionGrid) return false;
+    for (let r = 0; r < crosswordData.gridSize; r++) {
+      for (let c = 0; c < crosswordData.gridSize; c++) {
+        const solutionCell = crosswordData.solutionGrid[r]?.[c];
+        if (
+          solutionCell &&
+          userGrid[r]?.[c]?.toUpperCase() !== solutionCell.toUpperCase()
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }, [userGrid, crosswordData]);
+
+  useEffect(() => {
+    if (checkPuzzleSolved()) {
+      setIsPuzzleSolved(true);
+      setIsTimerRunning(false);
+    }
+  }, [userGrid, checkPuzzleSolved]);
 
   const moveToNextCell = () => {
     if (!activeCell || !activeWord) return;
     let { row, col } = activeCell;
-    const { length, startPosition } = activeWord;
+    const { length, startPosition, orientation } = activeWord;
 
-    if (activeDirection === "ACROSS") {
+    if (orientation === "ACROSS") {
       if (col < startPosition.col + length - 1) {
         setActiveCell({ row, col: col + 1 });
       }
     } else {
+      // DOWN
       if (row < startPosition.row + length - 1) {
         setActiveCell({ row: row + 1, col });
       }
+    }
+  };
+
+  const moveToPrevCell = () => {
+    if (!activeCell) return;
+    let { row, col } = activeCell;
+
+    if (activeDirection === "ACROSS") {
+      if (col > 0) setActiveCell({ row, col: col - 1 });
+    } else {
+      // DOWN
+      if (row > 0) setActiveCell({ row: row - 1, col });
     }
   };
 
@@ -207,21 +213,23 @@ const App: React.FC = () => {
       return;
     }
 
-    const newUserGrid = [...userGrid];
-    newUserGrid[row] = [...newUserGrid[row]];
-    newUserGrid[row][col] = value.substring(0, 1).toUpperCase();
+    const newUserGrid = userGrid.map((r, rIdx) =>
+      rIdx === row
+        ? r.map((c, cIdx) =>
+            cIdx === col ? value.substring(0, 1).toUpperCase() : c
+          )
+        : r
+    );
     setUserGrid(newUserGrid);
 
     if (cellCheckGrid) {
-      const newCheckGrid = [...cellCheckGrid];
-      newCheckGrid[row] = [...newCheckGrid[row]];
-      newCheckGrid[row][col] = "unchecked";
+      const newCheckGrid = cellCheckGrid.map((r, rIdx) =>
+        rIdx === row ? r.map((c, cIdx) => (cIdx === col ? "unchecked" : c)) : r
+      );
       setCellCheckGrid(newCheckGrid);
     }
 
-    if (value) {
-      moveToNextCell();
-    }
+    if (value) moveToNextCell();
   };
 
   const handleCellFocus = (row: number, col: number) => {
@@ -233,13 +241,16 @@ const App: React.FC = () => {
     if (isSameCell) {
       newDirection = activeDirection === "ACROSS" ? "DOWN" : "ACROSS";
       if (!findWordAtCell({ row, col }, newDirection)) {
-        newDirection = activeDirection; // Revert if no word in new direction
+        newDirection = activeDirection; // Revert if no word in the new direction
       }
     } else {
+      // When moving to a new cell, try to keep the direction.
+      // If the new cell isn't part of a word in that direction, switch.
       if (!findWordAtCell({ row, col }, newDirection)) {
         newDirection = activeDirection === "ACROSS" ? "DOWN" : "ACROSS";
       }
     }
+
     setActiveCell({ row, col });
     setActiveDirection(newDirection);
   };
@@ -258,10 +269,9 @@ const App: React.FC = () => {
     col: number
   ) => {
     if (isPuzzleSolved) return;
-
     if (event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
       startTimer();
-      return; // Let onChange handle it
+      return;
     }
     event.preventDefault();
 
@@ -275,7 +285,7 @@ const App: React.FC = () => {
         newCol < (crosswordData?.gridSize || 0) &&
         crosswordData?.solutionGrid[newRow][newCol] !== null
       ) {
-        handleCellFocus(newRow, newCol);
+        setActiveCell({ row: newRow, col: newCol });
       }
     };
 
@@ -301,15 +311,7 @@ const App: React.FC = () => {
         if (userGrid?.[row]?.[col]) {
           handleCellChange(row, col, "");
         } else {
-          const prevRow = activeDirection === "DOWN" ? row - 1 : row;
-          const prevCol = activeDirection === "ACROSS" ? col - 1 : col;
-          if (
-            prevRow >= 0 &&
-            prevCol >= 0 &&
-            crosswordData?.solutionGrid[prevRow][prevCol] !== null
-          ) {
-            setActiveCell({ row: prevRow, col: prevCol });
-          }
+          moveToPrevCell();
         }
         break;
       case "Enter":
@@ -322,22 +324,77 @@ const App: React.FC = () => {
   };
 
   const handleCheckPuzzle = () => {
-    /* Unchanged */
+    if (!userGrid || !crosswordData || !cellCheckGrid) return;
+    const newCheckGrid = userGrid.map((row, rIdx) =>
+      row.map((cell, cIdx) => {
+        if (crosswordData.solutionGrid[rIdx][cIdx] === null) return null;
+        if (!cell) return "unchecked";
+        return cell === crosswordData.solutionGrid[rIdx][cIdx]
+          ? "correct"
+          : "incorrect";
+      })
+    );
+    setCellCheckGrid(newCheckGrid);
   };
+
   const handleRevealWord = () => {
-    /* Unchanged */
+    if (!activeWord || !userGrid || !crosswordData) return;
+    startTimer();
+    let newUserGrid = [...userGrid];
+    let newCheckGrid = cellCheckGrid ? [...cellCheckGrid] : [];
+
+    for (let i = 0; i < activeWord.length; i++) {
+      let r = activeWord.startPosition.row;
+      let c = activeWord.startPosition.col;
+      if (activeWord.orientation === "ACROSS") c += i;
+      else r += i;
+
+      if (r < crosswordData.gridSize && c < crosswordData.gridSize) {
+        newUserGrid[r] = [...newUserGrid[r]];
+        newUserGrid[r][c] = crosswordData.solutionGrid[r][c];
+        if (newCheckGrid.length) {
+          newCheckGrid[r] = [...newCheckGrid[r]];
+          newCheckGrid[r][c] = "correct";
+        }
+      }
+    }
+    setUserGrid(newUserGrid);
+    if (newCheckGrid.length) setCellCheckGrid(newCheckGrid);
   };
+
   const handleRevealPuzzle = () => {
-    /* Unchanged */
+    if (!crosswordData) return;
+    startTimer();
+    setUserGrid(crosswordData.solutionGrid.map((r) => [...r]));
+    setCellCheckGrid(
+      crosswordData.solutionGrid.map((row) =>
+        row.map((cell) => (cell ? "correct" : null))
+      )
+    );
   };
+
   const handleClearPuzzle = () => {
     if (crosswordData) initializeGrids(crosswordData);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        {error}
+      </div>
+    );
   if (!crosswordData || !userGrid || !cellCheckGrid || !activeCell)
-    return <div>Initializing...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Initializing...
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-2 sm:p-4 max-w-5xl bg-gray-50 min-h-screen flex flex-col">
