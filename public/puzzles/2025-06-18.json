@@ -3,117 +3,141 @@
   "title": "Indian Mini Crossword - 2025-06-18",
   "words": [
     {
+      "id": 1,
+      "clue": "Indian classical dance form",
+      "answer": "BHANGRA",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 7
+    },
+    {
+      "id": 2,
+      "clue": "River in North India",
       "answer": "GANGES",
-      "clue": "River in India",
+      "orientation": "DOWN",
       "startPosition": {
         "row": 0,
         "col": 0
-      }
+      },
+      "length": 6
     },
     {
-      "answer": "ASOKA",
-      "clue": "Famous Indian emperor",
-      "startPosition": {
-        "row": 0,
-        "col": 5
-      }
-    },
-    {
-      "answer": "RIVER",
-      "clue": "Type of Ganges",
-      "startPosition": {
-        "row": 1,
-        "col": 0
-      }
-    },
-    {
-      "answer": "TANDOOR",
-      "clue": "Indian clay oven",
+      "id": 3,
+      "clue": "Spicy Indian dish",
+      "answer": "CURRY",
+      "orientation": "ACROSS",
       "startPosition": {
         "row": 2,
-        "col": 3
-      }
-    },
-    {
-      "answer": "MASALA",
-      "clue": "Indian spice blend",
-      "startPosition": {
-        "row": 3,
         "col": 0
-      }
+      },
+      "length": 5
     },
     {
-      "answer": "CURRY",
-      "clue": "Common Indian dish",
+      "id": 4,
+      "clue": "Indian bread",
+      "answer": "ROTI",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 2,
+        "col": 2
+      },
+      "length": 4
+    },
+    {
+      "id": 5,
+      "clue": "Large Indian city",
+      "answer": "DELHI",
+      "orientation": "ACROSS",
       "startPosition": {
         "row": 4,
         "col": 0
-      }
+      },
+      "length": 5
     },
     {
-      "answer": "OM",
-      "clue": "Sacred sound in Hinduism",
+      "id": 6,
+      "clue": "Indian spiritual leader",
+      "answer": "GURU",
+      "orientation": "DOWN",
       "startPosition": {
         "row": 4,
-        "col": 4
-      }
+        "col": 2
+      },
+      "length": 4
     },
     {
-      "answer": "LOTA",
-      "clue": "Traditional Indian water pot",
+      "id": 7,
+      "clue": "Indian musical instrument",
+      "answer": "SITAR",
+      "orientation": "ACROSS",
       "startPosition": {
         "row": 5,
         "col": 2
-      }
+      },
+      "length": 5
+    },
+    {
+      "id": 8,
+      "clue": "Type of tea",
+      "answer": "MASALA",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 6
     }
   ],
   "solutionGrid": [
     [
+      "B",
       "G",
+      "C",
+      "R",
+      "D",
+      "M"
+    ],
+    [
+      "H",
+      "A",
+      "U",
+      "O",
+      "E",
+      "A"
+    ],
+    [
       "A",
       "N",
+      "R",
+      "T",
+      "L",
+      "S"
+    ],
+    [
+      "N",
+      "G",
+      "R",
+      "I",
+      "H",
+      "A"
+    ],
+    [
       "G",
       "E",
-      "S"
+      "G",
+      "U",
+      "I",
+      "L"
     ],
     [
       "R",
       "S",
-      "O",
+      "S",
       "R",
-      "I",
-      "A"
-    ],
-    [
-      "I",
-      "O",
-      "K",
       "T",
-      "V",
-      "A"
-    ],
-    [
-      "V",
-      "K",
-      "A",
-      "A",
-      "E",
-      "K"
-    ],
-    [
-      "E",
-      "A",
-      "M",
-      "N",
-      "O",
-      "M"
-    ],
-    [
-      "R",
-      "L",
-      "O",
-      "D",
-      "R",
       "A"
     ]
   ]
