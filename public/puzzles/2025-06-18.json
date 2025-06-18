@@ -4,75 +4,20 @@
   "words": [
     {
       "id": 1,
-      "clue": "Indian classical dance form",
-      "answer": "BHANGRA",
+      "clue": "Capital city of India",
+      "answer": "DELHI",
       "orientation": "ACROSS",
       "startPosition": {
         "row": 0,
         "col": 0
-      },
-      "length": 7
-    },
-    {
-      "id": 2,
-      "clue": "River in North India",
-      "answer": "GANGES",
-      "orientation": "DOWN",
-      "startPosition": {
-        "row": 0,
-        "col": 1
-      },
-      "length": 6
-    },
-    {
-      "id": 3,
-      "clue": "Spicy Indian dish",
-      "answer": "CURRY",
-      "orientation": "DOWN",
-      "startPosition": {
-        "row": 0,
-        "col": 3
       },
       "length": 5
     },
     {
       "id": 4,
-      "clue": "Indian unit of currency",
-      "answer": "RUPEE",
+      "clue": "Spiritual teacher or master",
+      "answer": "GURU",
       "orientation": "ACROSS",
-      "startPosition": {
-        "row": 2,
-        "col": 0
-      },
-      "length": 5
-    },
-    {
-      "id": 5,
-      "clue": "Large Indian city",
-      "answer": "DELHI",
-      "orientation": "DOWN",
-      "startPosition": {
-        "row": 2,
-        "col": 2
-      },
-      "length": 5
-    },
-    {
-      "id": 6,
-      "clue": "Yoga position",
-      "answer": "ASANA",
-      "orientation": "ACROSS",
-      "startPosition": {
-        "row": 4,
-        "col": 0
-      },
-      "length": 5
-    },
-    {
-      "id": 7,
-      "clue": "Indian fabric",
-      "answer": "SILK",
-      "orientation": "DOWN",
       "startPosition": {
         "row": 4,
         "col": 1
@@ -80,65 +25,98 @@
       "length": 4
     },
     {
-      "id": 8,
-      "clue": "Tea type",
-      "answer": "MASALA",
+      "id": 5,
+      "clue": "Steamed rice cake",
+      "answer": "IDLI",
       "orientation": "ACROSS",
       "startPosition": {
         "row": 5,
         "col": 2
       },
-      "length": 6
+      "length": 4
+    },
+    {
+      "id": 1,
+      "clue": "Lentil stew",
+      "answer": "DAAL",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 4
+    },
+    {
+      "id": 2,
+      "clue": "Sphere-shaped sweet",
+      "answer": "LADDU",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5
+    },
+    {
+      "id": 3,
+      "clue": "Festival of colors",
+      "answer": "HOLI",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 4
     }
   ],
   "solutionGrid": [
     [
-      "B",
-      "G",
-      "C",
-      "U",
-      "R",
-      "R"
-    ],
-    [
-      "H",
-      "A",
-      "U",
-      "R",
-      "R",
-      "Y"
-    ],
-    [
-      "A",
-      "N",
       "D",
       "E",
-      "E",
-      "S"
-    ],
-    [
-      "N",
-      "G",
-      "E",
       "L",
-      "L",
-      "A"
-    ],
-    [
-      "G",
-      "S",
-      "H",
       "H",
       "I",
-      "M"
+      null
     ],
     [
+      "A",
+      null,
+      "A",
+      "O",
+      null,
+      null
+    ],
+    [
+      "A",
+      null,
+      "D",
+      "L",
+      null,
+      null
+    ],
+    [
+      "L",
+      null,
+      "D",
+      "I",
+      null,
+      null
+    ],
+    [
+      null,
+      "G",
+      "U",
       "R",
+      "U",
+      null
+    ],
+    [
+      null,
+      null,
       "I",
-      "M",
-      "I",
+      "D",
       "L",
-      "A"
+      "I"
     ]
   ]
 }
