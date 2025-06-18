@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { fetchPreGeneratedCrossword } from "./services/geminiService";
 import type {
   CrosswordData,
@@ -12,10 +12,10 @@ import type {
 import CrosswordGrid from "./components/CrosswordGrid";
 import ClueList from "./components/ClueList";
 import Toolbar from "./components/Toolbar";
+import Timer from "./components/Timer"; // Import the new component
 import { DEFAULT_GRID_SIZE } from "./constants";
 
 const getTodayDateString = (): string => {
-  // Use the IST-aware date string for fetching today's puzzle
   const now = new Date();
   const istDateString = now.toLocaleString("en-US", {
     timeZone: "Asia/Kolkata",
@@ -32,7 +32,7 @@ interface CachedCrossword {
   data: CrosswordData;
 }
 
-const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28"; // Date of the existing sample puzzle
+const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28";
 
 const App: React.FC = () => {
   const [crosswordData, setCrosswordData] = useState<CrosswordData | null>(
@@ -51,6 +51,34 @@ const App: React.FC = () => {
     undefined
   );
 
+  // Timer State
+  const [time, setTime] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Timer Lifecycle Logic
+  useEffect(() => {
+    if (isTimerRunning && !isPuzzleSolved) {
+      timerRef.current = setInterval(() => {
+        setTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerRunning, isPuzzleSolved]);
+
+  const startTimer = () => {
+    if (!isTimerRunning && !isPuzzleSolved) {
+      setIsTimerRunning(true);
+    }
+  };
+
   const initializeGrids = (data: CrosswordData) => {
     const newUserGrid: UserGrid = data.solutionGrid.map((row) =>
       row.map((cell) => (cell === null ? null : ""))
@@ -64,6 +92,10 @@ const App: React.FC = () => {
     );
     setCellCheckGrid(newCellCheckGrid);
     setIsPuzzleSolved(false);
+
+    // Reset timer state for new puzzle
+    setTime(0);
+    setIsTimerRunning(false);
   };
 
   const setActiveWordAndCell = (data: CrosswordData) => {
@@ -197,7 +229,6 @@ const App: React.FC = () => {
         activeCell.col,
         activeDirection
       );
-      // Find the specific word object that matches the ID AND orientation
       const activeWord = crosswordData.words.find(
         (w) => w.id === currentWord?.id && w.orientation === activeDirection
       );
@@ -225,6 +256,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (checkPuzzleSolved()) {
       setIsPuzzleSolved(true);
+      setIsTimerRunning(false);
       if (crosswordData?.solutionGrid) {
         const newCheckGrid: CellCheckGrid = crosswordData.solutionGrid.map(
           (rowCells) =>
@@ -236,6 +268,7 @@ const App: React.FC = () => {
   }, [userGrid, crosswordData, checkPuzzleSolved]);
 
   const handleCellChange = (row: number, col: number, value: string) => {
+    startTimer();
     if (!userGrid || !crosswordData?.solutionGrid || isPuzzleSolved) return;
     const newUserGrid = userGrid.map((r) => [...r]);
     newUserGrid[row][col] = value.substring(0, 1).toUpperCase();
@@ -279,11 +312,8 @@ const App: React.FC = () => {
 
   const handleCellFocus = (row: number, col: number) => {
     if (crosswordData?.solutionGrid?.[row]?.[col] === null) return;
-
     const oldActiveCell = activeCell;
     const newActiveCell = { row, col };
-
-    // If clicking the same cell twice, toggle direction
     if (oldActiveCell?.row === row && oldActiveCell?.col === col) {
       const wordAcross = findWordAtCell(row, col, "ACROSS");
       const wordDown = findWordAtCell(row, col, "DOWN");
@@ -291,8 +321,6 @@ const App: React.FC = () => {
         setActiveDirection((prev) => (prev === "ACROSS" ? "DOWN" : "ACROSS"));
       }
     } else {
-      // If moving to a new cell, try to maintain direction.
-      // Only switch if the new cell doesn't support the current direction.
       const supportsCurrentDirection = findWordAtCell(
         row,
         col,
@@ -320,15 +348,13 @@ const App: React.FC = () => {
     col: number
   ) => {
     if (!crosswordData?.solutionGrid || !activeCell || isPuzzleSolved) return;
-
     if (event.key.length === 1 && event.key.match(/[a-zA-Z]/i)) {
+      startTimer(); // Also start timer on keyboard input
       return;
     }
-
     let newRow = row,
       newCol = col,
       moved = false;
-
     const moveAndSetDirection = (dr: number, dc: number, dir: Orientation) => {
       event.preventDefault();
       setActiveDirection(dir);
@@ -356,7 +382,6 @@ const App: React.FC = () => {
         moved = true;
       }
     };
-
     switch (event.key) {
       case "ArrowUp":
         moveAndSetDirection(-1, 0, "DOWN");
@@ -372,13 +397,14 @@ const App: React.FC = () => {
         break;
       case "Backspace":
         event.preventDefault();
+        startTimer();
         if (userGrid?.[row]?.[col]) {
           handleCellChange(row, col, "");
         } else {
           const dr = activeDirection === "DOWN" ? -1 : 0;
           const dc = activeDirection === "ACROSS" ? -1 : 0;
-          let prevR = row + dr;
-          let prevC = col + dc;
+          let prevR = row + dr,
+            prevC = col + dc;
           while (
             prevR >= 0 &&
             prevR < crosswordData.gridSize &&
@@ -404,12 +430,11 @@ const App: React.FC = () => {
       case "Enter":
       case "Tab":
         event.preventDefault();
-        handleCellFocus(row, col); // Re-use the toggle logic
+        handleCellFocus(row, col);
         return;
       default:
         return;
     }
-
     if (moved) {
       setActiveCell({ row: newRow, col: newCol });
     }
@@ -426,7 +451,6 @@ const App: React.FC = () => {
   const handleCheckPuzzle = () => {
     if (!userGrid || !crosswordData?.solutionGrid || !cellCheckGrid) return;
     const newCheckGrid = cellCheckGrid.map((r) => [...r]);
-
     for (let r = 0; r < crosswordData.gridSize; r++) {
       for (let c = 0; c < crosswordData.gridSize; c++) {
         if (crosswordData.solutionGrid[r]?.[c] !== null) {
@@ -445,16 +469,15 @@ const App: React.FC = () => {
   };
 
   const revealWord = (wordDef: WordDefinition) => {
+    startTimer();
     if (!userGrid || !crosswordData?.solutionGrid || !cellCheckGrid) return;
     const newUserGrid = userGrid.map((r) => [...r]);
     const newCheckGrid = cellCheckGrid.map((r) => [...r]);
-
     for (let i = 0; i < wordDef.length; i++) {
       let r = wordDef.startPosition.row;
       let c = wordDef.startPosition.col;
       if (wordDef.orientation === "ACROSS") c += i;
       else r += i;
-
       if (r < crosswordData.gridSize && c < crosswordData.gridSize) {
         newUserGrid[r][c] = crosswordData.solutionGrid[r][c];
         newCheckGrid[r][c] = "correct";
@@ -477,6 +500,7 @@ const App: React.FC = () => {
   };
 
   const handleRevealPuzzle = () => {
+    startTimer();
     if (!crosswordData?.solutionGrid) return;
     setUserGrid(crosswordData.solutionGrid.map((r) => [...r]));
     setCellCheckGrid(
@@ -508,10 +532,7 @@ const App: React.FC = () => {
     );
   }
 
-  if (
-    error &&
-    (!crosswordData || !crosswordData.words || crosswordData.words.length === 0)
-  ) {
+  if (error && (!crosswordData || crosswordData.words.length === 0)) {
     return (
       <div className="flex flex-col justify-center items-center h-screen text-red-600 p-4 bg-red-50 text-center">
         <svg
@@ -561,22 +582,24 @@ const App: React.FC = () => {
           </p>
         )}
       </header>
-
       <main className="flex flex-col lg:flex-row gap-4 md:gap-6 items-start justify-center flex-grow">
         <div className="w-full lg:w-auto flex flex-col items-center">
-          <div
-            className="mb-3 p-2 border border-gray-300 rounded-md bg-white shadow text-sm text-gray-700 min-h-[4em] flex items-center justify-center text-center w-full max-w-md"
-            role="status"
-            aria-live="polite"
-          >
-            <span className="font-semibold mr-2">
-              {activeWordId
-                ? `${activeWordId} ${
-                    activeDirection === "ACROSS" ? "Across" : "Down"
-                  }: `
-                : ""}
-            </span>
-            {currentClue}
+          <div className="w-full max-w-md flex justify-between items-center mb-3 gap-2">
+            <div
+              className="p-2 border border-gray-300 rounded-md bg-white shadow-sm text-sm text-gray-700 min-h-[4em] flex items-center justify-center text-center flex-grow"
+              role="status"
+              aria-live="polite"
+            >
+              <span className="font-semibold mr-2">
+                {activeWordId
+                  ? `${activeWordId} ${
+                      activeDirection === "ACROSS" ? "Across" : "Down"
+                    }: `
+                  : ""}
+              </span>
+              {currentClue}
+            </div>
+            <Timer time={time} />
           </div>
           <CrosswordGrid
             crosswordData={crosswordData}
@@ -597,7 +620,6 @@ const App: React.FC = () => {
             isPuzzleSolved={isPuzzleSolved}
           />
         </div>
-
         <div className="w-full lg:flex-1 bg-white p-3 rounded-lg shadow-md overflow-hidden">
           {isPuzzleSolved && (
             <div
@@ -618,7 +640,8 @@ const App: React.FC = () => {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              Congratulations! You solved the puzzle!
+              Congratulations! You solved the puzzle in {Math.floor(time / 60)}m{" "}
+              {time % 60}s!
             </div>
           )}
           <ClueList
