@@ -1,0 +1,120 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-18",
+  "words": [
+    {
+      "answer": "GANGES",
+      "clue": "River in India",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "answer": "ASOKA",
+      "clue": "Famous Indian emperor",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "answer": "RIVER",
+      "clue": "Type of Ganges",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "answer": "TANDOOR",
+      "clue": "Indian clay oven",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "answer": "MASALA",
+      "clue": "Indian spice blend",
+      "startPosition": {
+        "row": 3,
+        "col": 0
+      }
+    },
+    {
+      "answer": "CURRY",
+      "clue": "Common Indian dish",
+      "startPosition": {
+        "row": 4,
+        "col": 0
+      }
+    },
+    {
+      "answer": "OM",
+      "clue": "Sacred sound in Hinduism",
+      "startPosition": {
+        "row": 4,
+        "col": 4
+      }
+    },
+    {
+      "answer": "LOTA",
+      "clue": "Traditional Indian water pot",
+      "startPosition": {
+        "row": 5,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "G",
+      "A",
+      "N",
+      "G",
+      "E",
+      "S"
+    ],
+    [
+      "R",
+      "S",
+      "O",
+      "R",
+      "I",
+      "A"
+    ],
+    [
+      "I",
+      "O",
+      "K",
+      "T",
+      "V",
+      "A"
+    ],
+    [
+      "V",
+      "K",
+      "A",
+      "A",
+      "E",
+      "K"
+    ],
+    [
+      "E",
+      "A",
+      "M",
+      "N",
+      "O",
+      "M"
+    ],
+    [
+      "R",
+      "L",
+      "O",
+      "D",
+      "R",
+      "A"
+    ]
+  ]
+}
