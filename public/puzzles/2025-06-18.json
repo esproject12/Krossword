@@ -1,0 +1,119 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-18",
+  "words": [
+    {
+      "id": 1,
+      "clue": "Indian classical dance form",
+      "answer": "BHANGRA",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "clue": "Spicy Indian stew",
+      "answer": "CURRY",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "clue": "River in India",
+      "answer": "GANGES",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 4,
+      "clue": "Indian bread",
+      "answer": "ROTI",
+      "startPosition": {
+        "row": 4,
+        "col": 0
+      }
+    },
+    {
+      "id": 5,
+      "clue": "Capital of India",
+      "answer": "DELHI",
+      "startPosition": {
+        "row": 4,
+        "col": 4
+      }
+    },
+    {
+      "id": 6,
+      "clue": "Indian fabric",
+      "answer": "SILK",
+      "startPosition": {
+        "row": 5,
+        "col": 2
+      }
+    },
+    {
+      "id": 7,
+      "clue": "South Indian state",
+      "answer": "KERALA",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "B",
+      "H",
+      "A",
+      "N",
+      "G",
+      "R"
+    ],
+    [
+      "A",
+      "K",
+      "E",
+      "R",
+      "A",
+      "Y"
+    ],
+    [
+      "G",
+      "E",
+      "R",
+      "A",
+      "L",
+      "U"
+    ],
+    [
+      "A",
+      "L",
+      "A",
+      "L",
+      "H",
+      "R"
+    ],
+    [
+      "R",
+      "O",
+      "T",
+      "I",
+      "D",
+      "I"
+    ],
+    [
+      "A",
+      "S",
+      "I",
+      "L",
+      "K",
+      "C"
+    ]
+  ]
+}
