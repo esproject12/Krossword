@@ -15,7 +15,16 @@ import Toolbar from "./components/Toolbar";
 import { DEFAULT_GRID_SIZE } from "./constants";
 
 const getTodayDateString = (): string => {
-  return new Date().toISOString().split("T")[0];
+  // Use the IST-aware date string for fetching today's puzzle
+  const now = new Date();
+  const istDateString = now.toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  const istDate = new Date(istDateString);
+  const year = istDate.getFullYear();
+  const month = String(istDate.getMonth() + 1).padStart(2, "0");
+  const day = String(istDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 interface CachedCrossword {
@@ -494,7 +503,7 @@ const App: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-screen text-xl text-gray-700 bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mr-3"></div>
-        Loading Daily Indian Crossword...
+        Loading Daily Dodo Krossword...
       </div>
     );
   }
@@ -541,8 +550,11 @@ const App: React.FC = () => {
     <div className="container mx-auto p-2 sm:p-4 max-w-5xl bg-gray-50 min-h-screen flex flex-col">
       <header className="text-center my-4 sm:my-6">
         <h1 className="text-3xl sm:text-4xl font-bold text-blue-700 tracking-tight">
-          {crosswordData.title || "Indian Mini Crossword"}
+          Dodo Krossword
         </h1>
+        <p className="text-lg text-gray-600 mt-1">
+          {crosswordData.title || "Daily Indian Mini"}
+        </p>
         {error && crosswordData.words.length > 0 && (
           <p className="text-sm text-red-500 mt-2 bg-red-100 p-2 rounded-md shadow">
             Note: {error}
@@ -618,7 +630,7 @@ const App: React.FC = () => {
         </div>
       </main>
       <footer className="text-center text-xs text-gray-500 mt-auto py-4 border-t border-gray-200">
-        Daily Indian Crossword powered by Gemini. A new puzzle every day!
+        Dodo Krossword – daily puzzles inspired by India!
       </footer>
     </div>
   );
