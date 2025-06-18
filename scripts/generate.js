@@ -7,23 +7,54 @@ import path from "path";
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const EXPECTED_GRID_SIZE = 6;
 
-// --- TIMEZONE-AWARE DATE FUNCTION ---
-const getTodayDateString = () => {
-  // Create a date object based on current time
-  const now = new Date();
-  // Convert it to an IST-specific string (UTC+5:30)
-  // toLocaleString is a standard way to get timezone-specific dates
-  const istDateString = now.toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata",
-  });
-  // Create a new date object from this IST string to avoid timezone-offset issues
-  const istDate = new Date(istDateString);
-  // Format it into YYYY-MM-DD
-  const year = istDate.getFullYear();
-  const month = String(istDate.getMonth() + 1).padStart(2, "0");
-  const day = String(istDate.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+// --- NEW "PARANOID" VALIDATION FUNCTION ---
+function validatePuzzleData(data) {
+  if (!data) {
+    throw new Error("Validation failed: Received data is null or undefined.");
+  }
+  if (data.gridSize !== EXPECTED_GRID_SIZE) {
+    throw new Error(
+      `Validation failed: Expected gridSize ${EXPECTED_GRID_SIZE}, but got ${data.gridSize}.`
+    );
+  }
+  if (
+    !Array.isArray(data.solutionGrid) ||
+    data.solutionGrid.length !== EXPECTED_GRID_SIZE
+  ) {
+    throw new Error(
+      `Validation failed: solutionGrid is not a ${EXPECTED_GRID_SIZE}-row array.`
+    );
+  }
+  for (const row of data.solutionGrid) {
+    if (!Array.isArray(row) || row.length !== EXPECTED_GRID_SIZE) {
+      throw new Error(
+        `Validation failed: A row in solutionGrid is not ${EXPECTED_GRID_SIZE} columns long.`
+      );
+    }
+  }
+  if (!Array.isArray(data.words) || data.words.length === 0) {
+    throw new Error("Validation failed: 'words' array is missing or empty.");
+  }
+  for (const word of data.words) {
+    if (
+      !word.id ||
+      !word.clue ||
+      !word.answer ||
+      !word.orientation ||
+      !word.startPosition
+    ) {
+      throw new Error(
+        `Validation failed: A word object is missing required properties. Received: ${JSON.stringify(
+          word
+        )}`
+      );
+    }
+  }
+  console.log(
+    `Validation passed: Received a ${data.gridSize}x${data.gridSize} puzzle with ${data.words.length} complete word entries.`
+  );
+  return true;
+}
 
 // --- Main Generation Logic ---
 async function generateCrosswordWithGemini() {
@@ -35,7 +66,7 @@ async function generateCrosswordWithGemini() {
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  const today = getTodayDateString(); // This will now correctly get the IST date
+  const today = new Date().toISOString().split("T")[0];
 
   const prompt = `
     You are a crossword puzzle creator.
@@ -45,15 +76,16 @@ async function generateCrosswordWithGemini() {
     {
       "gridSize": 6,
       "title": "Indian Mini Crossword - ${today}",
-      "words": [],
+      "words": [
+        { "id": 1, "clue": "Example clue", "answer": "EXAMPLE", "orientation": "ACROSS", "startPosition": {"row": 0, "col": 0}, "length": 7 }
+      ],
       "solutionGrid": []
     }
     Key requirements:
-    1. Grid size MUST be exactly 6x6.
-    2. 'words' array MUST contain all words placed and not be empty.
-    3. 'answer' must be all uppercase and match 'solutionGrid'.
-    4. 'startPosition' is 0-indexed {row, col}.
-    5. 'solutionGrid' MUST be a 6x6 array.
+    1. gridSize MUST be exactly 6.
+    2. 'words' array MUST contain all words placed and MUST NOT be empty.
+    3. Every object in the 'words' array MUST have all properties: id, clue, answer, orientation, startPosition, length.
+    4. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle.
     `;
 
   const result = await ai.models.generateContent({
@@ -61,7 +93,7 @@ async function generateCrosswordWithGemini() {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
-      temperature: 0.85,
+      temperature: 0.9,
     },
   });
 
@@ -91,19 +123,10 @@ async function generateCrosswordWithGemini() {
   }
   const data = JSON.parse(jsonStr);
 
-  if (
-    !data ||
-    data.gridSize !== EXPECTED_GRID_SIZE ||
-    !data.solutionGrid ||
-    data.solutionGrid.length !== EXPECTED_GRID_SIZE ||
-    !data.words ||
-    data.words.length === 0
-  ) {
-    throw new Error(`Validation failed for generated puzzle.`);
-  }
-  console.log(
-    `Validation passed: Received a ${data.gridSize}x${data.gridSize} puzzle with ${data.words.length} words.`
-  );
+  // Run the new, strict validation
+  validatePuzzleData(data);
+
+  // Normalize data
   data.words.forEach((word) => (word.answer = word.answer.toUpperCase()));
   data.solutionGrid.forEach((row) => {
     if (row) {
@@ -117,22 +140,31 @@ async function generateCrosswordWithGemini() {
 
 // --- File Saving Logic ---
 async function generateAndSave() {
-  const today = getTodayDateString(); // This will get the correct IST date
+  const today = new Date()
+    .toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    .split(",")[0];
+  const [month, day, year] = today.split("/");
+  const todayStr = `${year}-${String(month).padStart(2, "0")}-${String(
+    day
+  ).padStart(2, "0")}`;
+
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
-  const puzzlePath = path.join(puzzleDir, `${today}.json`);
+  const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
 
   if (!fs.existsSync(puzzleDir)) {
     fs.mkdirSync(puzzleDir, { recursive: true });
   }
 
+  // To allow for re-running the test, we will delete the file for today if it exists.
+  // In production, the schedule only runs once, so this is safe.
   if (fs.existsSync(puzzlePath)) {
     console.log(
-      `Puzzle for ${today} (IST) already exists. Skipping generation.`
+      `A puzzle for ${todayStr} already exists. Deleting it to generate a new one for this test run.`
     );
-    return;
+    fs.unlinkSync(puzzlePath);
   }
 
-  console.log(`Generating new puzzle for ${today} (IST)...`);
+  console.log(`Generating new puzzle for ${todayStr} (IST)...`);
   try {
     const crosswordData = await generateCrosswordWithGemini();
     fs.writeFileSync(puzzlePath, JSON.stringify(crosswordData, null, 2));
