@@ -80,11 +80,13 @@ const App: React.FC = () => {
   );
 
   useEffect(() => {
-    if (activeCell) {
-      const word = findWordAtCell(activeCell, activeDirection);
+    if (activeCell && crosswordData) {
+      const word = findWordAtCell(activeCell, activeDirection, crosswordData);
       setActiveWord(word || null);
+    } else {
+      setActiveWord(null);
     }
-  }, [activeCell, activeDirection, findWordAtCell]);
+  }, [activeCell, activeDirection, findWordAtCell, crosswordData]);
 
   const startTimer = () => {
     if (!isTimerRunning && !isPuzzleSolved) setIsTimerRunning(true);
@@ -109,6 +111,47 @@ const App: React.FC = () => {
     }
   };
 
+  const loadCrossword = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    const today = getTodayDateString();
+    try {
+      const data = await fetchPreGeneratedCrossword(today);
+      setCrosswordData(data);
+      initializeGrids(data);
+    } catch (err) {
+      try {
+        const sampleData = await fetchPreGeneratedCrossword(
+          SAMPLE_PUZZLE_DATE_STRING
+        );
+        setCrosswordData(sampleData);
+        initializeGrids(sampleData);
+        setError(
+          `Today's puzzle (${today}) was not found. Displaying a sample puzzle.`
+        );
+      } catch (sampleErr) {
+        setError(`Failed to load any puzzles. Please try again later.`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCrossword();
+  }, [loadCrossword]);
+
+  useEffect(() => {
+    if (isTimerRunning && !isPuzzleSolved) {
+      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isTimerRunning, isPuzzleSolved]);
+
   const checkPuzzleSolved = useCallback(() => {
     if (!userGrid || !crosswordData?.solutionGrid) return false;
     for (let r = 0; r < crosswordData.gridSize; r++) {
@@ -124,24 +167,6 @@ const App: React.FC = () => {
     }
     return true;
   }, [userGrid, crosswordData]);
-
-  useEffect(() => {
-    const loadCrossword = async () => {
-      /* Unchanged */
-    };
-    loadCrossword();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (isTimerRunning && !isPuzzleSolved) {
-      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [isTimerRunning, isPuzzleSolved]);
 
   useEffect(() => {
     if (checkPuzzleSolved()) {
@@ -169,46 +194,41 @@ const App: React.FC = () => {
   const moveToPrevCell = () => {
     if (!activeCell) return;
     let { row, col } = activeCell;
-    if (activeDirection === "ACROSS" && col > 0) {
-      setActiveCell({ row, col: col - 1 });
-    } else if (activeDirection === "DOWN" && row > 0) {
-      setActiveCell({ row: row - 1, col });
+    if (activeDirection === "ACROSS") {
+      const newCol = col - 1;
+      if (newCol >= 0) setActiveCell({ row, col: newCol });
+    } else {
+      const newRow = row - 1;
+      if (newRow >= 0) setActiveCell({ row: newRow, col });
     }
   };
 
-  // *** REWRITTEN LOGIC BASED ON NYT ***
   const handleCellChange = (row: number, col: number, value: string) => {
     if (!userGrid || isPuzzleSolved) return;
     startTimer();
-
     const upperValue = value.substring(0, 1).toUpperCase();
-    const cellWasEmpty = userGrid[row][col] === "";
+    const cellWasEmpty = !userGrid[row][col];
 
-    // Rule #4: Skip on Match
     if (userGrid[row][col] === upperValue) {
       moveToNextCell();
       return;
     }
 
-    // Update grid
     const newUserGrid = userGrid.map((r, rIdx) =>
       rIdx === row ? r.map((c, cIdx) => (cIdx === col ? upperValue : c)) : r
     );
     setUserGrid(newUserGrid);
 
-    // Update check grid
     if (cellCheckGrid) {
-      const newCheckGrid = [...cellCheckGrid];
-      newCheckGrid[row] = [...newCheckGrid[row]];
-      newCheckGrid[row][col] = "unchecked";
+      const newCheckGrid = cellCheckGrid.map((r, rIdx) =>
+        rIdx === row ? r.map((c, cIdx) => (cIdx === col ? "unchecked" : c)) : r
+      );
       setCellCheckGrid(newCheckGrid);
     }
 
-    // Rule #2: Auto-Advance on Fill
     if (cellWasEmpty && upperValue) {
       moveToNextCell();
     }
-    // Rule #3 (No Auto-Advance on Overwrite) is handled implicitly, as we only advance if `cellWasEmpty`.
   };
 
   const handleCellFocus = (row: number, col: number) => {
@@ -219,8 +239,8 @@ const App: React.FC = () => {
 
     if (isSameCell) {
       newDirection = activeDirection === "ACROSS" ? "DOWN" : "ACROSS";
-      if (!findWordAtCell({ row, col }, newDirection)) {
-        newDirection = activeDirection;
+      if (!findWordAtCell({ row, col }, newDirection, crosswordData)) {
+        newDirection = activeDirection; // Revert if no word in the new direction
       }
     }
 
@@ -236,7 +256,6 @@ const App: React.FC = () => {
     setActiveDirection(orientation);
   };
 
-  // *** REWRITTEN LOGIC BASED ON NYT ***
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
     row: number,
@@ -244,10 +263,10 @@ const App: React.FC = () => {
   ) => {
     if (isPuzzleSolved) return;
     if (event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
-      return; // Let onChange handle typing
+      startTimer();
+      return;
     }
     event.preventDefault();
-    startTimer();
 
     const move = (dr: number, dc: number, dir: Orientation) => {
       setActiveDirection(dir);
@@ -278,11 +297,11 @@ const App: React.FC = () => {
         move(0, 1, "ACROSS");
         break;
       case "Backspace":
-        // Rule #5: Backspace Logic
+        startTimer();
         if (userGrid?.[row]?.[col]) {
-          handleCellChange(row, col, ""); // Clear current cell and stay put
+          handleCellChange(row, col, "");
         } else {
-          moveToPrevCell(); // If empty, move to previous cell
+          moveToPrevCell();
         }
         break;
       case "Enter":
@@ -294,7 +313,6 @@ const App: React.FC = () => {
     }
   };
 
-  // ... Other handlers (check, reveal, clear) are unchanged but will now work correctly ...
   const handleCheckPuzzle = () => {
     if (!userGrid || !crosswordData || !cellCheckGrid) return;
     const newCheckGrid = userGrid.map((row, rIdx) =>
@@ -310,10 +328,10 @@ const App: React.FC = () => {
   };
 
   const handleRevealWord = () => {
-    if (!activeWord || !userGrid || !crosswordData) return;
+    if (!activeWord || !userGrid || !crosswordData || !cellCheckGrid) return;
     startTimer();
     let newUserGrid = [...userGrid];
-    let newCheckGrid = cellCheckGrid ? [...cellCheckGrid] : [];
+    let newCheckGrid = [...cellCheckGrid];
 
     for (let i = 0; i < activeWord.length; i++) {
       let r = activeWord.startPosition.row;
@@ -324,14 +342,12 @@ const App: React.FC = () => {
       if (r < crosswordData.gridSize && c < crosswordData.gridSize) {
         newUserGrid[r] = [...newUserGrid[r]];
         newUserGrid[r][c] = crosswordData.solutionGrid[r][c];
-        if (newCheckGrid.length) {
-          newCheckGrid[r] = [...newCheckGrid[r]];
-          newCheckGrid[r][c] = "correct";
-        }
+        newCheckGrid[r] = [...newCheckGrid[r]];
+        newCheckGrid[r][c] = "correct";
       }
     }
     setUserGrid(newUserGrid);
-    if (newCheckGrid.length) setCellCheckGrid(newCheckGrid);
+    setCellCheckGrid(newCheckGrid);
   };
 
   const handleRevealPuzzle = () => {
@@ -351,14 +367,15 @@ const App: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="flex justify-center items-center h-screen text-xl text-gray-700">
+        Loading Daily Dodo Krossword...
       </div>
     );
   if (error)
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        {error}
+      <div className="flex flex-col justify-center items-center h-screen text-red-600 p-4 text-center">
+        <h2>Error Loading Puzzle</h2>
+        <p>{error}</p>
       </div>
     );
   if (!crosswordData || !userGrid || !cellCheckGrid || !activeCell)

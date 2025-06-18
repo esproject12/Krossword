@@ -45,7 +45,7 @@ const Cell: React.FC<CellProps> = ({
   return (
     <div
       className={`${baseClasses} ${cellBgColor} ${ringClass}`}
-      onClick={onFocus} // Changed to onFocus to trigger cell activation
+      onClick={onFocus}
     >
       {clueNumber && (
         <span className="absolute top-0 left-0.5 text-xs text-gray-600 font-normal select-none pointer-events-none">
@@ -60,7 +60,7 @@ const Cell: React.FC<CellProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
         onKeyDown={onKeyDown}
-        className="w-full h-full text-center p-0 m-0 border-0 text-inherit"
+        className="w-full h-full text-center p-0 m-0 border-0 bg-transparent text-inherit"
         aria-label={`cell input ${clueNumber ? `clue ${clueNumber}` : ""}`}
       />
     </div>
