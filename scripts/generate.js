@@ -1,146 +1,162 @@
-// This is the final, self-contained script with the new word length constraint.
+// This is the final version with a minimum word count requirement.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
+import { templates } from "./templates/grid-templates.js";
 
-// --- Configuration ---
+// --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
-const EXPECTED_GRID_SIZE = 6;
-const MAX_RETRIES = 3;
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
+const MAX_RETRIES = 5;
+const MINIMUM_WORDS = 8; // The new minimum word count!
 
-// --- Validation Functions ---
-function validatePuzzleLogic(data) {
-  console.log("Performing logic-based validation...");
-  const { gridSize, words, solutionGrid: geminiGrid } = data;
-  const localGrid = Array(gridSize)
+// --- TEMPLATE-BASED LOGIC ---
+function findSlots(template) {
+  const slots = [];
+  const size = template.length;
+
+  const numberGrid = Array(size)
+    .fill(null)
+    .map(() => Array(size).fill(0));
+  let id = 1;
+
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (template[r][c] === "0") continue;
+      const isAcrossStart = c === 0 || template[r][c - 1] === "0";
+      const isDownStart = r === 0 || template[r - 1][c] === "0";
+
+      if (isAcrossStart || isDownStart) {
+        numberGrid[r][c] = id++;
+      }
+    }
+  }
+
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      if (template[r][c] === "0") continue;
+      const isAcrossStart = c === 0 || template[r][c - 1] === "0";
+      const isDownStart = r === 0 || template[r - 1][c] === "0";
+
+      if (isAcrossStart) {
+        let length = 0;
+        while (c + length < size && template[r][c + length] === "1") length++;
+        if (length > 1)
+          slots.push({
+            id: numberGrid[r][c],
+            orientation: "ACROSS",
+            start: { row: r, col: c },
+            length,
+          });
+      }
+
+      if (isDownStart) {
+        let length = 0;
+        while (r + length < size && template[r + length][c] === "1") length++;
+        if (length > 1)
+          slots.push({
+            id: numberGrid[r][c],
+            orientation: "DOWN",
+            start: { row: r, col: c },
+            length,
+          });
+      }
+    }
+  }
+  return slots;
+}
+
+function buildPuzzle(template, filledSlots, date) {
+  const gridSize = template.length;
+  const solutionGrid = Array(gridSize)
     .fill(null)
     .map(() => Array(gridSize).fill(null));
-  for (const word of words) {
-    const { answer, startPosition, orientation } = word;
-    if (!answer || !startPosition)
-      throw new Error(
-        `Validation Error: Invalid word object: ${JSON.stringify(word)}`
-      );
-    let { row, col } = startPosition;
-    for (let i = 0; i < answer.length; i++) {
-      const char = answer[i];
-      if (row >= gridSize || col >= gridSize)
-        throw new Error(
-          `Validation Error: Word "${answer}" goes out of bounds.`
-        );
-      if (localGrid[row][col] !== null && localGrid[row][col] !== char)
-        throw new Error(
-          `Validation Error: Conflict at (${row},${col}). Word "${answer}" wants '${char}', grid has '${localGrid[row][col]}'.`
-        );
-      localGrid[row][col] = char;
-      if (orientation === "ACROSS") col++;
-      else row++;
+  const words = [];
+  const slotMap = new Map();
+  findSlots(template).forEach((slot) => {
+    const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
+    slotMap.set(key, { id: slot.id });
+  });
+
+  for (const filled of filledSlots) {
+    const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
+    const slotInfo = slotMap.get(key);
+    if (slotInfo) {
+      words.push({ ...filled, id: slotInfo.id });
+      const { answer, start, orientation } = filled;
+      let { row, col } = start;
+      for (const char of answer) {
+        if (row < gridSize && col < gridSize) {
+          solutionGrid[row][col] = char;
+          if (orientation === "ACROSS") col++;
+          else row++;
+        }
+      }
     }
   }
+
+  // Fill in black squares
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
-      const localCell = localGrid[r][c] || null;
-      const geminiCell = geminiGrid[r][c] || null;
-      if (localCell !== geminiCell)
-        throw new Error(
-          `Validation Error: Grid mismatch at (${r},${c}). Local:'${localCell}', Gemini:'${geminiCell}'.`
-        );
+      if (template[r][c] === "0") {
+        solutionGrid[r][c] = null;
+      }
     }
   }
-  console.log("Logic-based validation successful!");
-  return true;
+
+  return {
+    gridSize,
+    title: `Indian Mini Crossword - ${date}`,
+    words,
+    solutionGrid,
+  };
 }
 
-function validateBasicStructure(data) {
-  if (!data) throw new Error("Validation failed: Data is null.");
-  if (data.gridSize !== EXPECTED_GRID_SIZE)
-    throw new Error(`Validation failed: gridSize is ${data.gridSize}.`);
-  if (
-    !Array.isArray(data.solutionGrid) ||
-    data.solutionGrid.length !== EXPECTED_GRID_SIZE
-  )
-    throw new Error(
-      `Validation failed: solutionGrid is not ${EXPECTED_GRID_SIZE} rows.`
-    );
-  for (const row of data.solutionGrid) {
-    if (!Array.isArray(row) || row.length !== EXPECTED_GRID_SIZE)
-      throw new Error(
-        `Validation failed: A row is not ${EXPECTED_GRID_SIZE} columns.`
-      );
-  }
-  if (!Array.isArray(data.words) || data.words.length === 0)
-    throw new Error("Validation failed: 'words' array is empty.");
-  for (const word of data.words) {
-    if (
-      !word.id ||
-      !word.clue ||
-      !word.answer ||
-      !word.orientation ||
-      !word.startPosition
-    )
-      throw new Error(
-        `Validation failed: A word object is missing properties.`
-      );
-  }
-  console.log(`Basic structure validation passed.`);
-  return true;
-}
-
-async function selfCorrectJson(ai, brokenJson) {
-  console.log("Attempting to self-correct invalid JSON...");
-  const correctionPrompt = `The following text is supposed to be a single, valid JSON object, but it has a syntax error. Please fix it and return only the corrected, valid JSON object with no other text or markdown fences.\n\nInvalid JSON:\n${brokenJson}`;
-  const result = await ai.models.generateContent({
-    model: GEMINI_MODEL_NAME,
-    contents: [{ role: "user", parts: [{ text: correctionPrompt }] }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.0,
-    },
-  });
-  if (!result?.candidates?.[0]?.content?.parts?.[0]?.text)
-    throw new Error("Self-correction failed: Invalid response.");
-  console.log("Self-correction successful, re-parsing...");
-  return result.candidates[0].content.parts[0].text.trim();
-}
-
-// --- Main Generation Logic with Word Length Constraint ---
-async function generateCrosswordWithGemini(yesterdaysWords = []) {
+async function generateCrosswordWithGemini(slots, yesterdaysWords = []) {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
-  if (!apiKey)
-    throw new Error("CRITICAL: GEMINI_API_KEY_FROM_SECRET is not set.");
-
+  if (!apiKey) throw new Error("CRITICAL: API_KEY is not set.");
   const ai = new GoogleGenAI({ apiKey });
-  const today = new Date().toISOString().split("T")[0];
 
-  let uniquenessInstruction = "";
-  if (yesterdaysWords.length > 0) {
-    uniquenessInstruction = `\n    9. CRITICAL REQUIREMENT: The puzzle MUST be completely new. Do NOT use any of these words as answers: ${yesterdaysWords.join(
-      ", "
-    )}.`;
-  }
+  const uniquenessInstruction =
+    yesterdaysWords.length > 0
+      ? `Crucially, do NOT use any of these words: ${yesterdaysWords.join(
+          ", "
+        )}.`
+      : "";
 
   const prompt = `
-    You are a crossword puzzle creator.
-    Create a 6x6 crossword puzzle for the date ${today}. The theme must be related to India.
-    The puzzle must be valid, fully-interlocking, and have a reasonable density of words.
-    Provide the output as a single JSON object. The JSON must strictly follow this structure:
-    {
-      "gridSize": 6,
-      "title": "Indian Mini Crossword - ${today}",
-      "words": [
-        { "id": 1, "clue": "Example clue", "answer": "EXAMPLE", "orientation": "ACROSS", "startPosition": {"row": 0, "col": 0}, "length": 7 }
-      ],
-      "solutionGrid": []
-    }
-    Key requirements:
-    1. gridSize MUST be exactly 6.
-    2. 'words' array MUST contain all words placed and MUST NOT be empty.
-    3. Every object in the 'words' array MUST have all properties: id, clue, answer, orientation, startPosition, length.
-    4. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle.
-    5. VERY IMPORTANT: All answer words MUST be 6 letters long or less. Do not use words longer than 6 letters.
-    ${uniquenessInstruction}
-    `;
+    You are an expert crossword puzzle filler. Your task is to fill the following word slots with India-themed words and provide a clever clue for each.
+    All words must be in English.
+    
+    Word Slots to fill:
+    ${JSON.stringify(
+      slots.map((s) => ({
+        orientation: s.orientation,
+        length: s.length,
+        start: s.start,
+      })),
+      null,
+      2
+    )}
+    
+    Your response MUST be a valid JSON array of objects. Each object must represent a filled slot and have the properties "answer", "clue", "orientation", and "start".
+    Example response format:
+    [
+      {
+        "answer": "PANEER",
+        "clue": "A type of Indian cheese",
+        "orientation": "ACROSS",
+        "start": { "row": 0, "col": 0 },
+        "length": 6
+      }
+    ]
+    
+    Constraints:
+    1. The 'answer' for each object MUST exactly match the 'length' required by its corresponding slot.
+    2. The entire response MUST be a single, valid JSON array.
+    3. All words must interlock correctly. Ensure that if a letter is shared between an ACROSS and DOWN word, it is the same letter.
+    4. ${uniquenessInstruction}
+  `;
 
   const result = await ai.models.generateContent({
     model: GEMINI_MODEL_NAME,
@@ -151,53 +167,59 @@ async function generateCrosswordWithGemini(yesterdaysWords = []) {
     },
   });
 
-  if (!result?.candidates?.[0]?.content?.parts[0]?.text)
-    throw new Error("Failed to get a valid text part from Gemini.");
+  const jsonStr = result.response.text();
+  const filledSlots = JSON.parse(jsonStr);
 
-  let jsonStr = result.candidates[0].content.parts[0].text.trim();
-  let data;
-  try {
-    const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[1]) jsonStr = match[1].trim();
-    data = JSON.parse(jsonStr);
-  } catch (error) {
-    console.warn("Initial JSON.parse failed. Error:", error.message);
-    const correctedJsonStr = await selfCorrectJson(ai, jsonStr);
-    data = JSON.parse(correctedJsonStr);
+  if (!Array.isArray(filledSlots) || filledSlots.length > slots.length) {
+    throw new Error(
+      `AI returned an incorrect number of words. Expected <=${slots.length}, got ${filledSlots.length}`
+    );
   }
-  validateBasicStructure(data);
-  validatePuzzleLogic(data);
-  data.words.forEach((word) => (word.answer = word.answer.toUpperCase()));
-  data.solutionGrid.forEach((row) => {
-    if (row) {
-      row.forEach((cell, i) => {
-        if (typeof cell === "string") row[i] = cell.toUpperCase();
-      });
-    }
-  });
-  return data;
+
+  return filledSlots;
 }
 
-// --- File Saving Logic ---
 async function generateAndSave() {
   const now = new Date();
-  const istDateString = now.toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata",
-  });
-  const istDate = new Date(istDateString);
-  const year = istDate.getFullYear();
-  const month = String(istDate.getMonth() + 1).padStart(2, "0");
-  const day = String(istDate.getDate()).padStart(2, "0");
-  const todayStr = `${year}-${month}-${day}`;
+  const istDate = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+  );
+  const todayStr = `${istDate.getFullYear()}-${String(
+    istDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(istDate.getDate()).padStart(2, "0")}`;
 
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
   const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
 
   if (fs.existsSync(puzzlePath)) {
-    console.log(`A puzzle for ${todayStr} (IST) already exists. Skipping.`);
+    console.log(`Puzzle for ${todayStr} already exists. Skipping.`);
     return;
+  }
+
+  let chosenTemplate = null;
+  let slots = [];
+  let templateTries = 0;
+
+  while (!chosenTemplate && templateTries < templates.length * 2) {
+    const tempTemplate =
+      templates[Math.floor(Math.random() * templates.length)];
+    const tempSlots = findSlots(tempTemplate);
+    if (tempSlots.length >= MINIMUM_WORDS) {
+      chosenTemplate = tempTemplate;
+      slots = tempSlots;
+      console.log(
+        `Selected a template with ${slots.length} words (>=${MINIMUM_WORDS} required).`
+      );
+    }
+    templateTries++;
+  }
+
+  if (!chosenTemplate) {
+    console.error(
+      `Could not find a suitable template with at least ${MINIMUM_WORDS} words.`
+    );
+    // If no good template found, we will still resort to the sample puzzle.
   }
 
   let yesterdaysWords = [];
@@ -219,40 +241,38 @@ async function generateAndSave() {
           yesterdaysWords.join(", ")
         );
       }
-    } else {
-      console.log(
-        `No puzzle found for yesterday (${yesterdayFilename}). Generating a new puzzle without uniqueness constraints.`
-      );
     }
   } catch (e) {
-    console.warn(
-      "Could not read or parse yesterday's puzzle. Proceeding without uniqueness constraint.",
-      e.message
-    );
+    console.warn("Could not read yesterday's puzzle.", e.message);
   }
 
-  let crosswordData = null;
+  let finalPuzzleData = null;
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    console.log(
-      `--- Generating puzzle for ${todayStr} (IST) - Attempt ${attempt}/${MAX_RETRIES} ---`
-    );
-    try {
-      crosswordData = await generateCrosswordWithGemini(yesterdaysWords);
+  if (chosenTemplate) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       console.log(
-        `Successfully generated and validated a new puzzle on attempt ${attempt}.`
+        `--- Generating puzzle for ${todayStr} - Attempt ${attempt}/${MAX_RETRIES} ---`
       );
-      break;
-    } catch (error) {
-      console.error(`Attempt ${attempt} failed:`, error.message);
-      crosswordData = null;
-      if (attempt === MAX_RETRIES) {
-        console.error("All AI generation attempts failed.");
+      try {
+        const filledSlots = await generateCrosswordWithGemini(
+          slots,
+          yesterdaysWords
+        );
+        finalPuzzleData = buildPuzzle(chosenTemplate, filledSlots, todayStr);
+        console.log(
+          `Successfully generated and built puzzle on attempt ${attempt}.`
+        );
+        break;
+      } catch (error) {
+        console.error(`Attempt ${attempt} failed:`, error.message);
+        if (attempt === MAX_RETRIES) {
+          console.error("All AI generation attempts failed.");
+        }
       }
     }
   }
 
-  if (!crosswordData) {
+  if (!finalPuzzleData) {
     console.log("Resorting to fallback: copying sample puzzle.");
     try {
       if (!fs.existsSync(samplePuzzlePath)) {
@@ -277,8 +297,8 @@ async function generateAndSave() {
       process.exit(1);
     }
   } else {
-    fs.writeFileSync(puzzlePath, JSON.stringify(crosswordData, null, 2));
-    console.log(`Successfully generated and saved new puzzle to ${puzzlePath}`);
+    fs.writeFileSync(puzzlePath, JSON.stringify(finalPuzzleData, null, 2));
+    console.log(`Successfully saved new puzzle to ${puzzlePath}`);
   }
 }
 
