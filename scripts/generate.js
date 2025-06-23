@@ -1,4 +1,4 @@
-// This is a self-contained script with correct date logic for uniqueness.
+// This is the final, self-contained script with the new word length constraint.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -104,7 +104,7 @@ async function selfCorrectJson(ai, brokenJson) {
   return result.candidates[0].content.parts[0].text.trim();
 }
 
-// --- Main Generation Logic with Uniqueness ---
+// --- Main Generation Logic with Word Length Constraint ---
 async function generateCrosswordWithGemini(yesterdaysWords = []) {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
   if (!apiKey)
@@ -138,6 +138,7 @@ async function generateCrosswordWithGemini(yesterdaysWords = []) {
     2. 'words' array MUST contain all words placed and MUST NOT be empty.
     3. Every object in the 'words' array MUST have all properties: id, clue, answer, orientation, startPosition, length.
     4. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle.
+    5. VERY IMPORTANT: All answer words MUST be 6 letters long or less. Do not use words longer than 6 letters.
     ${uniquenessInstruction}
     `;
 
@@ -178,7 +179,7 @@ async function generateCrosswordWithGemini(yesterdaysWords = []) {
   return data;
 }
 
-// --- File Saving Logic with CORRECTED Date Logic ---
+// --- File Saving Logic ---
 async function generateAndSave() {
   const now = new Date();
   const istDateString = now.toLocaleString("en-US", {
@@ -199,12 +200,10 @@ async function generateAndSave() {
     return;
   }
 
-  // NEW: Read yesterday's puzzle to ensure uniqueness
   let yesterdaysWords = [];
   try {
-    const yesterday = new Date(istDate); // Start with today's IST date
-    yesterday.setDate(istDate.getDate() - 1); // Correctly subtract one day
-
+    const yesterday = new Date(istDate);
+    yesterday.setDate(istDate.getDate() - 1);
     const y_year = yesterday.getFullYear();
     const y_month = String(yesterday.getMonth() + 1).padStart(2, "0");
     const y_day = String(yesterday.getDate()).padStart(2, "0");
