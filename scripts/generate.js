@@ -1,4 +1,4 @@
-// This is a self-contained script with retry and fallback logic.
+// This is a self-contained script with correct date logic for uniqueness.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -7,7 +7,7 @@ import path from "path";
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const EXPECTED_GRID_SIZE = 6;
 const MAX_RETRIES = 3;
-const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json"; // The known good puzzle
+const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 
 // --- Validation Functions ---
 function validatePuzzleLogic(data) {
@@ -18,6 +18,10 @@ function validatePuzzleLogic(data) {
     .map(() => Array(gridSize).fill(null));
   for (const word of words) {
     const { answer, startPosition, orientation } = word;
+    if (!answer || !startPosition)
+      throw new Error(
+        `Validation Error: Invalid word object: ${JSON.stringify(word)}`
+      );
     let { row, col } = startPosition;
     for (let i = 0; i < answer.length; i++) {
       const char = answer[i];
@@ -100,15 +104,43 @@ async function selfCorrectJson(ai, brokenJson) {
   return result.candidates[0].content.parts[0].text.trim();
 }
 
-// --- Main Generation Logic ---
-async function generateCrosswordWithGemini() {
+// --- Main Generation Logic with Uniqueness ---
+async function generateCrosswordWithGemini(yesterdaysWords = []) {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
   if (!apiKey)
     throw new Error("CRITICAL: GEMINI_API_KEY_FROM_SECRET is not set.");
+
   const ai = new GoogleGenAI({ apiKey });
   const today = new Date().toISOString().split("T")[0];
-  const prompt = `You are a crossword puzzle creator... [prompt content is the same]`;
-  // The rest of this function is unchanged...
+
+  let uniquenessInstruction = "";
+  if (yesterdaysWords.length > 0) {
+    uniquenessInstruction = `\n    9. CRITICAL REQUIREMENT: The puzzle MUST be completely new. Do NOT use any of these words as answers: ${yesterdaysWords.join(
+      ", "
+    )}.`;
+  }
+
+  const prompt = `
+    You are a crossword puzzle creator.
+    Create a 6x6 crossword puzzle for the date ${today}. The theme must be related to India.
+    The puzzle must be valid, fully-interlocking, and have a reasonable density of words.
+    Provide the output as a single JSON object. The JSON must strictly follow this structure:
+    {
+      "gridSize": 6,
+      "title": "Indian Mini Crossword - ${today}",
+      "words": [
+        { "id": 1, "clue": "Example clue", "answer": "EXAMPLE", "orientation": "ACROSS", "startPosition": {"row": 0, "col": 0}, "length": 7 }
+      ],
+      "solutionGrid": []
+    }
+    Key requirements:
+    1. gridSize MUST be exactly 6.
+    2. 'words' array MUST contain all words placed and MUST NOT be empty.
+    3. Every object in the 'words' array MUST have all properties: id, clue, answer, orientation, startPosition, length.
+    4. 'solutionGrid' MUST be a 6x6 array and accurately represent the solved puzzle.
+    ${uniquenessInstruction}
+    `;
+
   const result = await ai.models.generateContent({
     model: GEMINI_MODEL_NAME,
     contents: [{ role: "user", parts: [{ text: prompt }] }],
@@ -117,8 +149,10 @@ async function generateCrosswordWithGemini() {
       temperature: 0.9,
     },
   });
+
   if (!result?.candidates?.[0]?.content?.parts[0]?.text)
     throw new Error("Failed to get a valid text part from Gemini.");
+
   let jsonStr = result.candidates[0].content.parts[0].text.trim();
   let data;
   try {
@@ -144,7 +178,7 @@ async function generateCrosswordWithGemini() {
   return data;
 }
 
-// --- NEW File Saving Logic with Retry and Fallback ---
+// --- File Saving Logic with CORRECTED Date Logic ---
 async function generateAndSave() {
   const now = new Date();
   const istDateString = now.toLocaleString("en-US", {
@@ -160,13 +194,42 @@ async function generateAndSave() {
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
   const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
 
-  if (!fs.existsSync(puzzleDir)) {
-    fs.mkdirSync(puzzleDir, { recursive: true });
-  }
-
   if (fs.existsSync(puzzlePath)) {
     console.log(`A puzzle for ${todayStr} (IST) already exists. Skipping.`);
     return;
+  }
+
+  // NEW: Read yesterday's puzzle to ensure uniqueness
+  let yesterdaysWords = [];
+  try {
+    const yesterday = new Date(istDate); // Start with today's IST date
+    yesterday.setDate(istDate.getDate() - 1); // Correctly subtract one day
+
+    const y_year = yesterday.getFullYear();
+    const y_month = String(yesterday.getMonth() + 1).padStart(2, "0");
+    const y_day = String(yesterday.getDate()).padStart(2, "0");
+    const yesterdayFilename = `${y_year}-${y_month}-${y_day}.json`;
+    const yesterdayPath = path.join(puzzleDir, yesterdayFilename);
+
+    if (fs.existsSync(yesterdayPath)) {
+      const yesterdayData = JSON.parse(fs.readFileSync(yesterdayPath, "utf-8"));
+      if (yesterdayData.words) {
+        yesterdaysWords = yesterdayData.words.map((w) => w.answer);
+        console.log(
+          "Found yesterday's words to avoid:",
+          yesterdaysWords.join(", ")
+        );
+      }
+    } else {
+      console.log(
+        `No puzzle found for yesterday (${yesterdayFilename}). Generating a new puzzle without uniqueness constraints.`
+      );
+    }
+  } catch (e) {
+    console.warn(
+      "Could not read or parse yesterday's puzzle. Proceeding without uniqueness constraint.",
+      e.message
+    );
   }
 
   let crosswordData = null;
@@ -176,7 +239,7 @@ async function generateAndSave() {
       `--- Generating puzzle for ${todayStr} (IST) - Attempt ${attempt}/${MAX_RETRIES} ---`
     );
     try {
-      crosswordData = await generateCrosswordWithGemini();
+      crosswordData = await generateCrosswordWithGemini(yesterdaysWords);
       console.log(
         `Successfully generated and validated a new puzzle on attempt ${attempt}.`
       );
