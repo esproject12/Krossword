@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history so the script can find yesterday's puzzle
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
