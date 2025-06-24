@@ -1,4 +1,4 @@
-// This is the final version with a minimum word count requirement.
+// This is the final version with the correct API response parsing.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -8,7 +8,7 @@ import { templates } from "./templates/grid-templates.js";
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_RETRIES = 5;
-const MINIMUM_WORDS = 8; // The new minimum word count!
+const MINIMUM_WORDS = 8;
 
 // --- TEMPLATE-BASED LOGIC ---
 function findSlots(template) {
@@ -95,11 +95,14 @@ function buildPuzzle(template, filledSlots, date) {
     }
   }
 
-  // Fill in black squares
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
-      if (template[r][c] === "0") {
-        solutionGrid[r][c] = null;
+      if (template[r][c] === "0" && solutionGrid[r][c] === null) {
+        // It's a black square
+      } else if (template[r][c] === "1" && solutionGrid[r][c] === null) {
+        throw new Error(
+          `Logical Error: Cell [${r},${c}] should have a letter but is empty.`
+        );
       }
     }
   }
@@ -167,13 +170,20 @@ async function generateCrosswordWithGemini(slots, yesterdaysWords = []) {
     },
   });
 
-  const jsonStr = result.response.text();
+  if (!result?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    console.error(
+      "Unexpected response structure:",
+      JSON.stringify(result, null, 2)
+    );
+    throw new Error("Failed to get a valid text part from Gemini response.");
+  }
+
+  const jsonStr = result.candidates[0].content.parts[0].text;
+
   const filledSlots = JSON.parse(jsonStr);
 
-  if (!Array.isArray(filledSlots) || filledSlots.length > slots.length) {
-    throw new Error(
-      `AI returned an incorrect number of words. Expected <=${slots.length}, got ${filledSlots.length}`
-    );
+  if (!Array.isArray(filledSlots)) {
+    throw new Error("AI response was not a JSON array.");
   }
 
   return filledSlots;
@@ -219,7 +229,6 @@ async function generateAndSave() {
     console.error(
       `Could not find a suitable template with at least ${MINIMUM_WORDS} words.`
     );
-    // If no good template found, we will still resort to the sample puzzle.
   }
 
   let yesterdaysWords = [];
