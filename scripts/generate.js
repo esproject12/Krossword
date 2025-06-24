@@ -1,4 +1,4 @@
-// Final version with rate-limit handling and markdown cleanup.
+// Final version with the absolute correct API response parsing.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -7,11 +7,11 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 3; // Reduced retries as the new logic is more reliable
+const MAX_RETRIES = 5;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 2500; // 2.5 second delay between API calls to respect rate limits
+const API_DELAY_MS = 2500;
 
-// --- HELPER FUNCTION FOR DELAY ---
+// --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // --- TEMPLATE-BASED LOGIC ---
@@ -119,6 +119,7 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
 async function generateCrosswordWithChainOfThought(
   slots,
   yesterdaysWords = []
@@ -158,9 +159,11 @@ async function generateCrosswordWithChainOfThought(
     const prompt = `
       You are an expert crossword puzzle word filler.
       Task: Find a single, India-themed English word and a clever, short clue for it.
+      
       Word to find: A ${length}-letter word matching the pattern "${currentWordPattern}".
       Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
       ${uniquenessConstraint}
+      
       Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
       Do NOT include markdown fences, explanations, or any other text.
     `;
@@ -179,17 +182,16 @@ async function generateCrosswordWithChainOfThought(
       },
     });
 
-    // Corrected response parsing
-    if (!result?.response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    // Corrected response parsing based on actual logs
+    if (!result?.candidates?.[0]?.content?.parts?.[0]?.text) {
       console.error(
         "Unexpected response structure:",
         JSON.stringify(result, null, 2)
       );
       throw new Error("Failed to get a valid text part from Gemini response.");
     }
-    let jsonStr = result.response.candidates[0].content.parts[0].text.trim();
+    let jsonStr = result.candidates[0].content.parts[0].text.trim();
 
-    // Restore markdown fence cleanup
     const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
     const match = jsonStr.match(fenceRegex);
     if (match && match[1]) {
@@ -224,6 +226,7 @@ async function generateCrosswordWithChainOfThought(
   return filledSlots;
 }
 
+// --- FILE SAVING AND RETRY LOGIC ---
 async function generateAndSave() {
   const now = new Date();
   const istDate = new Date(
