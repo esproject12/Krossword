@@ -1,4 +1,4 @@
-// Final version with Chain-of-Thought generation
+// Final version with all logic correctly wired.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -14,7 +14,6 @@ const MINIMUM_WORDS = 8;
 function findSlots(template) {
   const slots = [];
   const size = template.length;
-
   const numberGrid = Array(size)
     .fill(null)
     .map(() => Array(size).fill(0));
@@ -25,7 +24,6 @@ function findSlots(template) {
       if (template[r][c] === "0") continue;
       const isAcrossStart = c === 0 || template[r][c - 1] === "0";
       const isDownStart = r === 0 || template[r - 1][c] === "0";
-
       if (isAcrossStart || isDownStart) {
         numberGrid[r][c] = id++;
       }
@@ -37,7 +35,6 @@ function findSlots(template) {
       if (template[r][c] === "0") continue;
       const isAcrossStart = c === 0 || template[r][c - 1] === "0";
       const isDownStart = r === 0 || template[r - 1][c] === "0";
-
       if (isAcrossStart) {
         let length = 0;
         while (c + length < size && template[r][c + length] === "1") length++;
@@ -49,7 +46,6 @@ function findSlots(template) {
             length,
           });
       }
-
       if (isDownStart) {
         let length = 0;
         while (r + length < size && template[r + length][c] === "1") length++;
@@ -82,11 +78,19 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
     if (slotInfo) {
+      if (filled.answer.length !== filled.length) {
+        throw new Error(`AI word "${filled.answer}" length mismatch.`);
+      }
       words.push({ ...filled, id: slotInfo.id });
       const { answer, start, orientation } = filled;
       let { row, col } = start;
       for (const char of answer) {
         if (row < gridSize && col < gridSize) {
+          if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
+            throw new Error(
+              `Intersection conflict at [${row},${col}] for word "${answer}".`
+            );
+          }
           solutionGrid[row][col] = char;
           if (orientation === "ACROSS") col++;
           else row++;
@@ -102,7 +106,6 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
-
   return {
     gridSize,
     title: `Indian Mini Crossword - ${date}`,
@@ -111,6 +114,7 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
 async function generateCrosswordWithChainOfThought(
   slots,
   yesterdaysWords = []
@@ -127,7 +131,10 @@ async function generateCrosswordWithChainOfThought(
 
   const uniquenessConstraint =
     yesterdaysWords.length > 0
-      ? `Do NOT use any of these words: ${yesterdaysWords.join(", ")}.`
+      ? `Do NOT use any of these words: ${[
+          ...yesterdaysWords,
+          ...filledSlots.map((f) => f.answer),
+        ].join(", ")}.`
       : "";
 
   for (const slot of sortedSlots) {
@@ -151,11 +158,9 @@ async function generateCrosswordWithChainOfThought(
     const prompt = `
       You are an expert crossword puzzle word filler.
       Task: Find a single, India-themed English word and a clever, short clue for it.
-      
       Word to find: A ${length}-letter word matching the pattern "${currentWordPattern}".
       Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
       ${uniquenessConstraint}
-      
       Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
       Do NOT include markdown fences, explanations, or any other text.
     `;
@@ -172,24 +177,31 @@ async function generateCrosswordWithChainOfThought(
     const responseText = result.response.text();
     const { answer, clue } = JSON.parse(responseText);
 
-    if (answer.length !== length) {
+    if (answer.toUpperCase().length !== length) {
       throw new Error(
         `AI returned word "${answer}" with length ${answer.length}, but slot requires ${length}.`
       );
     }
 
     let { row, col } = start;
-    for (const char of answer) {
+    for (const char of answer.toUpperCase()) {
       tempGrid[row][col] = char;
       if (orientation === "ACROSS") col++;
       else row++;
     }
-    filledSlots.push({ answer, clue, orientation, start, length });
+    filledSlots.push({
+      answer: answer.toUpperCase(),
+      clue,
+      orientation,
+      start,
+      length,
+    });
   }
 
   return filledSlots;
 }
 
+// --- FILE SAVING AND RETRY LOGIC ---
 async function generateAndSave() {
   const now = new Date();
   const istDate = new Date(
@@ -264,6 +276,7 @@ async function generateAndSave() {
         `--- Generating puzzle for ${todayStr} - Attempt ${attempt}/${MAX_RETRIES} ---`
       );
       try {
+        // **THIS IS THE CRITICAL FIX: CALLING THE CORRECT FUNCTION**
         const filledSlots = await generateCrosswordWithChainOfThought(
           slots,
           yesterdaysWords
