@@ -7,7 +7,7 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 5; // We can keep this high as each attempt is just one API call
+const MAX_RETRIES = 5;
 const MINIMUM_WORDS = 8;
 
 // --- TEMPLATE-BASED LOGIC ---
@@ -18,7 +18,6 @@ function findSlots(template) {
     .fill(null)
     .map(() => Array(size).fill(0));
   let id = 1;
-
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (template[r][c] === "0") continue;
@@ -29,7 +28,6 @@ function findSlots(template) {
       }
     }
   }
-
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (template[r][c] === "0") continue;
@@ -65,8 +63,17 @@ function findSlots(template) {
 function validatePuzzleLogic(data) {
   console.log("Performing logic-based validation...");
   const { gridSize, words, solutionGrid: geminiGrid } = data;
-  if (gridSize !== 6 || geminiGrid.length !== 6)
-    throw new Error("Grid size validation failed.");
+  if (
+    !data ||
+    !gridSize ||
+    gridSize !== 6 ||
+    !geminiGrid ||
+    geminiGrid.length !== 6
+  ) {
+    throw new Error(
+      "Basic puzzle structure (gridSize, solutionGrid) is invalid."
+    );
+  }
 
   const localGrid = Array(gridSize)
     .fill(null)
@@ -99,6 +106,7 @@ function validatePuzzleLogic(data) {
   return true;
 }
 
+// --- MAIN GENERATION LOGIC (SINGLE SHOT) ---
 async function generateSingleShotCrossword(slots, yesterdaysWords = []) {
   const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
   if (!apiKey) throw new Error("CRITICAL: API_KEY is not set.");
@@ -141,7 +149,8 @@ async function generateSingleShotCrossword(slots, yesterdaysWords = []) {
     2. The "answer" for each word MUST exactly match its specified length and fit the grid.
     3. The "solutionGrid" MUST be a 6x6 array and be logically consistent with all the answers in the "words" array. All intersections must match perfectly.
     4. All words and clues must be India-themed and in English.
-    5. ${uniquenessInstruction}
+    5. All answer words MUST be 6 letters long or less.
+    6. ${uniquenessInstruction}
   `;
 
   const result = await ai.models.generateContent({
@@ -170,6 +179,7 @@ async function generateSingleShotCrossword(slots, yesterdaysWords = []) {
   return data;
 }
 
+// --- FILE SAVING AND RETRY LOGIC ---
 async function generateAndSave() {
   const now = new Date();
   const istDate = new Date(
@@ -248,7 +258,7 @@ async function generateAndSave() {
           slots,
           yesterdaysWords
         );
-        finalPuzzleData = puzzleData; // Assign if successful
+        finalPuzzleData = puzzleData;
         console.log(
           `Successfully generated and validated a new puzzle on attempt ${attempt}.`
         );
@@ -287,6 +297,17 @@ async function generateAndSave() {
       process.exit(1);
     }
   } else {
+    // Normalize data just before saving
+    finalPuzzleData.words.forEach(
+      (word) => (word.answer = word.answer.toUpperCase())
+    );
+    finalPuzzleData.solutionGrid.forEach((row) => {
+      if (row) {
+        row.forEach((cell, i) => {
+          if (typeof cell === "string") row[i] = cell.toUpperCase();
+        });
+      }
+    });
     fs.writeFileSync(puzzlePath, JSON.stringify(finalPuzzleData, null, 2));
     console.log(`Successfully saved new puzzle to ${puzzlePath}`);
   }
