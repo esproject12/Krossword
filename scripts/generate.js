@@ -1,4 +1,4 @@
-// Final version with correct API response parsing.
+// Final version with rate-limit handling and markdown cleanup.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -7,14 +7,17 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 3; // Reduced retries as the new logic is more reliable
 const MINIMUM_WORDS = 8;
+const API_DELAY_MS = 2500; // 2.5 second delay between API calls to respect rate limits
+
+// --- HELPER FUNCTION FOR DELAY ---
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // --- TEMPLATE-BASED LOGIC ---
 function findSlots(template) {
   const slots = [];
   const size = template.length;
-
   const numberGrid = Array(size)
     .fill(null)
     .map(() => Array(size).fill(0));
@@ -25,7 +28,6 @@ function findSlots(template) {
       if (template[r][c] === "0") continue;
       const isAcrossStart = c === 0 || template[r][c - 1] === "0";
       const isDownStart = r === 0 || template[r - 1][c] === "0";
-
       if (isAcrossStart || isDownStart) {
         numberGrid[r][c] = id++;
       }
@@ -37,7 +39,6 @@ function findSlots(template) {
       if (template[r][c] === "0") continue;
       const isAcrossStart = c === 0 || template[r][c - 1] === "0";
       const isDownStart = r === 0 || template[r - 1][c] === "0";
-
       if (isAcrossStart) {
         let length = 0;
         while (c + length < size && template[r][c + length] === "1") length++;
@@ -49,7 +50,6 @@ function findSlots(template) {
             length,
           });
       }
-
       if (isDownStart) {
         let length = 0;
         while (r + length < size && template[r + length][c] === "1") length++;
@@ -82,6 +82,9 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
     if (slotInfo) {
+      if (filled.answer.length !== filled.length) {
+        throw new Error(`AI word "${filled.answer}" length mismatch.`);
+      }
       words.push({ ...filled, id: slotInfo.id });
       const { answer, start, orientation } = filled;
       let { row, col } = start;
@@ -129,7 +132,6 @@ async function generateCrosswordWithChainOfThought(
     .fill(null)
     .map(() => Array(6).fill(null));
   const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
-
   const usedWords = new Set(yesterdaysWords);
 
   for (const slot of sortedSlots) {
@@ -156,14 +158,17 @@ async function generateCrosswordWithChainOfThought(
     const prompt = `
       You are an expert crossword puzzle word filler.
       Task: Find a single, India-themed English word and a clever, short clue for it.
-      
       Word to find: A ${length}-letter word matching the pattern "${currentWordPattern}".
       Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
       ${uniquenessConstraint}
-      
       Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
       Do NOT include markdown fences, explanations, or any other text.
     `;
+
+    console.log(
+      `Requesting word for slot: ${length}-${orientation} at [${start.row},${start.col}]`
+    );
+    await sleep(API_DELAY_MS); // Respect rate limit
 
     const result = await ai.models.generateContent({
       model: GEMINI_MODEL_NAME,
@@ -174,16 +179,25 @@ async function generateCrosswordWithChainOfThought(
       },
     });
 
-    if (!result?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    // Corrected response parsing
+    if (!result?.response?.candidates?.[0]?.content?.parts?.[0]?.text) {
       console.error(
         "Unexpected response structure:",
         JSON.stringify(result, null, 2)
       );
       throw new Error("Failed to get a valid text part from Gemini response.");
     }
-    const responseText = result.candidates[0].content.parts[0].text;
+    let jsonStr = result.response.candidates[0].content.parts[0].text.trim();
 
-    const { answer, clue } = JSON.parse(responseText);
+    // Restore markdown fence cleanup
+    const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
+    const match = jsonStr.match(fenceRegex);
+    if (match && match[1]) {
+      console.log("Found and removed Markdown fences.");
+      jsonStr = match[1].trim();
+    }
+
+    const { answer, clue } = JSON.parse(jsonStr);
 
     const upperAnswer = answer.toUpperCase();
     if (upperAnswer.length !== length) {
