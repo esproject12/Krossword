@@ -1,4 +1,4 @@
-// Final version with the absolute correct API response parsing.
+// Final version optimized for API rate limits by using a single, powerful prompt.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -7,12 +7,8 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 5; // We can keep this high as each attempt is just one API call
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 2500;
-
-// --- HELPER FUNCTION ---
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // --- TEMPLATE-BASED LOGIC ---
 function findSlots(template) {
@@ -66,167 +62,114 @@ function findSlots(template) {
   return slots;
 }
 
-function buildPuzzle(template, filledSlots, date) {
-  const gridSize = template.length;
-  const solutionGrid = Array(gridSize)
+function validatePuzzleLogic(data) {
+  console.log("Performing logic-based validation...");
+  const { gridSize, words, solutionGrid: geminiGrid } = data;
+  if (gridSize !== 6 || geminiGrid.length !== 6)
+    throw new Error("Grid size validation failed.");
+
+  const localGrid = Array(gridSize)
     .fill(null)
     .map(() => Array(gridSize).fill(null));
-  let words = [];
-  const slotMap = new Map();
-  findSlots(template).forEach((slot) => {
-    const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
-    slotMap.set(key, { id: slot.id });
-  });
-
-  for (const filled of filledSlots) {
-    const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
-    const slotInfo = slotMap.get(key);
-    if (slotInfo) {
-      if (filled.answer.length !== filled.length) {
-        throw new Error(`AI word "${filled.answer}" length mismatch.`);
-      }
-      words.push({ ...filled, id: slotInfo.id });
-      const { answer, start, orientation } = filled;
-      let { row, col } = start;
-      for (const char of answer) {
-        if (row < gridSize && col < gridSize) {
-          if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
-            throw new Error(
-              `Intersection conflict at [${row},${col}] for word "${answer}".`
-            );
-          }
-          solutionGrid[row][col] = char;
-          if (orientation === "ACROSS") col++;
-          else row++;
-        }
-      }
-    }
-  }
-
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      if (template[r][c] === "0") {
-        solutionGrid[r][c] = null;
-      }
-    }
-  }
-
-  return {
-    gridSize,
-    title: `Indian Mini Crossword - ${date}`,
-    words,
-    solutionGrid,
-  };
-}
-
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
-async function generateCrosswordWithChainOfThought(
-  slots,
-  yesterdaysWords = []
-) {
-  const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
-  if (!apiKey) throw new Error("CRITICAL: API_KEY is not set.");
-  const ai = new GoogleGenAI({ apiKey });
-
-  const filledSlots = [];
-  const tempGrid = Array(6)
-    .fill(null)
-    .map(() => Array(6).fill(null));
-  const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
-  const usedWords = new Set(yesterdaysWords);
-
-  for (const slot of sortedSlots) {
-    const { length, orientation, start } = slot;
-    let constraints = [];
-    let currentWordPattern = "_".repeat(length);
-    const uniquenessConstraint = `Do NOT use any of these words: ${[
-      ...usedWords,
-    ].join(", ")}.`;
-
-    for (let i = 0; i < length; i++) {
-      const r = start.row + (orientation === "DOWN" ? i : 0);
-      const c = start.col + (orientation === "ACROSS" ? i : 0);
-      if (tempGrid[r][c]) {
-        constraints.push(
-          `The letter at index ${i} (0-indexed) must be '${tempGrid[r][c]}'.`
-        );
-        let pattern = currentWordPattern.split("");
-        pattern[i] = tempGrid[r][c];
-        currentWordPattern = pattern.join("");
-      }
-    }
-
-    const prompt = `
-      You are an expert crossword puzzle word filler.
-      Task: Find a single, India-themed English word and a clever, short clue for it.
-      
-      Word to find: A ${length}-letter word matching the pattern "${currentWordPattern}".
-      Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
-      ${uniquenessConstraint}
-      
-      Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
-      Do NOT include markdown fences, explanations, or any other text.
-    `;
-
-    console.log(
-      `Requesting word for slot: ${length}-${orientation} at [${start.row},${start.col}]`
-    );
-    await sleep(API_DELAY_MS); // Respect rate limit
-
-    const result = await ai.models.generateContent({
-      model: GEMINI_MODEL_NAME,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.7,
-      },
-    });
-
-    // Corrected response parsing based on actual logs
-    if (!result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-      console.error(
-        "Unexpected response structure:",
-        JSON.stringify(result, null, 2)
-      );
-      throw new Error("Failed to get a valid text part from Gemini response.");
-    }
-    let jsonStr = result.candidates[0].content.parts[0].text.trim();
-
-    const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[1]) {
-      console.log("Found and removed Markdown fences.");
-      jsonStr = match[1].trim();
-    }
-
-    const { answer, clue } = JSON.parse(jsonStr);
-
-    const upperAnswer = answer.toUpperCase();
-    if (upperAnswer.length !== length) {
-      throw new Error(
-        `AI returned word "${upperAnswer}" with length ${upperAnswer.length}, but slot requires ${length}.`
-      );
-    }
-    if (usedWords.has(upperAnswer)) {
-      throw new Error(
-        `AI returned a word that has already been used: ${upperAnswer}`
-      );
-    }
-
-    usedWords.add(upperAnswer);
-    let { row, col } = start;
-    for (const char of upperAnswer) {
-      tempGrid[row][col] = char;
+  for (const word of words) {
+    const { answer, startPosition, orientation } = word;
+    if (!answer || !startPosition)
+      throw new Error(`Invalid word object: ${JSON.stringify(word)}`);
+    let { row, col } = startPosition;
+    for (let i = 0; i < answer.length; i++) {
+      const char = answer[i];
+      if (row >= gridSize || col >= gridSize)
+        throw new Error(`Word "${answer}" goes out of bounds.`);
+      if (localGrid[row][col] && localGrid[row][col] !== char)
+        throw new Error(`Conflict at [${row},${col}] for word "${answer}".`);
+      localGrid[row][col] = char;
       if (orientation === "ACROSS") col++;
       else row++;
     }
-    filledSlots.push({ answer: upperAnswer, clue, orientation, start, length });
   }
-
-  return filledSlots;
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      const localCell = localGrid[r][c];
+      const geminiCell = geminiGrid[r][c];
+      if ((localCell || null) !== (geminiCell || null))
+        throw new Error(`Grid mismatch at [${r},${c}].`);
+    }
+  }
+  console.log("Logic-based validation successful!");
+  return true;
 }
 
-// --- FILE SAVING AND RETRY LOGIC ---
+async function generateSingleShotCrossword(slots, yesterdaysWords = []) {
+  const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
+  if (!apiKey) throw new Error("CRITICAL: API_KEY is not set.");
+  const ai = new GoogleGenAI({ apiKey });
+  const today = new Date().toISOString().split("T")[0];
+
+  const uniquenessInstruction =
+    yesterdaysWords.length > 0
+      ? `Crucially, do NOT use any of these words: ${yesterdaysWords.join(
+          ", "
+        )}.`
+      : "";
+
+  const prompt = `
+    You are an expert crossword puzzle creator. Your task is to generate a complete, valid, and interlocking set of words and clues for the provided puzzle grid structure.
+    
+    The puzzle grid is 6x6. Here are the exact word slots you must fill:
+    ${JSON.stringify(
+      slots.map((s) => ({
+        orientation: s.orientation,
+        length: s.length,
+        start: s.start,
+      })),
+      null,
+      2
+    )}
+
+    Your response MUST be a single, valid JSON object with the following structure:
+    {
+      "gridSize": 6,
+      "title": "Indian Mini Crossword - ${today}",
+      "words": [
+        { "id": 1, "clue": "...", "answer": "...", "orientation": "...", "startPosition": {...}, "length": ... }
+      ],
+      "solutionGrid": [ ["C", "R", "I", "C", "K", "E"], ["I", null, ...], ... ]
+    }
+
+    CRITICAL REQUIREMENTS:
+    1. The "words" array MUST contain an entry for every slot provided above.
+    2. The "answer" for each word MUST exactly match its specified length and fit the grid.
+    3. The "solutionGrid" MUST be a 6x6 array and be logically consistent with all the answers in the "words" array. All intersections must match perfectly.
+    4. All words and clues must be India-themed and in English.
+    5. ${uniquenessInstruction}
+  `;
+
+  const result = await ai.models.generateContent({
+    model: GEMINI_MODEL_NAME,
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.85,
+    },
+  });
+
+  if (!result?.response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    throw new Error("Failed to get a valid text part from Gemini response.");
+  }
+
+  let jsonStr = result.response.candidates[0].content.parts[0].text.trim();
+
+  const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
+  const match = jsonStr.match(fenceRegex);
+  if (match && match[1]) {
+    jsonStr = match[1].trim();
+  }
+
+  const data = JSON.parse(jsonStr);
+  validatePuzzleLogic(data);
+  return data;
+}
+
 async function generateAndSave() {
   const now = new Date();
   const istDate = new Date(
@@ -301,13 +244,13 @@ async function generateAndSave() {
         `--- Generating puzzle for ${todayStr} - Attempt ${attempt}/${MAX_RETRIES} ---`
       );
       try {
-        const filledSlots = await generateCrosswordWithChainOfThought(
+        const puzzleData = await generateSingleShotCrossword(
           slots,
           yesterdaysWords
         );
-        finalPuzzleData = buildPuzzle(chosenTemplate, filledSlots, todayStr);
+        finalPuzzleData = puzzleData; // Assign if successful
         console.log(
-          `Successfully generated and built puzzle on attempt ${attempt}.`
+          `Successfully generated and validated a new puzzle on attempt ${attempt}.`
         );
         break;
       } catch (error) {
