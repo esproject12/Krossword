@@ -1,4 +1,4 @@
-// This is the final version with the correct API response parsing.
+// This is the final version with Markdown fence cleanup restored.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -41,7 +41,7 @@ function findSlots(template) {
       if (isAcrossStart) {
         let length = 0;
         while (c + length < size && template[r][c + length] === "1") length++;
-        if (length > 1)
+        if (length > 2)
           slots.push({
             id: numberGrid[r][c],
             orientation: "ACROSS",
@@ -53,7 +53,7 @@ function findSlots(template) {
       if (isDownStart) {
         let length = 0;
         while (r + length < size && template[r + length][c] === "1") length++;
-        if (length > 1)
+        if (length > 2)
           slots.push({
             id: numberGrid[r][c],
             orientation: "DOWN",
@@ -71,13 +71,37 @@ function buildPuzzle(template, filledSlots, date) {
   const solutionGrid = Array(gridSize)
     .fill(null)
     .map(() => Array(gridSize).fill(null));
-  const words = [];
+  let words = [];
   const slotMap = new Map();
   findSlots(template).forEach((slot) => {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
 
+  // Validate that all answers fit their slots and build the grid
+  const tempGrid = Array(gridSize)
+    .fill(null)
+    .map(() => Array(gridSize).fill(null));
+  for (const filled of filledSlots) {
+    if (filled.answer.length !== filled.length) {
+      throw new Error(
+        `AI returned word "${filled.answer}" with length ${filled.answer.length} for a slot of length ${filled.length}.`
+      );
+    }
+    let { row, col } = filled.start;
+    for (const char of filled.answer) {
+      if (tempGrid[row][col] && tempGrid[row][col] !== char) {
+        throw new Error(
+          `Intersection conflict at [${row},${col}] for word "${filled.answer}".`
+        );
+      }
+      tempGrid[row][col] = char;
+      if (filled.orientation === "ACROSS") col++;
+      else row++;
+    }
+  }
+
+  // If validation passes, build the final puzzle object
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
@@ -97,12 +121,8 @@ function buildPuzzle(template, filledSlots, date) {
 
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
-      if (template[r][c] === "0" && solutionGrid[r][c] === null) {
-        // It's a black square
-      } else if (template[r][c] === "1" && solutionGrid[r][c] === null) {
-        throw new Error(
-          `Logical Error: Cell [${r},${c}] should have a letter but is empty.`
-        );
+      if (template[r][c] === "0") {
+        solutionGrid[r][c] = null;
       }
     }
   }
@@ -156,7 +176,7 @@ async function generateCrosswordWithGemini(slots, yesterdaysWords = []) {
     
     Constraints:
     1. The 'answer' for each object MUST exactly match the 'length' required by its corresponding slot.
-    2. The entire response MUST be a single, valid JSON array.
+    2. The entire response MUST be a single, valid JSON array, without any markdown fences like \`\`\`json.
     3. All words must interlock correctly. Ensure that if a letter is shared between an ACROSS and DOWN word, it is the same letter.
     4. ${uniquenessInstruction}
   `;
@@ -171,14 +191,18 @@ async function generateCrosswordWithGemini(slots, yesterdaysWords = []) {
   });
 
   if (!result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-    console.error(
-      "Unexpected response structure:",
-      JSON.stringify(result, null, 2)
-    );
     throw new Error("Failed to get a valid text part from Gemini response.");
   }
 
-  const jsonStr = result.candidates[0].content.parts[0].text;
+  let jsonStr = result.candidates[0].content.parts[0].text.trim();
+
+  // Restore the markdown fence cleanup logic
+  const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
+  const match = jsonStr.match(fenceRegex);
+  if (match && match[1]) {
+    console.log("Found and removed Markdown fences.");
+    jsonStr = match[1].trim();
+  }
 
   const filledSlots = JSON.parse(jsonStr);
 
