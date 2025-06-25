@@ -1,20 +1,19 @@
-// Final version with corrected startPosition property name.
-import { GoogleGenAI } from "@google/genai";
+// Final version with the missing OpenAI import statement.
+import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
-const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 2500;
+const API_DELAY_MS = 1000;
 
-// --- HELPER FUNCTION ---
+// --- HELPER FUNCTION FOR DELAY ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// --- TEMPLATE LOGIC (Unchanged) ---
+// --- TEMPLATE-BASED LOGIC ---
 function findSlots(template) {
   const slots = [];
   const size = template.length;
@@ -66,68 +65,59 @@ function findSlots(template) {
   return slots;
 }
 
-// --- LOGIC VALIDATION ---
-function buildAndValidatePuzzle(template, filledSlots, date) {
-  console.log("Attempting to assemble and validate puzzle locally...");
+function buildPuzzle(template, filledSlots, date) {
   const gridSize = template.length;
-  const slots = findSlots(template);
-  if (filledSlots.length !== slots.length) {
-    throw new Error(
-      `AI returned ${filledSlots.length} words, but template requires ${slots.length}.`
-    );
-  }
-
-  let words = [];
-  const tempGrid = Array(gridSize)
+  const solutionGrid = Array(gridSize)
     .fill(null)
     .map(() => Array(gridSize).fill(null));
+  let words = [];
+  const slotMap = new Map();
+  findSlots(template).forEach((slot) => {
+    const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
+    slotMap.set(key, { id: slot.id });
+  });
 
-  // First, map the AI's words to the correct slots
-  let assignedSlots = [];
-  let remainingWords = [...filledSlots];
-  for (const slot of slots) {
-    const wordIndex = remainingWords.findIndex(
-      (w) => w.answer.length === slot.length
-    );
-    if (wordIndex === -1)
-      throw new Error(
-        `Could not find a matching word for a slot of length ${slot.length}.`
-      );
-
-    const word = remainingWords.splice(wordIndex, 1)[0];
-    assignedSlots.push({ ...slot, ...word });
-  }
-
-  // Now, validate intersections and build the grid
-  for (const word of assignedSlots) {
-    let { row, col } = word.start;
-    for (const char of word.answer.toUpperCase()) {
-      if (tempGrid[row][col] && tempGrid[row][col] !== char) {
-        throw new Error(
-          `Intersection conflict at [${row},${col}] for word "${word.answer}".`
-        );
+  for (const filled of filledSlots) {
+    const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
+    const slotInfo = slotMap.get(key);
+    if (slotInfo) {
+      if (filled.answer.length !== filled.length) {
+        throw new Error(`AI word "${filled.answer}" length mismatch.`);
       }
-      tempGrid[row][col] = char;
-      if (word.orientation === "ACROSS") col++;
-      else row++;
+      // Use startPosition to be consistent with the app's type definition
+      words.push({
+        id: slotInfo.id,
+        clue: filled.clue,
+        answer: filled.answer,
+        orientation: filled.orientation,
+        startPosition: filled.start,
+        length: filled.length,
+      });
+      const { answer, start, orientation } = filled;
+      let { row, col } = start;
+      for (const char of answer) {
+        if (row < gridSize && col < gridSize) {
+          if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
+            throw new Error(
+              `Intersection conflict at [${row},${col}] for word "${answer}".`
+            );
+          }
+          solutionGrid[row][col] = char;
+          if (orientation === "ACROSS") col++;
+          else row++;
+        }
+      }
     }
   }
 
-  // Final assignment with the correct property name
-  words = assignedSlots.map((w) => ({
-    id: w.id,
-    clue: w.clue,
-    answer: w.answer,
-    orientation: w.orientation,
-    startPosition: w.start, // <-- The critical fix is here
-    length: w.length,
-  }));
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      if (template[r][c] === "0") {
+        solutionGrid[r][c] = null;
+      }
+    }
+  }
 
-  const solutionGrid = tempGrid.map((row, rIdx) =>
-    row.map((cell, cIdx) => (template[rIdx][cIdx] === "0" ? null : cell))
-  );
-
-  console.log("Local assembly and validation successful!");
   return {
     gridSize,
     title: `Indian Mini Crossword - ${date}`,
@@ -136,53 +126,94 @@ function buildAndValidatePuzzle(template, filledSlots, date) {
   };
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC for OpenAI ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY_SECRET;
   if (!apiKey) throw new Error("CRITICAL: OPENAI_API_KEY_SECRET is not set.");
+
   const openai = new OpenAI({ apiKey });
   const filledSlots = [];
+  const tempGrid = Array(6)
+    .fill(null)
+    .map(() => Array(6).fill(null));
+  const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
   const usedWords = new Set(yesterdaysWords);
 
-  // Create a copy to not mutate the original
-  const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
-
   for (const slot of sortedSlots) {
-    const { length, orientation } = slot;
+    const { length, orientation, start } = slot;
+    let constraints = [];
+    let currentWordPattern = "_".repeat(length);
+
     const uniquenessConstraint = `Do NOT use any of these words: ${[
       ...usedWords,
     ].join(", ")}.`;
-    const prompt = `You are a crossword puzzle word filler. Find a single, India-themed English word and a clever, short clue for a slot of length ${length}. ${uniquenessConstraint} Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
 
-    console.log(`Requesting word for slot: ${length}-${orientation}`);
+    for (let i = 0; i < length; i++) {
+      const r = start.row + (orientation === "DOWN" ? i : 0);
+      const c = start.col + (orientation === "ACROSS" ? i : 0);
+      if (tempGrid[r][c]) {
+        constraints.push(
+          `The letter at index ${i} (0-indexed) must be '${tempGrid[r][c]}'.`
+        );
+        let pattern = currentWordPattern.split("");
+        pattern[i] = tempGrid[r][c];
+        currentWordPattern = pattern.join("");
+      }
+    }
+
+    const prompt = `
+      You are an expert crossword puzzle word filler.
+      Task: Find a single, India-themed English word and a clever, short clue for it.
+      
+      Word to find: A ${length}-letter word matching the pattern "${currentWordPattern}".
+      Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
+      ${uniquenessConstraint}
+      
+      Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here.", "length": ${length}}
+      The "length" property in your JSON response MUST be exactly ${length}.
+      Do NOT include markdown fences, explanations, or any other text.
+    `;
+
+    console.log(
+      `Requesting word for slot: ${length}-${orientation} at [${start.row},${start.col}]`
+    );
     await sleep(API_DELAY_MS);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo-1106",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
-      temperature: 0.8,
+      temperature: 0.7,
     });
 
     const responseText = response.choices[0].message.content;
     if (!responseText) throw new Error("OpenAI returned an empty response.");
 
-    const { answer, clue } = JSON.parse(responseText);
-    const upperAnswer = answer.toUpperCase();
+    const { answer, clue, length: returnedLength } = JSON.parse(responseText);
 
-    if (upperAnswer.length !== length)
-      throw new Error(`AI word "${upperAnswer}" has wrong length.`);
-    if (usedWords.has(upperAnswer))
-      throw new Error(`AI reused word "${upperAnswer}".`);
+    const upperAnswer = answer.toUpperCase();
+    if (
+      upperAnswer.length !== length ||
+      (returnedLength && returnedLength !== length)
+    ) {
+      throw new Error(
+        `AI returned word "${upperAnswer}" with length ${upperAnswer.length}, but slot requires ${length}.`
+      );
+    }
+    if (usedWords.has(upperAnswer)) {
+      throw new Error(
+        `AI returned a word that has already been used: ${upperAnswer}`
+      );
+    }
 
     usedWords.add(upperAnswer);
-    filledSlots.push({
-      answer: upperAnswer,
-      clue,
-      orientation,
-      start: slot.start,
-      length,
-    });
+    let { row, col } = start;
+    for (const char of upperAnswer) {
+      tempGrid[row][col] = char;
+      if (orientation === "ACROSS") col++;
+      else row++;
+    }
+    filledSlots.push({ answer: upperAnswer, clue, orientation, start, length });
   }
 
   return filledSlots;
@@ -226,21 +257,29 @@ async function generateAndSave() {
   }
 
   if (!chosenTemplate) {
-    console.error(`Could not find a suitable template.`);
+    console.error(
+      `Could not find a suitable template with at least ${MINIMUM_WORDS} words.`
+    );
   }
 
   let yesterdaysWords = [];
   try {
     const yesterday = new Date(istDate);
     yesterday.setDate(istDate.getDate() - 1);
-    const yesterdayFilename = `${yesterday.getFullYear()}-${String(
-      yesterday.getMonth() + 1
-    ).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}.json`;
+    const y_year = yesterday.getFullYear();
+    const y_month = String(yesterday.getMonth() + 1).padStart(2, "0");
+    const y_day = String(yesterday.getDate()).padStart(2, "0");
+    const yesterdayFilename = `${y_year}-${y_month}-${y_day}.json`;
     const yesterdayPath = path.join(puzzleDir, yesterdayFilename);
+
     if (fs.existsSync(yesterdayPath)) {
       const yesterdayData = JSON.parse(fs.readFileSync(yesterdayPath, "utf-8"));
       if (yesterdayData.words) {
         yesterdaysWords = yesterdayData.words.map((w) => w.answer);
+        console.log(
+          "Found yesterday's words to avoid:",
+          yesterdaysWords.join(", ")
+        );
       }
     }
   } catch (e) {
@@ -259,11 +298,7 @@ async function generateAndSave() {
           slots,
           yesterdaysWords
         );
-        finalPuzzleData = buildAndValidatePuzzle(
-          chosenTemplate,
-          filledSlots,
-          todayStr
-        );
+        finalPuzzleData = buildPuzzle(chosenTemplate, filledSlots, todayStr);
         console.log(
           `Successfully generated and built puzzle on attempt ${attempt}.`
         );
@@ -287,7 +322,9 @@ async function generateAndSave() {
       }
       const sampleData = fs.readFileSync(samplePuzzlePath, "utf-8");
       const puzzleJson = JSON.parse(sampleData);
+
       puzzleJson.title = `Indian Mini Crossword - ${todayStr}`;
+
       fs.writeFileSync(puzzlePath, JSON.stringify(puzzleJson, null, 2));
       console.log(
         `Successfully used sample puzzle as fallback for ${todayStr}.`

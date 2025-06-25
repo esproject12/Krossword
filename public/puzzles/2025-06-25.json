@@ -3,141 +3,119 @@
   "title": "Indian Mini Crossword - 2025-06-25",
   "words": [
     {
-      "answer": "TANDY",
-      "clue": "Indian footwear often worn with traditional clothing.",
+      "id": 1,
+      "clue": "Capital city of India",
+      "answer": "DELHI",
       "orientation": "ACROSS",
-      "start": {
+      "startPosition": {
         "row": 0,
         "col": 0
       },
-      "length": 5,
-      "id": 1
+      "length": 5
     },
     {
-      "answer": "TANDA",
-      "clue": "Small rural settlement in India.",
-      "orientation": "DOWN",
-      "start": {
-        "row": 0,
-        "col": 0
-      },
-      "length": 5,
-      "id": 1
-    },
-    {
-      "answer": "VINDI",
-      "clue": "Part of India with a twist.",
-      "orientation": "DOWN",
-      "start": {
-        "row": 1,
-        "col": 5
-      },
-      "length": 5,
-      "id": 9
-    },
-    {
-      "answer": "NAIRI",
-      "clue": "Ancient civilization of India.",
+      "id": 4,
+      "clue": "Spiritual teacher or master",
+      "answer": "GURU",
       "orientation": "ACROSS",
-      "start": {
-        "row": 5,
+      "startPosition": {
+        "row": 4,
         "col": 1
       },
-      "length": 5,
-      "id": 21
+      "length": 4
     },
     {
-      "answer": "NAGA",
-      "clue": "Snake charmer's concern.",
+      "id": 5,
+      "clue": "Steamed rice cake",
+      "answer": "IDLI",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 5,
+        "col": 2
+      },
+      "length": 4
+    },
+    {
+      "id": 1,
+      "clue": "Lentil stew",
+      "answer": "DAAL",
       "orientation": "DOWN",
-      "start": {
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 4
+    },
+    {
+      "id": 2,
+      "clue": "Sphere-shaped sweet",
+      "answer": "LADDU",
+      "orientation": "DOWN",
+      "startPosition": {
         "row": 0,
         "col": 2
       },
-      "length": 4,
-      "id": 3
+      "length": 5
     },
     {
-      "answer": "NAGG",
-      "clue": "Persistent annoyance from a female serpent.",
-      "orientation": "ACROSS",
-      "start": {
-        "row": 2,
-        "col": 0
-      },
-      "length": 4,
-      "id": 10
-    },
-    {
-      "answer": "GADI",
-      "clue": "Traditional Indian carriage.",
+      "id": 3,
+      "clue": "Festival of colors",
+      "answer": "HOLI",
       "orientation": "DOWN",
-      "start": {
-        "row": 2,
+      "startPosition": {
+        "row": 0,
         "col": 3
       },
-      "length": 4,
-      "id": 12
-    },
-    {
-      "answer": "AARN",
-      "clue": "Goat-like Indian antelope",
-      "orientation": "ACROSS",
-      "start": {
-        "row": 3,
-        "col": 2
-      },
-      "length": 4,
-      "id": 15
+      "length": 4
     }
   ],
   "solutionGrid": [
     [
-      "T",
-      "A",
-      "N",
       "D",
-      "Y",
+      "E",
+      "L",
+      "H",
+      "I",
       null
     ],
     [
       "A",
       null,
       "A",
+      "O",
       null,
-      null,
-      "V"
-    ],
-    [
-      "N",
-      "A",
-      "G",
-      "G",
-      null,
-      "I"
-    ],
-    [
-      "D",
-      null,
-      "A",
-      "A",
-      "R",
-      "N"
+      null
     ],
     [
       "A",
-      null,
       null,
       "D",
+      "L",
       null,
-      "D"
+      null
     ],
     [
+      "L",
       null,
-      "N",
-      "A",
+      "D",
       "I",
+      null,
+      null
+    ],
+    [
+      null,
+      "G",
+      "U",
       "R",
+      "U",
+      null
+    ],
+    [
+      null,
+      null,
+      "I",
+      "D",
+      "L",
       "I"
     ]
   ]
