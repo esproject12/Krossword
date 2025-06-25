@@ -1,4 +1,4 @@
-// Final version using OpenAI and Chain-of-Thought logic.
+// Final version with a "primed" prompt for better AI performance.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -6,14 +6,14 @@ import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 3; // We can use fewer retries as this method is more reliable
+const MAX_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 1000; // 1 second delay between calls, very safe for OpenAI limits
+const API_DELAY_MS = 1000;
 
-// --- HELPER FUNCTION FOR DELAY ---
+// --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// --- TEMPLATE-BASED LOGIC ---
+// --- TEMPLATE LOGIC ---
 function findSlots(template) {
   const slots = [];
   const size = template.length;
@@ -21,18 +21,14 @@ function findSlots(template) {
     .fill(null)
     .map(() => Array(size).fill(0));
   let id = 1;
-
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (template[r][c] === "0") continue;
       const isAcrossStart = c === 0 || template[r][c - 1] === "0";
       const isDownStart = r === 0 || template[r - 1][c] === "0";
-      if (isAcrossStart || isDownStart) {
-        numberGrid[r][c] = id++;
-      }
+      if (isAcrossStart || isDownStart) numberGrid[r][c] = id++;
     }
   }
-
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
       if (template[r][c] === "0") continue;
@@ -118,7 +114,6 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC for OpenAI ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY_SECRET;
   if (!apiKey) throw new Error("CRITICAL: OPENAI_API_KEY_SECRET is not set.");
@@ -135,7 +130,6 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
     const { length, orientation, start } = slot;
     let constraints = [];
     let currentWordPattern = "_".repeat(length);
-
     const uniquenessConstraint = `Do NOT use any of these words: ${[
       ...usedWords,
     ].join(", ")}.`;
@@ -161,7 +155,8 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
       Constraints: ${constraints.length > 0 ? constraints.join(" ") : "None."}
       ${uniquenessConstraint}
       
-      Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
+      Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here.", "length": ${length}}
+      The "length" property in your JSON response MUST be exactly ${length}.
       Do NOT include markdown fences, explanations, or any other text.
     `;
 
@@ -180,10 +175,10 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
     const responseText = response.choices[0].message.content;
     if (!responseText) throw new Error("OpenAI returned an empty response.");
 
-    const { answer, clue } = JSON.parse(responseText);
+    const { answer, clue, length: returnedLength } = JSON.parse(responseText);
 
     const upperAnswer = answer.toUpperCase();
-    if (upperAnswer.length !== length) {
+    if (upperAnswer.length !== length || returnedLength !== length) {
       throw new Error(
         `AI returned word "${upperAnswer}" with length ${upperAnswer.length}, but slot requires ${length}.`
       );
@@ -207,7 +202,6 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   return filledSlots;
 }
 
-// --- FILE SAVING AND RETRY LOGIC ---
 async function generateAndSave() {
   const now = new Date();
   const istDate = new Date(
