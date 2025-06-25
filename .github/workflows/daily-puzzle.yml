@@ -2,13 +2,12 @@ name: Generate Daily Crossword
 
 on:
   schedule:
-    # Runs every day at 18:31 UTC, which is 00:01 Indian Standard Time (IST).
+    # Runs every day at 18:31 UTC (00:01 IST)
     - cron: "31 18 * * *"
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
-  contents: write # Allows the action to commit to the repo
+  contents: write
 
 jobs:
   generate_puzzle:
@@ -18,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches all history so the script can find yesterday's puzzle
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,13 +31,14 @@ jobs:
       - name: Generate new puzzle file
         run: node scripts/generate.js
         env:
-          GEMINI_API_KEY_FROM_SECRET: ${{ secrets.GEMINI_API_KEY }}
+          # Use the new OpenAI secret
+          OPENAI_API_KEY_SECRET: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "feat: ✨ Add daily crossword for"
           file_pattern: "public/puzzles/*.json"
-          commit_user_name: "GitHub Actions Bot"
+          commit_user_name: "Dodo Krossword Bot"
           commit_user_email: "actions@github.com"
-          commit_author: "GitHub Actions Bot <actions@github.com>"
+          commit_author: "Dodo Krossword Bot <actions@github.com>"
