@@ -1,4 +1,4 @@
-// Final, definitive version with all robust logic combined.
+// Final version with simplified prompt to ensure length-matching.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -10,7 +10,7 @@ const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 1000; // 1 second delay between API calls
+const API_DELAY_MS = 1000;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -103,37 +103,30 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- AI-POWERED VALIDATION FUNCTION ---
 async function isWordValid(ai, word) {
   if (!word || word.length < 2) return false;
   await sleep(API_DELAY_MS);
   console.log(`    > Validating word: "${word}"...`);
-
   const prompt = `Is "${word}" a real, common, correctly-spelled English word? Respond with only a single word: YES or NO.`;
-
   const completion = await ai.chat.completions.create({
     model: OPENAI_MODEL_NAME,
     messages: [{ role: "user", content: prompt }],
     temperature: 0,
     max_tokens: 3,
   });
-
   const responseText = completion.choices[0]?.message?.content
     ?.trim()
     .toUpperCase();
-
   if (responseText === "YES") {
     console.log(`    > Validation for "${word}": PASSED`);
     return true;
   }
-
   console.log(
     `    > Validation for "${word}": FAILED (Response: ${responseText})`
   );
   return false;
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC with INNER RETRY LOOP ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey)
@@ -157,7 +150,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
     while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
       wordAttempts++;
       console.log(
-        `  > Slot (${slot.length}, ${slot.orientation}), Word Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
+        `  > Slot (${slot.length}, ${slot.orientation}), Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
       );
 
       let constraints = [];
@@ -182,10 +175,8 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
       const system_prompt =
         "You are an expert crossword puzzle word filler. You only respond with a single, valid JSON object and nothing else.";
       const user_prompt = `
-          Find a single, common English word and a clever, short clue for it.
-          The word must fit the pattern: "${currentWordPattern}".
-          Constraints: ${constraints.join(" ") || "None."}
-          Please try to find an India-themed word if a common one fits, but prioritize creating a valid, solvable puzzle with real words.
+          Find a single, common English word that fits the pattern "${currentWordPattern}" and provide a clever, short clue for it.
+          Prioritize common words. An India-themed word is a bonus if it fits perfectly.
           ${uniquenessConstraint}
           Your response format must be: {"answer": "THEWORD", "clue": "Your clever clue here."}
         `;
@@ -209,27 +200,30 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         const { answer, clue } = JSON.parse(responseContent);
         const upperAnswer = answer.toUpperCase();
 
-        if (upperAnswer.length !== slot.length)
-          throw new Error(`Word "${upperAnswer}" has wrong length.`);
-        if (usedWords.has(upperAnswer))
+        if (upperAnswer.length !== slot.length) {
+          throw new Error(
+            `Word "${upperAnswer}" has wrong length (got ${upperAnswer.length}, needed ${slot.length}).`
+          );
+        }
+        if (usedWords.has(upperAnswer)) {
           throw new Error(`Word "${upperAnswer}" has been used.`);
-
-        if (await isWordValid(openai, upperAnswer)) {
-          wordIsValid = true;
-          usedWords.add(upperAnswer);
-          let { row, col } = slot.start;
-          for (const char of upperAnswer) {
-            tempGrid[row][col] = char;
-            if (slot.orientation === "ACROSS") col++;
-            else row++;
-          }
-          filledSlots.push({ ...slot, answer: upperAnswer, clue });
-        } else {
+        }
+        if (!(await isWordValid(openai, upperAnswer))) {
           failedWordsForSlot.push(upperAnswer);
           throw new Error(
             `Word "${upperAnswer}" was deemed invalid by validation API.`
           );
         }
+
+        wordIsValid = true;
+        usedWords.add(upperAnswer);
+        let { row, col } = slot.start;
+        for (const char of upperAnswer) {
+          tempGrid[row][col] = char;
+          if (slot.orientation === "ACROSS") col++;
+          else row++;
+        }
+        filledSlots.push({ ...slot, answer: upperAnswer, clue });
       } catch (e) {
         console.warn(`    > Word attempt failed: ${e.message}`);
         if (wordAttempts >= MAX_WORD_RETRIES) {
@@ -243,7 +237,6 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   return filledSlots;
 }
 
-// --- MAIN SCRIPT ---
 async function main() {
   const now = new Date();
   const istDate = new Date(
@@ -305,14 +298,19 @@ async function main() {
       console.log(
         `Successfully generated and saved new puzzle to ${puzzlePath}`
       );
-      return; // Success!
+      return;
     } catch (error) {
       console.error(`Main Attempt ${attempt} failed:`, error.message);
       if (attempt === MAX_MAIN_RETRIES) {
         console.error(
           "All AI generation attempts failed. Resorting to fallback."
         );
-        const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
+        const samplePuzzlePath = path.join(
+          process.cwd(),
+          "public",
+          "puzzles",
+          SAMPLE_PUZZLE_FILENAME
+        );
         try {
           if (!fs.existsSync(samplePuzzlePath))
             throw new Error(`CRITICAL: Sample puzzle file not found.`);
