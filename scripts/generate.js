@@ -1,4 +1,4 @@
-// Final version with a strong prompt for high-quality word generation.
+// Final version with "Inner Retry Loop" for AI self-validation.
 import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 import path from "path";
@@ -7,8 +7,13 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_RETRIES = 5;
+const MAX_MAIN_RETRIES = 3;
+const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
+const API_DELAY_MS = 2000; // A safe delay to avoid rate limiting
+
+// --- HELPER FUNCTION ---
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // --- TEMPLATE LOGIC ---
 function findSlots(template) {
@@ -58,58 +63,31 @@ function findSlots(template) {
   return slots;
 }
 
-function assembleAndValidatePuzzle(template, wordList, date) {
-  console.log("Attempting to assemble and validate puzzle locally...");
-  const slots = findSlots(template);
-  if (wordList.length !== slots.length) {
-    throw new Error(
-      `AI returned ${wordList.length} words, but template requires ${slots.length}.`
-    );
-  }
-
-  let assignedSlots = [];
-  let remainingWords = [...wordList];
-
-  // Sort slots to prioritize longer words and ACROSS orientation for more stable fitting
-  const sortedSlots = slots.sort((a, b) => {
-    if (a.length !== b.length) {
-      return b.length - a.length;
-    }
-    return a.orientation === "ACROSS" ? -1 : 1;
-  });
-
-  for (const slot of sortedSlots) {
-    const wordIndex = remainingWords.findIndex(
-      (w) => w.answer.length === slot.length
-    );
-    if (wordIndex === -1) {
-      throw new Error(
-        `Could not find a matching word for a slot of length ${slot.length}.`
-      );
-    }
-    const word = remainingWords.splice(wordIndex, 1)[0];
-    assignedSlots.push({ ...slot, ...word });
-  }
-
+function buildPuzzle(template, filledSlots, date) {
   const gridSize = template.length;
   const solutionGrid = Array(gridSize)
     .fill(null)
     .map(() => Array(gridSize).fill(null));
-
-  for (const word of assignedSlots) {
-    let { row, col } = word.start;
-    for (const char of word.answer.toUpperCase()) {
-      if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
-        throw new Error(
-          `Intersection conflict at [${row},${col}] for word "${word.answer}". Grid has ${solutionGrid[row][col]}, word wants ${char}.`
-        );
+  let words = [];
+  const slotMap = new Map();
+  findSlots(template).forEach((slot) => {
+    const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
+    slotMap.set(key, { id: slot.id });
+  });
+  for (const filled of filledSlots) {
+    const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
+    const slotInfo = slotMap.get(key);
+    if (slotInfo) {
+      words.push({ ...filled, id: slotInfo.id });
+      const { answer, start, orientation } = filled;
+      let { row, col } = start;
+      for (const char of answer) {
+        solutionGrid[row][col] = char;
+        if (orientation === "ACROSS") col++;
+        else row++;
       }
-      solutionGrid[row][col] = char;
-      if (word.orientation === "ACROSS") col++;
-      else row++;
     }
   }
-
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
@@ -117,80 +95,137 @@ function assembleAndValidatePuzzle(template, wordList, date) {
       }
     }
   }
-
-  console.log("Local assembly and validation successful!");
   return {
     gridSize,
     title: `Indian Mini Crossword - ${date}`,
-    words: assignedSlots,
+    words,
     solutionGrid,
   };
 }
 
-// --- MAIN GENERATION LOGIC ---
-async function generateWordList(slots, yesterdaysWords = []) {
-  const apiKey = process.env.GEMINI_API_KEY_FROM_SECRET;
-  if (!apiKey) throw new Error("CRITICAL: API_KEY is not set.");
-  const ai = new GoogleGenAI({ apiKey });
-
-  const uniquenessInstruction =
-    yesterdaysWords.length > 0
-      ? `Do NOT use any of these words: ${yesterdaysWords.join(", ")}.`
-      : "";
-
-  const prompt = `
-    You are an expert crossword puzzle creator, like a New York Times editor. Your task is to generate a list of high-quality, interlocking, India-themed words and clues to fit a predefined 6x6 grid structure.
-
-    Here are the required word slots. You must provide one word for each slot.
-    ${JSON.stringify(
-      slots.map((s) => ({ orientation: s.orientation, length: s.length })),
-      null,
-      2
-    )}
-
-    Please provide a list of words and clues that will fit perfectly into these slots and interlock correctly. 
-    
-    Your response MUST be a single, valid JSON array of objects. Each object must have an "answer" and a "clue".
-
-    Example Response:
-    [
-        {"answer": "MUMBAI", "clue": "Financial capital of India"},
-        {"answer": "DIWALI", "clue": "Festival of lights"}
-    ]
-
-    CRITICAL CONSTRAINTS:
-    1. **Word Quality:** All answers MUST be common, well-known, and correctly spelled English words. Do NOT use fragments, slang, or obscure terms. Every word should be one a typical person would recognize.
-    2. **Logical Consistency:** All words must interlock logically to form a valid crossword puzzle.
-    3. **Format:** The 'answer' for each object MUST exactly match the 'length' required by its corresponding slot. The entire response must be a single, valid JSON array.
-    4. **Theme:** All words must be related to India.
-    5. **Uniqueness:** ${uniquenessInstruction}
-  `;
-
-  const result = await ai.models.generateContent({
-    model: GEMINI_MODEL_NAME,
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.8,
-    },
-  });
-
-  if (!result?.response?.candidates?.[0]?.content?.parts?.[0]?.text) {
-    throw new Error("Failed to get a valid text part from Gemini response.");
-  }
-
-  let jsonStr = result.response.candidates[0].content.parts[0].text.trim();
-  const fenceRegex = /^```(?:json)?\s*\n?(.*?)\n?\s*```$/s;
-  const match = jsonStr.match(fenceRegex);
-  if (match && match[1]) {
-    jsonStr = match[1].trim();
-  }
-
-  return JSON.parse(jsonStr);
+// --- AI-POWERED VALIDATION FUNCTION ---
+async function isWordValid(ai, word) {
+  if (!word || word.length < 3) return false;
+  console.log(`    > Validating word: "${word}"...`);
+  await sleep(API_DELAY_MS);
+  const prompt = `Is "${word}" a real, common, correctly-spelled English word? Please answer with only a single word: YES or NO.`;
+  const result = await ai.models.generateContent(prompt);
+  const responseText = result.response.text().trim().toUpperCase();
+  console.log(`    > Validation response for "${word}": ${responseText}`);
+  return responseText === "YES";
 }
 
-// --- FILE SAVING AND RETRY LOGIC ---
-async function generateAndSave() {
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC with INNER RETRY LOOP ---
+async function generateCrosswordWithChainOfThought(
+  slots,
+  yesterdaysWords = []
+) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("CRITICAL: GEMINI_API_KEY is not set.");
+  const ai = new GoogleGenAI({ apiKey });
+
+  const filledSlots = [];
+  const tempGrid = Array(6)
+    .fill(null)
+    .map(() => Array(6).fill(null));
+  const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
+  const usedWords = new Set(yesterdaysWords);
+
+  for (const slot of sortedSlots) {
+    let wordIsValid = false;
+    let wordAttempts = 0;
+    const failedWordsForSlot = [];
+
+    while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
+      wordAttempts++;
+      console.log(
+        `  > Attempting to fill slot (${slot.length}, ${slot.orientation}) - Word Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
+      );
+
+      let constraints = [];
+      let currentWordPattern = "_".repeat(slot.length);
+      for (let i = 0; i < slot.length; i++) {
+        const r = slot.start.row + (slot.orientation === "DOWN" ? i : 0);
+        const c = slot.start.col + (slot.orientation === "ACROSS" ? i : 0);
+        if (tempGrid[r][c]) {
+          constraints.push(
+            `The letter at index ${i} (0-indexed) must be '${tempGrid[r][c]}'.`
+          );
+          let p = currentWordPattern.split("");
+          p[i] = tempGrid[r][c];
+          currentWordPattern = p.join("");
+        }
+      }
+      const uniquenessConstraint = `Do NOT use any of these words: ${[
+        ...usedWords,
+        ...failedWordsForSlot,
+      ].join(", ")}.`;
+
+      const user_prompt = `
+          Find a single, India-themed English word and a clever, short clue for it.
+          Word to find: A ${
+            slot.length
+          }-letter word matching the pattern "${currentWordPattern}".
+          Constraints: ${
+            constraints.length > 0 ? constraints.join(" ") : "None."
+          }
+          ${uniquenessConstraint}
+          Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
+        `;
+
+      try {
+        await sleep(API_DELAY_MS);
+        const result = await ai.models.generateContent({
+          model: GEMINI_MODEL_NAME,
+          contents: [{ role: "user", parts: [{ text: user_prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.8,
+          },
+        });
+        const responseText = result.response.text();
+        const { answer, clue } = JSON.parse(responseText);
+        const upperAnswer = answer.toUpperCase();
+
+        if (upperAnswer.length !== slot.length)
+          throw new Error(`Word "${upperAnswer}" has incorrect length.`);
+        if (usedWords.has(upperAnswer))
+          throw new Error(`Word "${upperAnswer}" has been used.`);
+
+        if (await isWordValid(ai, upperAnswer)) {
+          wordIsValid = true;
+          usedWords.add(upperAnswer);
+          let { row, col } = slot.start;
+          for (const char of upperAnswer) {
+            tempGrid[row][col] = char;
+            if (slot.orientation === "ACROSS") col++;
+            else row++;
+          }
+          filledSlots.push({
+            answer: upperAnswer,
+            clue,
+            orientation: slot.orientation,
+            start: slot.start,
+            length: slot.length,
+          });
+        } else {
+          failedWordsForSlot.push(upperAnswer);
+          throw new Error(`Word "${upperAnswer}" was deemed invalid.`);
+        }
+      } catch (e) {
+        console.warn(`    > Word Attempt ${wordAttempts} failed: ${e.message}`);
+        if (wordAttempts >= MAX_WORD_RETRIES) {
+          throw new Error(
+            `Could not find a valid word for slot (${slot.length}, ${slot.orientation}) after ${MAX_WORD_RETRIES} tries.`
+          );
+        }
+      }
+    }
+  }
+  return filledSlots;
+}
+
+async function main() {
   const now = new Date();
   const istDate = new Date(
     now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
@@ -198,7 +233,6 @@ async function generateAndSave() {
   const todayStr = `${istDate.getFullYear()}-${String(
     istDate.getMonth() + 1
   ).padStart(2, "0")}-${String(istDate.getDate()).padStart(2, "0")}`;
-
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
   const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
@@ -208,29 +242,14 @@ async function generateAndSave() {
     return;
   }
 
-  let chosenTemplate = null;
-  let slots = [];
-  let templateTries = 0;
-
-  while (!chosenTemplate && templateTries < templates.length * 2) {
-    const tempTemplate =
-      templates[Math.floor(Math.random() * templates.length)];
-    const tempSlots = findSlots(tempTemplate);
-    if (tempSlots.length >= MINIMUM_WORDS) {
-      chosenTemplate = tempTemplate;
-      slots = tempSlots;
-      console.log(
-        `Selected a template with ${slots.length} words (>=${MINIMUM_WORDS} required).`
-      );
-    }
-    templateTries++;
-  }
-
-  if (!chosenTemplate) {
-    console.error(
-      `Could not find a suitable template with at least ${MINIMUM_WORDS} words.`
-    );
-  }
+  const validTemplates = templates.filter(
+    (t) => findSlots(t).length >= MINIMUM_WORDS
+  );
+  if (validTemplates.length === 0)
+    throw new Error(`No templates found with at least ${MINIMUM_WORDS} words.`);
+  const chosenTemplate =
+    validTemplates[Math.floor(Math.random() * validTemplates.length)];
+  const slots = findSlots(chosenTemplate);
 
   let yesterdaysWords = [];
   try {
@@ -241,70 +260,55 @@ async function generateAndSave() {
     const y_day = String(yesterday.getDate()).padStart(2, "0");
     const yesterdayFilename = `${y_year}-${y_month}-${y_day}.json`;
     const yesterdayPath = path.join(puzzleDir, yesterdayFilename);
-
     if (fs.existsSync(yesterdayPath)) {
-      const yesterdayData = JSON.parse(fs.readFileSync(yesterdayPath, "utf-8"));
-      if (yesterdayData.words) {
-        yesterdaysWords = yesterdayData.words.map((w) => w.answer);
-      }
+      yesterdaysWords = JSON.parse(
+        fs.readFileSync(yesterdayPath, "utf-8")
+      ).words.map((w) => w.answer);
     }
   } catch (e) {
     console.warn("Could not read yesterday's puzzle.", e.message);
   }
 
-  let finalPuzzleData = null;
-
-  if (chosenTemplate) {
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      console.log(
-        `--- Generating puzzle for ${todayStr} - Attempt ${attempt}/${MAX_RETRIES} ---`
+  for (let attempt = 1; attempt <= MAX_MAIN_RETRIES; attempt++) {
+    console.log(
+      `--- Generating new puzzle - Main Attempt ${attempt}/${MAX_MAIN_RETRIES} ---`
+    );
+    try {
+      const filledSlots = await generateCrosswordWithChainOfThought(
+        slots,
+        yesterdaysWords
       );
-      try {
-        const wordList = await generateWordList(slots, yesterdaysWords);
-        finalPuzzleData = assembleAndValidatePuzzle(
-          chosenTemplate,
-          wordList,
-          todayStr
+      const finalPuzzleData = buildPuzzle(
+        chosenTemplate,
+        filledSlots,
+        todayStr
+      );
+      fs.writeFileSync(puzzlePath, JSON.stringify(finalPuzzleData, null, 2));
+      console.log(
+        `Successfully generated and saved new puzzle to ${puzzlePath}`
+      );
+      return;
+    } catch (error) {
+      console.error(`Main Attempt ${attempt} failed:`, error.message);
+      if (attempt === MAX_MAIN_RETRIES) {
+        console.error(
+          "All main generation attempts failed. Resorting to fallback."
         );
-        console.log(
-          `Successfully generated and built puzzle on attempt ${attempt}.`
-        );
-        break;
-      } catch (error) {
-        console.error(`Attempt ${attempt} failed:`, error.message);
-        if (attempt === MAX_RETRIES) {
-          console.error("All AI generation attempts failed.");
+        try {
+          if (!fs.existsSync(samplePuzzlePath))
+            throw new Error(`CRITICAL: Sample puzzle file not found.`);
+          const sampleData = fs.readFileSync(samplePuzzlePath, "utf-8");
+          const puzzleJson = JSON.parse(sampleData);
+          puzzleJson.title = `Indian Mini Crossword - ${todayStr}`;
+          fs.writeFileSync(puzzlePath, JSON.stringify(puzzleJson, null, 2));
+          console.log(`Successfully used sample puzzle as fallback.`);
+        } catch (fallbackError) {
+          console.error("CRITICAL: Fallback failed.", fallbackError);
+          process.exit(1);
         }
       }
     }
   }
-
-  if (!finalPuzzleData) {
-    console.log("Resorting to fallback: copying sample puzzle.");
-    try {
-      if (!fs.existsSync(samplePuzzlePath)) {
-        throw new Error(
-          `CRITICAL: Sample puzzle file not found at ${samplePuzzlePath}`
-        );
-      }
-      const sampleData = fs.readFileSync(samplePuzzlePath, "utf-8");
-      const puzzleJson = JSON.parse(sampleData);
-      puzzleJson.title = `Indian Mini Crossword - ${todayStr}`;
-      fs.writeFileSync(puzzlePath, JSON.stringify(puzzleJson, null, 2));
-      console.log(
-        `Successfully used sample puzzle as fallback for ${todayStr}.`
-      );
-    } catch (fallbackError) {
-      console.error(
-        "CRITICAL: Failed to use the fallback puzzle.",
-        fallbackError
-      );
-      process.exit(1);
-    }
-  } else {
-    fs.writeFileSync(puzzlePath, JSON.stringify(finalPuzzleData, null, 2));
-    console.log(`Successfully saved new puzzle to ${puzzlePath}`);
-  }
 }
 
-generateAndSave();
+main();
