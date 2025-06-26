@@ -1,4 +1,4 @@
-// Final version using OpenAI API with a robust "Chain-of-Thought" process.
+// Final version with smarter, definition-based AI validation.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -10,7 +10,7 @@ const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 500;
+const API_DELAY_MS = 1000;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,7 +74,6 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
-
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
@@ -89,7 +88,6 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
-
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
@@ -105,29 +103,40 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
+// --- NEW SMARTER AI-POWERED VALIDATION FUNCTION ---
 async function isWordValid(ai, word) {
-  if (!word || word.length < 3) return false;
+  if (!word || word.length < 2) return false;
   await sleep(API_DELAY_MS);
   console.log(`    > Validating word: "${word}"...`);
-  const system_prompt =
-    "You are a validation assistant. Respond with only a single word: YES or NO.";
-  const user_prompt = `Is "${word}" a real, common, correctly-spelled English word?`;
+
+  const prompt = `Is "${word}" a real, common, correctly-spelled English word, relevant to an India-themed crossword? If it is not a real or common word, respond with only the single word "INVALID". Otherwise, provide a very short, one-sentence definition.`;
+
   const completion = await ai.chat.completions.create({
     model: OPENAI_MODEL_NAME,
-    messages: [
-      { role: "system", content: system_prompt },
-      { role: "user", content: user_prompt },
-    ],
+    messages: [{ role: "user", content: prompt }],
     temperature: 0,
-    max_tokens: 3,
+    max_tokens: 60,
   });
+
   const responseText = completion.choices[0]?.message?.content
     ?.trim()
     .toUpperCase();
-  console.log(`    > Validation response for "${word}": ${responseText}`);
-  return responseText === "YES";
+
+  if (!responseText || responseText === "INVALID") {
+    console.log(`    > Validation response for "${word}": INVALID`);
+    return false;
+  }
+
+  console.log(
+    `    > Validation for "${word}" PASSED with definition: ${responseText.substring(
+      0,
+      70
+    )}...`
+  );
+  return true;
 }
 
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC with INNER RETRY LOOP ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey)
@@ -234,6 +243,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   return filledSlots;
 }
 
+// --- MAIN SCRIPT ---
 async function main() {
   const now = new Date();
   const istDate = new Date(
@@ -242,10 +252,8 @@ async function main() {
   const todayStr = `${istDate.getFullYear()}-${String(
     istDate.getMonth() + 1
   ).padStart(2, "0")}-${String(istDate.getDate()).padStart(2, "0")}`;
-
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
-  const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
 
   if (fs.existsSync(puzzlePath)) {
     console.log(`Puzzle for ${todayStr} already exists. Skipping.`);
@@ -255,9 +263,8 @@ async function main() {
   const validTemplates = templates.filter(
     (t) => findSlots(t).length >= MINIMUM_WORDS
   );
-  if (validTemplates.length === 0) {
+  if (validTemplates.length === 0)
     throw new Error(`No templates found with at least ${MINIMUM_WORDS} words.`);
-  }
   const chosenTemplate =
     validTemplates[Math.floor(Math.random() * validTemplates.length)];
   const slots = findSlots(chosenTemplate);
@@ -303,8 +310,9 @@ async function main() {
       console.error(`Main Attempt ${attempt} failed:`, error.message);
       if (attempt === MAX_MAIN_RETRIES) {
         console.error(
-          "All main generation attempts failed. Resorting to fallback."
+          "All AI generation attempts failed. Resorting to fallback."
         );
+        const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
         try {
           if (!fs.existsSync(samplePuzzlePath))
             throw new Error(`CRITICAL: Sample puzzle file not found.`);
