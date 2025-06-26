@@ -1,4 +1,4 @@
-// Final version with smarter, definition-based AI validation.
+// Final, definitive version with all robust logic combined.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -10,7 +10,7 @@ const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 1000;
+const API_DELAY_MS = 1000; // 1 second delay between API calls
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -103,37 +103,34 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- NEW SMARTER AI-POWERED VALIDATION FUNCTION ---
+// --- AI-POWERED VALIDATION FUNCTION ---
 async function isWordValid(ai, word) {
   if (!word || word.length < 2) return false;
   await sleep(API_DELAY_MS);
   console.log(`    > Validating word: "${word}"...`);
 
-  const prompt = `Is "${word}" a real, common, correctly-spelled English word, relevant to an India-themed crossword? If it is not a real or common word, respond with only the single word "INVALID". Otherwise, provide a very short, one-sentence definition.`;
+  const prompt = `Is "${word}" a real, common, correctly-spelled English word? Respond with only a single word: YES or NO.`;
 
   const completion = await ai.chat.completions.create({
     model: OPENAI_MODEL_NAME,
     messages: [{ role: "user", content: prompt }],
     temperature: 0,
-    max_tokens: 60,
+    max_tokens: 3,
   });
 
   const responseText = completion.choices[0]?.message?.content
     ?.trim()
     .toUpperCase();
 
-  if (!responseText || responseText === "INVALID") {
-    console.log(`    > Validation response for "${word}": INVALID`);
-    return false;
+  if (responseText === "YES") {
+    console.log(`    > Validation for "${word}": PASSED`);
+    return true;
   }
 
   console.log(
-    `    > Validation for "${word}" PASSED with definition: ${responseText.substring(
-      0,
-      70
-    )}...`
+    `    > Validation for "${word}": FAILED (Response: ${responseText})`
   );
-  return true;
+  return false;
 }
 
 // --- "CHAIN-OF-THOUGHT" GENERATION LOGIC with INNER RETRY LOOP ---
@@ -160,7 +157,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
     while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
       wordAttempts++;
       console.log(
-        `  > Slot (${slot.length}, ${slot.orientation}), Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
+        `  > Slot (${slot.length}, ${slot.orientation}), Word Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
       );
 
       let constraints = [];
@@ -170,7 +167,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         const c = slot.start.col + (slot.orientation === "ACROSS" ? i : 0);
         if (tempGrid[r][c]) {
           constraints.push(
-            `The letter at index ${i} (0-indexed) must be '${tempGrid[r][c]}'.`
+            `The letter at index ${i} must be '${tempGrid[r][c]}'.`
           );
           let p = currentWordPattern.split("");
           p[i] = tempGrid[r][c];
@@ -184,11 +181,14 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
       ].join(", ")}.`;
       const system_prompt =
         "You are an expert crossword puzzle word filler. You only respond with a single, valid JSON object and nothing else.";
-      const user_prompt = `Find a single, India-themed English word and a clever, short clue for it. Word to find: A ${
-        slot.length
-      }-letter word matching the pattern "${currentWordPattern}". Constraints: ${
-        constraints.join(" ") || "None."
-      } ${uniquenessConstraint}. Your response format must be: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
+      const user_prompt = `
+          Find a single, common English word and a clever, short clue for it.
+          The word must fit the pattern: "${currentWordPattern}".
+          Constraints: ${constraints.join(" ") || "None."}
+          Please try to find an India-themed word if a common one fits, but prioritize creating a valid, solvable puzzle with real words.
+          ${uniquenessConstraint}
+          Your response format must be: {"answer": "THEWORD", "clue": "Your clever clue here."}
+        `;
 
       try {
         await sleep(API_DELAY_MS);
@@ -305,7 +305,7 @@ async function main() {
       console.log(
         `Successfully generated and saved new puzzle to ${puzzlePath}`
       );
-      return;
+      return; // Success!
     } catch (error) {
       console.error(`Main Attempt ${attempt} failed:`, error.message);
       if (attempt === MAX_MAIN_RETRIES) {
