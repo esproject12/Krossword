@@ -1,0 +1,144 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-26",
+  "words": [
+    {
+      "id": 1,
+      "clue": "A stretch of land, often with wildlife.",
+      "answer": "RANGE",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5
+    },
+    {
+      "id": 1,
+      "clue": "Melodic structures in Indian classical music.",
+      "answer": "RAGAS",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5
+    },
+    {
+      "id": 9,
+      "clue": "A spicy street snack that’s hard to resist.",
+      "answer": "CHAAT",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5
+    },
+    {
+      "id": 21,
+      "clue": "A place where spirits linger, often in tales from the subcontinent.",
+      "answer": "HAUNT",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5
+    },
+    {
+      "id": 3,
+      "clue": "Sacred river in India, often worshipped.",
+      "answer": "NADI",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4
+    },
+    {
+      "id": 10,
+      "clue": "A precious metal often associated with Indian weddings.",
+      "answer": "GOLD",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4
+    },
+    {
+      "id": 12,
+      "clue": "A festive sweet treat often enjoyed during celebrations.",
+      "answer": "DELU",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4
+    },
+    {
+      "id": 15,
+      "clue": "A traditional Indian dance form from the state of Andhra Pradesh.",
+      "answer": "IECA",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4
+    }
+  ],
+  "solutionGrid": [
+    [
+      "R",
+      "A",
+      "N",
+      "G",
+      "E",
+      null
+    ],
+    [
+      "A",
+      null,
+      "A",
+      null,
+      null,
+      "C"
+    ],
+    [
+      "G",
+      "O",
+      "L",
+      "D",
+      null,
+      "H"
+    ],
+    [
+      "A",
+      null,
+      "I",
+      "E",
+      "C",
+      "A"
+    ],
+    [
+      "S",
+      null,
+      null,
+      "L",
+      null,
+      "A"
+    ],
+    [
+      null,
+      "H",
+      "A",
+      "U",
+      "N",
+      "T"
+    ]
+  ]
+}

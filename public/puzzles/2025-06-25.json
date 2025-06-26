@@ -1,0 +1,144 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-25",
+  "words": [
+    {
+      "id": 1,
+      "clue": "A vibrant film industry that dances through dreams.",
+      "answer": "BOLLY",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5
+    },
+    {
+      "id": 1,
+      "clue": "A decorative dot worn on the forehead, often a symbol of beauty.",
+      "answer": "BINDI",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5
+    },
+    {
+      "id": 9,
+      "clue": "What goes around comes around in life.",
+      "answer": "KARMA",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5
+    },
+    {
+      "id": 21,
+      "clue": "A bear that enjoys bamboo, not curry!",
+      "answer": "PANDA",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5
+    },
+    {
+      "id": 3,
+      "clue": "Young woman, often seen in vibrant traditional attire.",
+      "answer": "LASS",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4
+    },
+    {
+      "id": 10,
+      "clue": "Home sweet home for many, including the sparrows of India.",
+      "answer": "NEST",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4
+    },
+    {
+      "id": 12,
+      "clue": "Home to many a bustling bazaar.",
+      "answer": "TOWN",
+      "orientation": "DOWN",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4
+    },
+    {
+      "id": 15,
+      "clue": "Rise high like a kite in the sky.",
+      "answer": "SOAR",
+      "orientation": "ACROSS",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4
+    }
+  ],
+  "solutionGrid": [
+    [
+      "B",
+      "O",
+      "L",
+      "L",
+      "Y",
+      null
+    ],
+    [
+      "I",
+      null,
+      "A",
+      null,
+      null,
+      "K"
+    ],
+    [
+      "N",
+      "E",
+      "S",
+      "T",
+      null,
+      "A"
+    ],
+    [
+      "D",
+      null,
+      "S",
+      "O",
+      "A",
+      "R"
+    ],
+    [
+      "I",
+      null,
+      null,
+      "W",
+      null,
+      "M"
+    ],
+    [
+      null,
+      "P",
+      "A",
+      "N",
+      "D",
+      "A"
+    ]
+  ]
+}
