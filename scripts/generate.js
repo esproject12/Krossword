@@ -1,4 +1,4 @@
-// Final version with simplified prompt to ensure length-matching.
+// Final version with the most explicit prompt possible for length constraints.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -7,10 +7,10 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const OPENAI_MODEL_NAME = "gpt-3.5-turbo";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_MAIN_RETRIES = 3;
+const MAX_MAIN_RETRIES = 5;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 1000;
+const API_DELAY_MS = 1500;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -175,9 +175,12 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
       const system_prompt =
         "You are an expert crossword puzzle word filler. You only respond with a single, valid JSON object and nothing else.";
       const user_prompt = `
-          Find a single, common English word that fits the pattern "${currentWordPattern}" and provide a clever, short clue for it.
-          Prioritize common words. An India-themed word is a bonus if it fits perfectly.
+          Your primary task is to find a single common English word that is EXACTLY ${slot.length} letters long and fits the pattern "${currentWordPattern}". This is the most important instruction.
+          
+          Also provide a clever, short clue for the word.
+          The word should ideally be India-themed if a common one fits, but creating a valid word of the correct length is the top priority.
           ${uniquenessConstraint}
+          
           Your response format must be: {"answer": "THEWORD", "clue": "Your clever clue here."}
         `;
 
@@ -190,7 +193,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
             { role: "user", content: user_prompt },
           ],
           response_format: { type: "json_object" },
-          temperature: 0.8,
+          temperature: 0.7,
         });
 
         const responseContent = completion.choices[0]?.message?.content;
