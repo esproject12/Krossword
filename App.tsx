@@ -1,3 +1,4 @@
+// Final version with automatic daily refresh logic.
 import React, {
   useState,
   useEffect,
@@ -329,7 +330,12 @@ const CrosswordGame: React.FC<{
     setIsTimerRunning(false);
   };
 
-  if (!activeCell) return <div>Initializing...</div>;
+  if (!activeCell)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Initializing...
+      </div>
+    );
 
   return (
     <div className="container mx-auto p-2 sm:p-4 max-w-5xl bg-gray-50 min-h-screen flex flex-col">
@@ -423,6 +429,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Initial data loading
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
@@ -484,6 +491,24 @@ const App: React.FC = () => {
     };
     load();
   }, []);
+
+  // Automatic daily refresh logic
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (crosswordData) {
+        const today = getTodayDateString();
+        const titleDate = crosswordData.title.split(" - ")[1];
+        if (titleDate && titleDate !== today) {
+          console.log(
+            `New day detected! Puzzle date is ${titleDate}, today is ${today}. Reloading page.`
+          );
+          window.location.reload();
+        }
+      }
+    }, 1000 * 60 * 5); // Check every 5 minutes
+
+    return () => clearInterval(interval);
+  }, [crosswordData]);
 
   if (isLoading) {
     return (
