@@ -1,16 +1,16 @@
-// Final version with "Inner Retry Loop" for AI self-validation.
-import { GoogleGenAI } from "@google/genai";
+// Final version using OpenAI API with a robust "Chain-of-Thought" process.
+import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
-const GEMINI_MODEL_NAME = "gemini-1.5-flash-latest";
+const OPENAI_MODEL_NAME = "gpt-3.5-turbo";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 2000; // A safe delay to avoid rate limiting
+const API_DELAY_MS = 500;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,11 +74,12 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
+
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
     if (slotInfo) {
-      words.push({ ...filled, id: slotInfo.id });
+      words.push({ ...filled, id: slotInfo.id, startPosition: filled.start });
       const { answer, start, orientation } = filled;
       let { row, col } = start;
       for (const char of answer) {
@@ -88,6 +89,7 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
+
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
@@ -103,27 +105,37 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- AI-POWERED VALIDATION FUNCTION ---
 async function isWordValid(ai, word) {
   if (!word || word.length < 3) return false;
-  console.log(`    > Validating word: "${word}"...`);
   await sleep(API_DELAY_MS);
-  const prompt = `Is "${word}" a real, common, correctly-spelled English word? Please answer with only a single word: YES or NO.`;
-  const result = await ai.models.generateContent(prompt);
-  const responseText = result.response.text().trim().toUpperCase();
+  console.log(`    > Validating word: "${word}"...`);
+  const system_prompt =
+    "You are a validation assistant. Respond with only a single word: YES or NO.";
+  const user_prompt = `Is "${word}" a real, common, correctly-spelled English word?`;
+  const completion = await ai.chat.completions.create({
+    model: OPENAI_MODEL_NAME,
+    messages: [
+      { role: "system", content: system_prompt },
+      { role: "user", content: user_prompt },
+    ],
+    temperature: 0,
+    max_tokens: 3,
+  });
+  const responseText = completion.choices[0]?.message?.content
+    ?.trim()
+    .toUpperCase();
   console.log(`    > Validation response for "${word}": ${responseText}`);
   return responseText === "YES";
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC with INNER RETRY LOOP ---
-async function generateCrosswordWithChainOfThought(
-  slots,
-  yesterdaysWords = []
-) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("CRITICAL: GEMINI_API_KEY is not set.");
-  const ai = new GoogleGenAI({ apiKey });
+async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey)
+    throw new Error(
+      "CRITICAL: OPENAI_API_KEY secret is not set in the GitHub repository."
+    );
 
+  const openai = new OpenAI({ apiKey });
   const filledSlots = [];
   const tempGrid = Array(6)
     .fill(null)
@@ -139,7 +151,7 @@ async function generateCrosswordWithChainOfThought(
     while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
       wordAttempts++;
       console.log(
-        `  > Attempting to fill slot (${slot.length}, ${slot.orientation}) - Word Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
+        `  > Slot (${slot.length}, ${slot.orientation}), Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
       );
 
       let constraints = [];
@@ -156,43 +168,44 @@ async function generateCrosswordWithChainOfThought(
           currentWordPattern = p.join("");
         }
       }
+
       const uniquenessConstraint = `Do NOT use any of these words: ${[
         ...usedWords,
         ...failedWordsForSlot,
       ].join(", ")}.`;
-
-      const user_prompt = `
-          Find a single, India-themed English word and a clever, short clue for it.
-          Word to find: A ${
-            slot.length
-          }-letter word matching the pattern "${currentWordPattern}".
-          Constraints: ${
-            constraints.length > 0 ? constraints.join(" ") : "None."
-          }
-          ${uniquenessConstraint}
-          Your response MUST be a single, valid JSON object with the format: {"answer": "THEWORD", "clue": "Your clever clue here."}
-        `;
+      const system_prompt =
+        "You are an expert crossword puzzle word filler. You only respond with a single, valid JSON object and nothing else.";
+      const user_prompt = `Find a single, India-themed English word and a clever, short clue for it. Word to find: A ${
+        slot.length
+      }-letter word matching the pattern "${currentWordPattern}". Constraints: ${
+        constraints.join(" ") || "None."
+      } ${uniquenessConstraint}. Your response format must be: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
 
       try {
         await sleep(API_DELAY_MS);
-        const result = await ai.models.generateContent({
-          model: GEMINI_MODEL_NAME,
-          contents: [{ role: "user", parts: [{ text: user_prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.8,
-          },
+        const completion = await openai.chat.completions.create({
+          model: OPENAI_MODEL_NAME,
+          messages: [
+            { role: "system", content: system_prompt },
+            { role: "user", content: user_prompt },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.8,
         });
-        const responseText = result.response.text();
-        const { answer, clue } = JSON.parse(responseText);
+
+        const responseContent = completion.choices[0]?.message?.content;
+        if (!responseContent)
+          throw new Error("OpenAI returned an empty response.");
+
+        const { answer, clue } = JSON.parse(responseContent);
         const upperAnswer = answer.toUpperCase();
 
         if (upperAnswer.length !== slot.length)
-          throw new Error(`Word "${upperAnswer}" has incorrect length.`);
+          throw new Error(`Word "${upperAnswer}" has wrong length.`);
         if (usedWords.has(upperAnswer))
           throw new Error(`Word "${upperAnswer}" has been used.`);
 
-        if (await isWordValid(ai, upperAnswer)) {
+        if (await isWordValid(openai, upperAnswer)) {
           wordIsValid = true;
           usedWords.add(upperAnswer);
           let { row, col } = slot.start;
@@ -201,22 +214,18 @@ async function generateCrosswordWithChainOfThought(
             if (slot.orientation === "ACROSS") col++;
             else row++;
           }
-          filledSlots.push({
-            answer: upperAnswer,
-            clue,
-            orientation: slot.orientation,
-            start: slot.start,
-            length: slot.length,
-          });
+          filledSlots.push({ ...slot, answer: upperAnswer, clue });
         } else {
           failedWordsForSlot.push(upperAnswer);
-          throw new Error(`Word "${upperAnswer}" was deemed invalid.`);
+          throw new Error(
+            `Word "${upperAnswer}" was deemed invalid by validation API.`
+          );
         }
       } catch (e) {
-        console.warn(`    > Word Attempt ${wordAttempts} failed: ${e.message}`);
+        console.warn(`    > Word attempt failed: ${e.message}`);
         if (wordAttempts >= MAX_WORD_RETRIES) {
           throw new Error(
-            `Could not find a valid word for slot (${slot.length}, ${slot.orientation}) after ${MAX_WORD_RETRIES} tries.`
+            `Could not find a valid word for slot after ${MAX_WORD_RETRIES} tries.`
           );
         }
       }
@@ -233,6 +242,7 @@ async function main() {
   const todayStr = `${istDate.getFullYear()}-${String(
     istDate.getMonth() + 1
   ).padStart(2, "0")}-${String(istDate.getDate()).padStart(2, "0")}`;
+
   const puzzleDir = path.join(process.cwd(), "public", "puzzles");
   const puzzlePath = path.join(puzzleDir, `${todayStr}.json`);
   const samplePuzzlePath = path.join(puzzleDir, SAMPLE_PUZZLE_FILENAME);
@@ -245,8 +255,9 @@ async function main() {
   const validTemplates = templates.filter(
     (t) => findSlots(t).length >= MINIMUM_WORDS
   );
-  if (validTemplates.length === 0)
+  if (validTemplates.length === 0) {
     throw new Error(`No templates found with at least ${MINIMUM_WORDS} words.`);
+  }
   const chosenTemplate =
     validTemplates[Math.floor(Math.random() * validTemplates.length)];
   const slots = findSlots(chosenTemplate);
@@ -274,7 +285,7 @@ async function main() {
       `--- Generating new puzzle - Main Attempt ${attempt}/${MAX_MAIN_RETRIES} ---`
     );
     try {
-      const filledSlots = await generateCrosswordWithChainOfThought(
+      const filledSlots = await generateCrosswordWithOpenAI(
         slots,
         yesterdaysWords
       );
