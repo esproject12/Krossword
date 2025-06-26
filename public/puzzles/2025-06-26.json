@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-26",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "MUMBAI",
+      "clue": "City of dreams in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "MADRAS",
+      "clue": "City that's now officially Chennai.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "SUMMED",
+      "clue": "Put together in total.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "PALM",
+      "clue": "Tree commonly found in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "ACID",
+      "clue": "Sour substance in chemistry.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AMP",
+      "clue": "Small unit of electric current",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ASH",
+      "clue": "Remains after a fire.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "SUN",
+      "clue": "Star worshipped in India.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "GAS",
+      "clue": "Fuel in a car.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "M",
+      "P",
+      null,
+      "M",
+      "A"
+    ],
+    [
+      "S",
+      "U",
+      "N",
+      null,
+      "A",
+      "C"
+    ],
+    [
+      "H",
+      "U",
+      "L",
+      "M",
+      "E",
+      "I"
+    ],
+    [
+      null,
+      "B",
+      "M",
+      null,
+      "R",
+      "D"
+    ],
+    [
+      null,
+      "A",
+      null,
+      null,
+      "A",
+      null
+    ],
+    [
+      null,
+      "I",
+      null,
+      "G",
+      "A",
+      "S"
+    ]
+  ]
+}
