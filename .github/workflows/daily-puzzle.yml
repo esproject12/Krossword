@@ -1,6 +1,10 @@
 name: Generate Daily Crossword
 
 on:
+  # This action now runs ONLY on the develop branch
+  push:
+    branches:
+      - develop # For testing when you push to develop
   schedule:
     - cron: "31 18 * * *" # 00:01 IST
   workflow_dispatch:
@@ -12,10 +16,15 @@ jobs:
   generate_puzzle:
     runs-on: ubuntu-latest
 
+    # This condition ensures the scheduled run only happens on the develop branch
+    if: github.ref == 'refs/heads/develop'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          # Check out the develop branch specifically
+          ref: develop
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -33,15 +42,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit and push if changed
-        id: auto-commit-action # Give this step an ID
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "feat: ✨ Add daily crossword for"
           file_pattern: "public/puzzles/*.json"
-          # ... other commit settings ...
-
-      # --- NEW FINAL STEP: TRIGGER NETLIFY DEPLOY ---
-      - name: Trigger Netlify Build
-        # This step only runs if the previous commit step actually made a change
-        if: steps.auto-commit-action.outputs.changes_detected == 'true'
-        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}
+          branch: develop # Make sure the bot commits to the develop branch
+          push_options: "--force" # Force push is needed if the branch is protected
