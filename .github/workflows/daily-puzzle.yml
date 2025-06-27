@@ -2,8 +2,7 @@ name: Generate Daily Crossword
 
 on:
   schedule:
-    # Runs every day at 18:31 UTC, which is 00:01 Indian Standard Time (IST).
-    - cron: "31 18 * * *"
+    - cron: "31 18 * * *" # 00:01 IST
   workflow_dispatch:
 
 permissions:
@@ -31,15 +30,18 @@ jobs:
       - name: Generate new puzzle file
         run: node scripts/generate.js
         env:
-          # THIS IS THE CRITICAL FIX:
-          # We are now passing the OPENAI_API_KEY secret, which the script expects.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit and push if changed
+        id: auto-commit-action # Give this step an ID
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "feat: ✨ Add daily crossword for"
           file_pattern: "public/puzzles/*.json"
-          commit_user_name: "GitHub Actions Bot"
-          commit_user_email: "actions@github.com"
-          commit_author: "GitHub Actions Bot <actions@github.com>"
+          # ... other commit settings ...
+
+      # --- NEW FINAL STEP: TRIGGER NETLIFY DEPLOY ---
+      - name: Trigger Netlify Build
+        # This step only runs if the previous commit step actually made a change
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}
