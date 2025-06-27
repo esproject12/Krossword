@@ -1,4 +1,4 @@
-// Final version with the most explicit prompt possible for length constraints.
+// Final version using OpenAI API with a robust "Chain-of-Thought" process.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -7,10 +7,10 @@ import { templates } from "./templates/grid-templates.js";
 // --- CONFIGURATION ---
 const OPENAI_MODEL_NAME = "gpt-3.5-turbo";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
-const MAX_MAIN_RETRIES = 5;
+const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
-const API_DELAY_MS = 1500;
+const API_DELAY_MS = 500;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,6 +74,7 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
+
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
@@ -88,6 +89,7 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
+
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
