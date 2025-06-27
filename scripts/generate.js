@@ -1,11 +1,11 @@
-// Final version using the more powerful gpt-4o model.
+// Final version using a combined English + Indian dictionary for validation.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
-const OPENAI_MODEL_NAME = "gpt-4o"; // Using a more capable model
+const OPENAI_MODEL_NAME = "gpt-4o";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
@@ -14,6 +14,49 @@ const API_DELAY_MS = 1000;
 
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// --- DICTIONARY SETUP ---
+function loadDictionary() {
+  console.log("Loading dictionaries...");
+  const englishWordsPath = path.join(
+    process.cwd(),
+    "scripts",
+    "data",
+    "english_words.txt"
+  );
+  const indianWordsPath = path.join(
+    process.cwd(),
+    "scripts",
+    "data",
+    "indian_words.txt"
+  );
+
+  const englishWords = fs
+    .readFileSync(englishWordsPath, "utf-8")
+    .split("\n")
+    .map((w) => w.trim().toUpperCase());
+  const indianWords = fs
+    .readFileSync(indianWordsPath, "utf-8")
+    .split("\n")
+    .map((w) => w.trim().toUpperCase());
+
+  const combinedDictionary = new Set([...englishWords, ...indianWords]);
+  console.log(
+    `Dictionary loaded with ${combinedDictionary.size} unique words.`
+  );
+  return combinedDictionary;
+}
+const dictionary = loadDictionary();
+
+function isValidWord(word) {
+  const valid = dictionary.has(word.toUpperCase());
+  if (valid) {
+    console.log(`    > Validation for "${word}": PASSED (in dictionary)`);
+  } else {
+    console.log(`    > Validation for "${word}": FAILED (not in dictionary)`);
+  }
+  return valid;
+}
 
 // --- TEMPLATE LOGIC ---
 function findSlots(template) {
@@ -103,30 +146,7 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-async function isWordValid(ai, word) {
-  if (!word || word.length < 2) return false;
-  await sleep(API_DELAY_MS);
-  console.log(`    > Validating word: "${word}"...`);
-  const prompt = `Is "${word}" a real, common, correctly-spelled English word? Respond with only a single word: YES or NO.`;
-  const completion = await ai.chat.completions.create({
-    model: OPENAI_MODEL_NAME,
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0,
-    max_tokens: 3,
-  });
-  const responseText = completion.choices[0]?.message?.content
-    ?.trim()
-    .toUpperCase();
-  if (responseText === "YES") {
-    console.log(`    > Validation for "${word}": PASSED`);
-    return true;
-  }
-  console.log(
-    `    > Validation for "${word}": FAILED (Response: ${responseText})`
-  );
-  return false;
-}
-
+// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey)
@@ -193,7 +213,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
             { role: "user", content: user_prompt },
           ],
           response_format: { type: "json_object" },
-          temperature: 0.7,
+          temperature: 0.8,
         });
 
         const responseContent = completion.choices[0]?.message?.content;
@@ -211,11 +231,9 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         if (usedWords.has(upperAnswer)) {
           throw new Error(`Word "${upperAnswer}" has been used.`);
         }
-        if (!(await isWordValid(openai, upperAnswer))) {
+        if (!isValidWord(upperAnswer)) {
           failedWordsForSlot.push(upperAnswer);
-          throw new Error(
-            `Word "${upperAnswer}" was deemed invalid by validation API.`
-          );
+          throw new Error(`Word "${upperAnswer}" is not in the dictionary.`);
         }
 
         wordIsValid = true;
