@@ -1,12 +1,10 @@
 name: Generate Daily Crossword
 
 on:
-  # This action now runs ONLY on the develop branch
-  push:
-    branches:
-      - develop # For testing when you push to develop
   schedule:
-    - cron: "31 18 * * *" # 00:01 IST
+    # Runs every day at 18:31 UTC, which is 00:01 Indian Standard Time (IST).
+    - cron: "31 18 * * *"
+  # Allows you to run this workflow manually from the Actions tab for testing
   workflow_dispatch:
 
 permissions:
@@ -16,16 +14,13 @@ jobs:
   generate_puzzle:
     runs-on: ubuntu-latest
 
-    # This condition ensures the scheduled run only happens on the develop branch
-    if: github.ref == 'refs/heads/develop'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Check out the develop branch specifically
-          ref: develop
-          fetch-depth: 0
+          # We check out the main branch because that's where the puzzle will be committed.
+          ref: main
+          fetch-depth: 0 # Fetches all history to find yesterday's puzzle
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,7 +39,7 @@ jobs:
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "feat: ✨ Add daily crossword for"
+          commit_message: "feat(bot): ✨ Add daily crossword"
           file_pattern: "public/puzzles/*.json"
-          branch: develop # Make sure the bot commits to the develop branch
-          push_options: "--force" # Force push is needed if the branch is protected
+          # CRITICAL CHANGE: The bot now commits directly to the main branch.
+          branch: main
