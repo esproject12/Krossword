@@ -2,7 +2,9 @@ name: Generate Daily Crossword
 
 on:
   schedule:
-    - cron: "31 18 * * *" # 00:01 IST
+    # Runs every day at 18:31 UTC, which is 00:01 Indian Standard Time (IST).
+    - cron: "31 18 * * *"
+  # Allows you to run this workflow manually from the Actions tab for testing
   workflow_dispatch:
 
 permissions:
@@ -16,7 +18,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          # We check out the main branch because that's where the puzzle will be committed.
+          ref: main
+          fetch-depth: 0 # Fetches all history to find yesterday's puzzle
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,15 +37,9 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Commit and push if changed
-        id: auto-commit-action # Give this step an ID
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "feat: ✨ Add daily crossword for"
+          commit_message: "feat(bot): ✨ Add daily crossword"
           file_pattern: "public/puzzles/*.json"
-          # ... other commit settings ...
-
-      # --- NEW FINAL STEP: TRIGGER NETLIFY DEPLOY ---
-      - name: Trigger Netlify Build
-        # This step only runs if the previous commit step actually made a change
-        if: steps.auto-commit-action.outputs.changes_detected == 'true'
-        run: curl -X POST -d {} ${{ secrets.NETLIFY_BUILD_HOOK }}
+          # CRITICAL CHANGE: The bot now commits directly to the main branch.
+          branch: main
