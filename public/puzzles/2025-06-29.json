@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-29",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "MASALA",
+      "clue": "Spice blend found in Indian kitchens.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "BENGAL",
+      "clue": "Region renowned for its tigers and sweets in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "ASPENS",
+      "clue": "Trees known for their quaking leaves, but rarely found in India.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "CHIP",
+      "clue": "A token of luck or a crunchy bite, sometimes found in a samosa.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "OAST",
+      "clue": "A kiln for drying hops, perhaps seen in English-India tea gardens.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AMC",
+      "clue": "Cinema chain known for movie magic.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "APA",
+      "clue": "Indian grandmother, perhaps.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "PAH",
+      "clue": "Expression of disdain or disbelief; sounds like a flat tire.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ALT",
+      "clue": "Key found on a keyboard, and also short for 'alternative' music genre.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "M",
+      "C",
+      null,
+      "B",
+      "O"
+    ],
+    [
+      "P",
+      "A",
+      "H",
+      null,
+      "E",
+      "A"
+    ],
+    [
+      "A",
+      "S",
+      "I",
+      "E",
+      "N",
+      "S"
+    ],
+    [
+      null,
+      "A",
+      "P",
+      null,
+      "G",
+      "T"
+    ],
+    [
+      null,
+      "L",
+      null,
+      null,
+      "A",
+      null
+    ],
+    [
+      null,
+      "A",
+      null,
+      "A",
+      "L",
+      "T"
+    ]
+  ]
+}
