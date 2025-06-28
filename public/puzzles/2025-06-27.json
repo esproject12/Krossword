@@ -4,69 +4,123 @@
   "words": [
     {
       "id": 1,
-      "clue": "Capital city of India",
-      "answer": "DELHI",
       "orientation": "ACROSS",
-      "startPosition": {
+      "start": {
         "row": 0,
         "col": 0
       },
-      "length": 5
-    },
-    {
-      "id": 4,
-      "clue": "Spiritual teacher or master",
-      "answer": "GURU",
-      "orientation": "ACROSS",
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city that's both old and new.",
       "startPosition": {
-        "row": 4,
-        "col": 1
-      },
-      "length": 4
-    },
-    {
-      "id": 5,
-      "clue": "Steamed rice cake",
-      "answer": "IDLI",
-      "orientation": "ACROSS",
-      "startPosition": {
-        "row": 5,
-        "col": 2
-      },
-      "length": 4
+        "row": 0,
+        "col": 0
+      }
     },
     {
       "id": 1,
-      "clue": "Lentil stew",
-      "answer": "DAAL",
       "orientation": "DOWN",
-      "startPosition": {
+      "start": {
         "row": 0,
         "col": 0
       },
-      "length": 4
-    },
-    {
-      "id": 2,
-      "clue": "Sphere-shaped sweet",
-      "answer": "LADDU",
-      "orientation": "DOWN",
+      "length": 5,
+      "answer": "DANCE",
+      "clue": "An art form that thrives in Bollywood.",
       "startPosition": {
         "row": 0,
-        "col": 2
+        "col": 0
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
       },
-      "length": 5
+      "length": 5,
+      "answer": "SAREE",
+      "clue": "Traditional attire for many in India.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 21,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "SPICE",
+      "clue": "Essential in every Indian kitchen, adds flavor to life.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
     },
     {
       "id": 3,
-      "clue": "Festival of colors",
-      "answer": "HOLI",
       "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "LION",
+      "clue": "The king prowling around India's national parks.",
       "startPosition": {
         "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "NEON",
+      "clue": "Glowing element in urban signs and old Bombay cinema ambiance.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 12,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
         "col": 3
       },
-      "length": 4
+      "length": 4,
+      "answer": "NAVY",
+      "clue": "Branch safeguarding Indian seas.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "NARR",
+      "clue": "Storyteller's short form of narration.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
     }
   ],
   "solutionGrid": [
@@ -81,42 +135,42 @@
     [
       "A",
       null,
-      "A",
+      "I",
+      null,
+      null,
+      "S"
+    ],
+    [
+      "N",
+      "E",
       "O",
+      "N",
       null,
-      null
+      "A"
     ],
     [
+      "C",
+      null,
+      "N",
       "A",
-      null,
-      "D",
-      "L",
-      null,
-      null
-    ],
-    [
-      "L",
-      null,
-      "D",
-      "I",
-      null,
-      null
-    ],
-    [
-      null,
-      "G",
-      "U",
       "R",
-      "U",
-      null
+      "R"
+    ],
+    [
+      "E",
+      null,
+      null,
+      "V",
+      null,
+      "E"
     ],
     [
       null,
-      null,
-      "I",
-      "D",
-      "L",
-      "I"
+      "S",
+      "P",
+      "Y",
+      "C",
+      "E"
     ]
   ]
 }

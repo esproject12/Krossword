@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-28",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "GANGES",
+      "clue": "Sacred river flowing through India.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "GANDHI",
+      "clue": "India's peaceful freedom fighter.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "INVENT",
+      "clue": "Create or innovate, like a tech hub in Bengaluru.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "CAVE",
+      "clue": "Stone home beneath the hills.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "YETI",
+      "clue": "This Himalayan legend is not just a myth.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "UGC",
+      "clue": "India's higher education overseer (abbr.).",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "UNI",
+      "clue": "Short for a type of Indian university.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "NAA",
+      "clue": "A sound of refusal in India.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "BIT",
+      "clue": "A small part or piece, or India's digital currency unit.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "U",
+      "G",
+      "C",
+      null,
+      "G",
+      "Y"
+    ],
+    [
+      "N",
+      "A",
+      "A",
+      null,
+      "A",
+      "E"
+    ],
+    [
+      "I",
+      "N",
+      "V",
+      "E",
+      "N",
+      "T"
+    ],
+    [
+      null,
+      "G",
+      "E",
+      null,
+      "D",
+      "I"
+    ],
+    [
+      null,
+      "E",
+      null,
+      null,
+      "H",
+      null
+    ],
+    [
+      null,
+      "S",
+      null,
+      "B",
+      "I",
+      "T"
+    ]
+  ]
+}
