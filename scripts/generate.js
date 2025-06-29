@@ -1,11 +1,11 @@
-// Final version using a combined English + Indian dictionary for validation.
+// Final version with user's robust parsing, validation, and dictionary logic.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
-const OPENAI_MODEL_NAME = "gpt-4o";
+const OPENAI_MODEL_NAME = "gpt-4o"; // Using the most capable model
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
@@ -15,47 +15,62 @@ const API_DELAY_MS = 1000;
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// --- DICTIONARY SETUP ---
+// --- DICTIONARY & VALIDATION ---
+let mainDictionary = new Set();
+const customIndianWords = new Set([
+  "JAIPUR",
+  "KABADI",
+  "DIWALI",
+  "HOLI",
+  "PANEER",
+  "SAREE",
+  "GURU",
+  "YOGA",
+  "SITAR",
+  "BANYAN",
+  "RAGA",
+  "TAJ",
+  "LADDU",
+  "DAAL",
+  "IDLI",
+  "DELHI",
+  "MUMBAI",
+  "PUNE",
+  "GOA",
+  "VEDA",
+  "ASANA",
+  "CHAI",
+  "LOTUS",
+  "ROTI",
+  "SAMOSA",
+  "BHAJI",
+  "BINDI",
+  "KARMA",
+  "TANDOOR",
+  "MASALA",
+]);
+
 function loadDictionary() {
-  console.log("Loading dictionaries...");
-  const englishWordsPath = path.join(
-    process.cwd(),
-    "scripts",
-    "data",
-    "english_words.txt"
-  );
-  const indianWordsPath = path.join(
-    process.cwd(),
-    "scripts",
-    "data",
-    "indian_words.txt"
-  );
-
-  const englishWords = fs
-    .readFileSync(englishWordsPath, "utf-8")
-    .split("\n")
-    .map((w) => w.trim().toUpperCase());
-  const indianWords = fs
-    .readFileSync(indianWordsPath, "utf-8")
-    .split("\n")
-    .map((w) => w.trim().toUpperCase());
-
-  const combinedDictionary = new Set([...englishWords, ...indianWords]);
-  console.log(
-    `Dictionary loaded with ${combinedDictionary.size} unique words.`
-  );
-  return combinedDictionary;
+  try {
+    const words_txt = fs.readFileSync(
+      path.join(process.cwd(), "scripts", "words.txt"),
+      "utf-8"
+    );
+    mainDictionary = new Set(
+      words_txt.split("\n").map((w) => w.trim().toUpperCase())
+    );
+    console.log(`Dictionary loaded with ${mainDictionary.size} unique words.`);
+  } catch (e) {
+    console.warn(
+      "Warning: Main dictionary 'scripts/words.txt' not found. Using custom list only."
+    );
+  }
 }
-const dictionary = loadDictionary();
 
 function isValidWord(word) {
-  const valid = dictionary.has(word.toUpperCase());
-  if (valid) {
-    console.log(`    > Validation for "${word}": PASSED (in dictionary)`);
-  } else {
-    console.log(`    > Validation for "${word}": FAILED (not in dictionary)`);
-  }
-  return valid;
+  if (!word || word.length < 2) return false;
+  const upperWord = word.toUpperCase();
+  return mainDictionary.has(upperWord) || customIndianWords.has(upperWord);
 }
 
 // --- TEMPLATE LOGIC ---
@@ -117,6 +132,7 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
+
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
@@ -125,12 +141,20 @@ function buildPuzzle(template, filledSlots, date) {
       const { answer, start, orientation } = filled;
       let { row, col } = start;
       for (const char of answer) {
-        solutionGrid[row][col] = char;
-        if (orientation === "ACROSS") col++;
-        else row++;
+        if (row < gridSize && col < gridSize) {
+          if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
+            throw new Error(
+              `Intersection conflict at [${row},${col}] for word "${answer}".`
+            );
+          }
+          solutionGrid[row][col] = char;
+          if (orientation === "ACROSS") col++;
+          else row++;
+        }
       }
     }
   }
+
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
@@ -138,6 +162,7 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
+
   return {
     gridSize,
     title: `Indian Mini Crossword - ${date}`,
@@ -146,7 +171,7 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
+// --- GENERATION LOGIC ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey)
@@ -213,14 +238,36 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
             { role: "user", content: user_prompt },
           ],
           response_format: { type: "json_object" },
-          temperature: 0.8,
+          temperature: 0.7,
         });
 
         const responseContent = completion.choices[0]?.message?.content;
         if (!responseContent)
           throw new Error("OpenAI returned an empty response.");
 
-        const { answer, clue } = JSON.parse(responseContent);
+        let parsed = {};
+        try {
+          parsed = JSON.parse(responseContent);
+        } catch (parseErr) {
+          throw new Error(
+            "Could not parse OpenAI response as JSON: " + responseContent
+          );
+        }
+        const { answer, clue } = parsed;
+        if (typeof answer !== "string" || !answer.trim()) {
+          throw new Error(
+            `OpenAI response missing or invalid 'answer': ${JSON.stringify(
+              parsed
+            )}`
+          );
+        }
+        if (typeof clue !== "string" || !clue.trim()) {
+          throw new Error(
+            `OpenAI response missing or invalid 'clue': ${JSON.stringify(
+              parsed
+            )}`
+          );
+        }
         const upperAnswer = answer.toUpperCase();
 
         if (upperAnswer.length !== slot.length) {
@@ -258,7 +305,10 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   return filledSlots;
 }
 
+// --- MAIN SCRIPT ---
 async function main() {
+  loadDictionary();
+
   const now = new Date();
   const istDate = new Date(
     now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
@@ -277,11 +327,16 @@ async function main() {
   const validTemplates = templates.filter(
     (t) => findSlots(t).length >= MINIMUM_WORDS
   );
-  if (validTemplates.length === 0)
-    throw new Error(`No templates found with at least ${MINIMUM_WORDS} words.`);
+  if (validTemplates.length === 0) {
+    console.error(
+      `No templates found with at least ${MINIMUM_WORDS} words. Check grid-templates.js`
+    );
+    process.exit(1);
+  }
   const chosenTemplate =
     validTemplates[Math.floor(Math.random() * validTemplates.length)];
   const slots = findSlots(chosenTemplate);
+  console.log(`Selected a template with ${slots.length} words.`);
 
   let yesterdaysWords = [];
   try {
@@ -296,6 +351,10 @@ async function main() {
       yesterdaysWords = JSON.parse(
         fs.readFileSync(yesterdayPath, "utf-8")
       ).words.map((w) => w.answer);
+      console.log(
+        "Found yesterday's words to avoid:",
+        yesterdaysWords.join(", ")
+      );
     }
   } catch (e) {
     console.warn("Could not read yesterday's puzzle.", e.message);
