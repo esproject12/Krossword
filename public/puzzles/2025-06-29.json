@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-29",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "SAREES",
+      "clue": "Traditional Indian attire for women.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "TEMPLE",
+      "clue": "Sacred structure often visited in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "AROMAS",
+      "clue": "Fragrant scents often found in Indian cuisine.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "ATOM",
+      "clue": "Smallest unit, or a Bollywood twist?",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "BASK",
+      "clue": "Enjoy the warmth of the Indian sun.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "USA",
+      "clue": "Three letters that unite the world; think of a country, not a continent.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "UMA",
+      "clue": "A goddess name, also a common Indian name.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "MAT",
+      "clue": "A traditional woven floor covering, often seen in Indian households.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "GET",
+      "clue": "Acquire or gather, often seen in Bollywood plots.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "U",
+      "S",
+      "A",
+      null,
+      "T",
+      "B"
+    ],
+    [
+      "M",
+      "A",
+      "T",
+      null,
+      "E",
+      "A"
+    ],
+    [
+      "A",
+      "R",
+      "O",
+      "M",
+      "A",
+      "S"
+    ],
+    [
+      null,
+      "E",
+      "M",
+      null,
+      "P",
+      "K"
+    ],
+    [
+      null,
+      "E",
+      null,
+      null,
+      "L",
+      null
+    ],
+    [
+      null,
+      "S",
+      null,
+      "G",
+      "E",
+      "T"
+    ]
+  ]
+}
