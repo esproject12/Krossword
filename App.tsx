@@ -1,4 +1,3 @@
-// Final version with automatic daily refresh logic.
 import React, {
   useState,
   useEffect,
@@ -41,6 +40,7 @@ interface CachedCrossword {
 
 const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28";
 
+// This component encapsulates the entire crossword game logic
 const CrosswordGame: React.FC<{
   initialData: CrosswordData;
   error?: string | null;
@@ -145,32 +145,43 @@ const CrosswordGame: React.FC<{
     };
   }, [isTimerRunning, isPuzzleSolved]);
 
+  const getActiveWordPath = (word: WordDefinition): CellPosition[] => {
+    const path: CellPosition[] = [];
+    for (let i = 0; i < word.length; i++) {
+      if (word.orientation === "ACROSS") {
+        path.push({
+          row: word.startPosition.row,
+          col: word.startPosition.col + i,
+        });
+      } else {
+        path.push({
+          row: word.startPosition.row + i,
+          col: word.startPosition.col,
+        });
+      }
+    }
+    return path;
+  };
+
   const moveToNextCell = () => {
     if (!activeCell || !activeWord) return;
-    let { row, col } = activeCell;
-    const { length, startPosition, orientation } = activeWord;
-    const wordEnd =
-      orientation === "ACROSS"
-        ? startPosition.col + length - 1
-        : startPosition.row + length - 1;
-    if (orientation === "ACROSS" && col < wordEnd) {
-      setActiveCell({ row, col: col + 1 });
-    } else if (orientation === "DOWN" && row < wordEnd) {
-      setActiveCell({ row: row + 1, col });
+    const wordPath = getActiveWordPath(activeWord);
+    const currentIndex = wordPath.findIndex(
+      (p) => p.row === activeCell.row && p.col === activeCell.col
+    );
+    if (currentIndex !== -1 && currentIndex < wordPath.length - 1) {
+      setActiveCell(wordPath[currentIndex + 1]);
     }
   };
 
   const moveToPrevCell = () => {
-    if (!activeCell) return;
-    let { row, col } = activeCell;
-    if (activeDirection === "ACROSS") {
-      const newCol = col - 1;
-      if (newCol >= 0 && crosswordData.solutionGrid[row][newCol] !== null)
-        setActiveCell({ row, col: newCol });
-    } else {
-      const newRow = row - 1;
-      if (newRow >= 0 && crosswordData.solutionGrid[newRow][col] !== null)
-        setActiveCell({ row: newRow, col });
+    if (!activeCell || !activeWord) return;
+    const wordPath = getActiveWordPath(activeWord);
+    const currentIndex = wordPath.findIndex(
+      (p) => p.row === activeCell.row && p.col === activeCell.col
+    );
+    if (currentIndex > 0) {
+      setActiveCell(wordPath[currentIndex - 1]);
     }
   };
 
@@ -179,14 +190,17 @@ const CrosswordGame: React.FC<{
     startTimer();
     const upperValue = value.substring(0, 1).toUpperCase();
     const cellWasEmpty = !userGrid[row][col];
+
     if (userGrid[row][col] === upperValue) {
       moveToNextCell();
       return;
     }
+
     const newUserGrid = userGrid.map((r, rIdx) =>
       rIdx === row ? r.map((c, cIdx) => (cIdx === col ? upperValue : c)) : r
     );
     setUserGrid(newUserGrid);
+
     if (cellCheckGrid) {
       const newCheckGrid = cellCheckGrid.map((r, rIdx) =>
         rIdx === row
@@ -197,6 +211,7 @@ const CrosswordGame: React.FC<{
       );
       setCellCheckGrid(newCheckGrid);
     }
+
     if (cellWasEmpty && upperValue) {
       moveToNextCell();
     }
@@ -204,14 +219,17 @@ const CrosswordGame: React.FC<{
 
   const handleCellFocus = (row: number, col: number) => {
     if (crosswordData.solutionGrid[row][col] === null) return;
+
     const isSameCell = activeCell?.row === row && activeCell?.col === col;
     let newDirection = activeDirection;
+
     if (isSameCell) {
       newDirection = activeDirection === "ACROSS" ? "DOWN" : "ACROSS";
       if (!findWordAtCell({ row, col }, newDirection)) {
         newDirection = activeDirection;
       }
     }
+
     setActiveCell({ row, col });
     setActiveDirection(newDirection);
   };
@@ -429,7 +447,6 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initial data loading
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
@@ -492,7 +509,6 @@ const App: React.FC = () => {
     load();
   }, []);
 
-  // Automatic daily refresh logic
   useEffect(() => {
     const interval = setInterval(() => {
       if (crosswordData) {
@@ -505,8 +521,7 @@ const App: React.FC = () => {
           window.location.reload();
         }
       }
-    }, 1000 * 60 * 5); // Check every 5 minutes
-
+    }, 1000 * 60 * 5);
     return () => clearInterval(interval);
   }, [crosswordData]);
 
