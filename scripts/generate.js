@@ -1,4 +1,4 @@
-// Final version with user's robust parsing, validation, and all other safeguards.
+// Final version with user's definitive intersection validation logic.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -178,11 +178,11 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const usedWords = new Set(yesterdaysWords);
 
   for (const slot of sortedSlots) {
-    let wordIsValid = false;
+    let wordIsValidAndFits = false;
     let wordAttempts = 0;
     const failedWordsForSlot = [];
 
-    while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
+    while (!wordIsValidAndFits && wordAttempts < MAX_WORD_RETRIES) {
       wordAttempts++;
       console.log(
         `  > Slot (${slot.length}, ${slot.orientation}), Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
@@ -235,46 +235,39 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         if (!responseContent)
           throw new Error("OpenAI returned an empty response.");
 
-        // Your robust parsing logic
-        let parsed = {};
-        try {
-          parsed = JSON.parse(responseContent);
-        } catch (parseErr) {
-          throw new Error(
-            "Could not parse OpenAI response as JSON: " + responseContent
-          );
-        }
-        const { answer, clue } = parsed;
-        if (typeof answer !== "string" || !answer.trim()) {
-          throw new Error(
-            `OpenAI response missing or invalid 'answer': ${JSON.stringify(
-              parsed
-            )}`
-          );
-        }
-        if (typeof clue !== "string" || !clue.trim()) {
-          throw new Error(
-            `OpenAI response missing or invalid 'clue': ${JSON.stringify(
-              parsed
-            )}`
-          );
-        }
+        const { answer, clue } = JSON.parse(responseContent);
         const upperAnswer = answer.toUpperCase();
 
-        if (upperAnswer.length !== slot.length) {
+        // Your definitive intersection validation
+        let matchesGrid = true;
+        let r_check = slot.start.row;
+        let c_check = slot.start.col;
+        for (let i = 0; i < upperAnswer.length; i++) {
+          const gridLetter = tempGrid[r_check][c_check];
+          if (gridLetter && gridLetter !== upperAnswer[i]) {
+            matchesGrid = false;
+            break;
+          }
+          if (slot.orientation === "ACROSS") c_check++;
+          else r_check++;
+        }
+        if (!matchesGrid) {
+          failedWordsForSlot.push(upperAnswer);
           throw new Error(
-            `Word "${upperAnswer}" has wrong length (got ${upperAnswer.length}, needed ${slot.length}).`
+            `Word "${upperAnswer}" does not match the intersecting grid letters.`
           );
         }
-        if (usedWords.has(upperAnswer)) {
+
+        if (upperAnswer.length !== slot.length)
+          throw new Error(`Word "${upperAnswer}" has wrong length.`);
+        if (usedWords.has(upperAnswer))
           throw new Error(`Word "${upperAnswer}" has been used.`);
-        }
         if (!isValidWord(upperAnswer)) {
           failedWordsForSlot.push(upperAnswer);
           throw new Error(`Word "${upperAnswer}" is not in the dictionary.`);
         }
 
-        wordIsValid = true;
+        wordIsValidAndFits = true;
         usedWords.add(upperAnswer);
         let { row, col } = slot.start;
         for (const char of upperAnswer) {
