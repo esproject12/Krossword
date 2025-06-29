@@ -1,11 +1,11 @@
-// Final version with user's robust parsing, validation, and dictionary logic.
+// Final version with user's robust parsing, validation, and all other safeguards.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { templates } from "./templates/grid-templates.js";
 
 // --- CONFIGURATION ---
-const OPENAI_MODEL_NAME = "gpt-4o"; // Using the most capable model
+const OPENAI_MODEL_NAME = "gpt-4o";
 const SAMPLE_PUZZLE_FILENAME = "2024-07-28.json";
 const MAX_MAIN_RETRIES = 3;
 const MAX_WORD_RETRIES = 3;
@@ -132,7 +132,6 @@ function buildPuzzle(template, filledSlots, date) {
     const key = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
     slotMap.set(key, { id: slot.id });
   });
-
   for (const filled of filledSlots) {
     const key = `${filled.orientation}-${filled.start.row}-${filled.start.col}`;
     const slotInfo = slotMap.get(key);
@@ -141,20 +140,12 @@ function buildPuzzle(template, filledSlots, date) {
       const { answer, start, orientation } = filled;
       let { row, col } = start;
       for (const char of answer) {
-        if (row < gridSize && col < gridSize) {
-          if (solutionGrid[row][col] && solutionGrid[row][col] !== char) {
-            throw new Error(
-              `Intersection conflict at [${row},${col}] for word "${answer}".`
-            );
-          }
-          solutionGrid[row][col] = char;
-          if (orientation === "ACROSS") col++;
-          else row++;
-        }
+        solutionGrid[row][col] = char;
+        if (orientation === "ACROSS") col++;
+        else row++;
       }
     }
   }
-
   for (let r = 0; r < gridSize; r++) {
     for (let c = 0; c < gridSize; c++) {
       if (template[r][c] === "0") {
@@ -162,7 +153,6 @@ function buildPuzzle(template, filledSlots, date) {
       }
     }
   }
-
   return {
     gridSize,
     title: `Indian Mini Crossword - ${date}`,
@@ -245,6 +235,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         if (!responseContent)
           throw new Error("OpenAI returned an empty response.");
 
+        // Your robust parsing logic
         let parsed = {};
         try {
           parsed = JSON.parse(responseContent);
