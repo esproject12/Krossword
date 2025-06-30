@@ -1,4 +1,4 @@
-// Final version using a combined English + Indian dictionary for validation.
+// Final version with user's definitive intersection validation logic.
 import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
@@ -15,47 +15,62 @@ const API_DELAY_MS = 1000;
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// --- DICTIONARY SETUP ---
+// --- DICTIONARY & VALIDATION ---
+let mainDictionary = new Set();
+const customIndianWords = new Set([
+  "JAIPUR",
+  "KABADI",
+  "DIWALI",
+  "HOLI",
+  "PANEER",
+  "SAREE",
+  "GURU",
+  "YOGA",
+  "SITAR",
+  "BANYAN",
+  "RAGA",
+  "TAJ",
+  "LADDU",
+  "DAAL",
+  "IDLI",
+  "DELHI",
+  "MUMBAI",
+  "PUNE",
+  "GOA",
+  "VEDA",
+  "ASANA",
+  "CHAI",
+  "LOTUS",
+  "ROTI",
+  "SAMOSA",
+  "BHAJI",
+  "BINDI",
+  "KARMA",
+  "TANDOOR",
+  "MASALA",
+]);
+
 function loadDictionary() {
-  console.log("Loading dictionaries...");
-  const englishWordsPath = path.join(
-    process.cwd(),
-    "scripts",
-    "data",
-    "english_words.txt"
-  );
-  const indianWordsPath = path.join(
-    process.cwd(),
-    "scripts",
-    "data",
-    "indian_words.txt"
-  );
-
-  const englishWords = fs
-    .readFileSync(englishWordsPath, "utf-8")
-    .split("\n")
-    .map((w) => w.trim().toUpperCase());
-  const indianWords = fs
-    .readFileSync(indianWordsPath, "utf-8")
-    .split("\n")
-    .map((w) => w.trim().toUpperCase());
-
-  const combinedDictionary = new Set([...englishWords, ...indianWords]);
-  console.log(
-    `Dictionary loaded with ${combinedDictionary.size} unique words.`
-  );
-  return combinedDictionary;
+  try {
+    const words_txt = fs.readFileSync(
+      path.join(process.cwd(), "scripts", "words.txt"),
+      "utf-8"
+    );
+    mainDictionary = new Set(
+      words_txt.split("\n").map((w) => w.trim().toUpperCase())
+    );
+    console.log(`Dictionary loaded with ${mainDictionary.size} unique words.`);
+  } catch (e) {
+    console.warn(
+      "Warning: Main dictionary 'scripts/words.txt' not found. Using custom list only."
+    );
+  }
 }
-const dictionary = loadDictionary();
 
 function isValidWord(word) {
-  const valid = dictionary.has(word.toUpperCase());
-  if (valid) {
-    console.log(`    > Validation for "${word}": PASSED (in dictionary)`);
-  } else {
-    console.log(`    > Validation for "${word}": FAILED (not in dictionary)`);
-  }
-  return valid;
+  if (!word || word.length < 2) return false;
+  const upperWord = word.toUpperCase();
+  return mainDictionary.has(upperWord) || customIndianWords.has(upperWord);
 }
 
 // --- TEMPLATE LOGIC ---
@@ -146,7 +161,7 @@ function buildPuzzle(template, filledSlots, date) {
   };
 }
 
-// --- "CHAIN-OF-THOUGHT" GENERATION LOGIC ---
+// --- GENERATION LOGIC ---
 async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey)
@@ -163,11 +178,11 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   const usedWords = new Set(yesterdaysWords);
 
   for (const slot of sortedSlots) {
-    let wordIsValid = false;
+    let wordIsValidAndFits = false;
     let wordAttempts = 0;
     const failedWordsForSlot = [];
 
-    while (!wordIsValid && wordAttempts < MAX_WORD_RETRIES) {
+    while (!wordIsValidAndFits && wordAttempts < MAX_WORD_RETRIES) {
       wordAttempts++;
       console.log(
         `  > Slot (${slot.length}, ${slot.orientation}), Attempt ${wordAttempts}/${MAX_WORD_RETRIES}`
@@ -213,7 +228,7 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
             { role: "user", content: user_prompt },
           ],
           response_format: { type: "json_object" },
-          temperature: 0.8,
+          temperature: 0.7,
         });
 
         const responseContent = completion.choices[0]?.message?.content;
@@ -223,20 +238,36 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
         const { answer, clue } = JSON.parse(responseContent);
         const upperAnswer = answer.toUpperCase();
 
-        if (upperAnswer.length !== slot.length) {
+        // Your definitive intersection validation
+        let matchesGrid = true;
+        let r_check = slot.start.row;
+        let c_check = slot.start.col;
+        for (let i = 0; i < upperAnswer.length; i++) {
+          const gridLetter = tempGrid[r_check][c_check];
+          if (gridLetter && gridLetter !== upperAnswer[i]) {
+            matchesGrid = false;
+            break;
+          }
+          if (slot.orientation === "ACROSS") c_check++;
+          else r_check++;
+        }
+        if (!matchesGrid) {
+          failedWordsForSlot.push(upperAnswer);
           throw new Error(
-            `Word "${upperAnswer}" has wrong length (got ${upperAnswer.length}, needed ${slot.length}).`
+            `Word "${upperAnswer}" does not match the intersecting grid letters.`
           );
         }
-        if (usedWords.has(upperAnswer)) {
+
+        if (upperAnswer.length !== slot.length)
+          throw new Error(`Word "${upperAnswer}" has wrong length.`);
+        if (usedWords.has(upperAnswer))
           throw new Error(`Word "${upperAnswer}" has been used.`);
-        }
         if (!isValidWord(upperAnswer)) {
           failedWordsForSlot.push(upperAnswer);
           throw new Error(`Word "${upperAnswer}" is not in the dictionary.`);
         }
 
-        wordIsValid = true;
+        wordIsValidAndFits = true;
         usedWords.add(upperAnswer);
         let { row, col } = slot.start;
         for (const char of upperAnswer) {
@@ -258,7 +289,10 @@ async function generateCrosswordWithOpenAI(slots, yesterdaysWords = []) {
   return filledSlots;
 }
 
+// --- MAIN SCRIPT ---
 async function main() {
+  loadDictionary();
+
   const now = new Date();
   const istDate = new Date(
     now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
@@ -277,11 +311,16 @@ async function main() {
   const validTemplates = templates.filter(
     (t) => findSlots(t).length >= MINIMUM_WORDS
   );
-  if (validTemplates.length === 0)
-    throw new Error(`No templates found with at least ${MINIMUM_WORDS} words.`);
+  if (validTemplates.length === 0) {
+    console.error(
+      `No templates found with at least ${MINIMUM_WORDS} words. Check grid-templates.js`
+    );
+    process.exit(1);
+  }
   const chosenTemplate =
     validTemplates[Math.floor(Math.random() * validTemplates.length)];
   const slots = findSlots(chosenTemplate);
+  console.log(`Selected a template with ${slots.length} words.`);
 
   let yesterdaysWords = [];
   try {
@@ -296,6 +335,10 @@ async function main() {
       yesterdaysWords = JSON.parse(
         fs.readFileSync(yesterdayPath, "utf-8")
       ).words.map((w) => w.answer);
+      console.log(
+        "Found yesterday's words to avoid:",
+        yesterdaysWords.join(", ")
+      );
     }
   } catch (e) {
     console.warn("Could not read yesterday's puzzle.", e.message);
