@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-30",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city that's a blend of old and new.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DEITY",
+      "clue": "A divine being worshipped in temples.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "CURRY",
+      "clue": "Spicy dish loved across India.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 21,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "PANDY",
+      "clue": "Nickname for rebellious soldier during the 1857 uprising in India.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "LASS",
+      "clue": "A Scottish girl, like many in Bollywood dance numbers.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "INNS",
+      "clue": "Resting spots all over India.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 12,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "SARI",
+      "clue": "Traditional Indian attire for women.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SAGE",
+      "clue": "Wise figure often found in Indian mythology.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "D",
+      "E",
+      "L",
+      "H",
+      "I",
+      null
+    ],
+    [
+      "E",
+      null,
+      "A",
+      null,
+      null,
+      "C"
+    ],
+    [
+      "I",
+      "N",
+      "N",
+      "S",
+      null,
+      "U"
+    ],
+    [
+      "T",
+      null,
+      "S",
+      "A",
+      "G",
+      "E"
+    ],
+    [
+      "Y",
+      null,
+      null,
+      "R",
+      null,
+      "R"
+    ],
+    [
+      null,
+      "P",
+      "A",
+      "I",
+      "D",
+      "Y"
+    ]
+  ]
+}

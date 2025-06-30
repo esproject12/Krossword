@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-29",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SARIS",
+      "clue": "Traditional Indian attire with drapes.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SAHIB",
+      "clue": "Respectful title in India, often used by sherpas.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "TIGER",
+      "clue": "India's national animal, known for its stripes.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 21,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "TAMAR",
+      "clue": "Indian fruit known for its tangy flavor",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "RANI",
+      "clue": "Indian queen or princess, often depicted in royal attire.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "HIND",
+      "clue": "Prefix for an Indian subcontinent region",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 12,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "DORM",
+      "clue": "Where students might sleep in India and beyond.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "IOTA",
+      "clue": "Tiny unit of measure, often used metaphorically.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "S",
+      "A",
+      "R",
+      "I",
+      "S",
+      null
+    ],
+    [
+      "A",
+      null,
+      "A",
+      null,
+      null,
+      "T"
+    ],
+    [
+      "H",
+      "I",
+      "N",
+      "D",
+      null,
+      "I"
+    ],
+    [
+      "I",
+      null,
+      "I",
+      "O",
+      "T",
+      "A"
+    ],
+    [
+      "B",
+      null,
+      null,
+      "R",
+      null,
+      "E"
+    ],
+    [
+      null,
+      "T",
+      "A",
+      "M",
+      "A",
+      "R"
+    ]
+  ]
+}
