@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-02",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "KERALA",
+      "clue": "Indian state known for backwaters and spices.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "MASALA",
+      "clue": "Indian spice blend that adds flavor to life.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "ARREST",
+      "clue": "To capture or detain; a common scene in Bollywood crime films.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "YARN",
+      "clue": "A tale spun from colorful threads.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "RITE",
+      "clue": "Ceremonial act common in Indian traditions",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "SKY",
+      "clue": "Above India's vibrant festivals.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "SPA",
+      "clue": "Relaxation hub, often with Ayurvedic treatments.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "PEA",
+      "clue": "Tiny green vegetable often found in Indian 'matar paneer'.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "TAN",
+      "clue": "Shade you'd get in Goa.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "S",
+      "K",
+      "Y",
+      null,
+      "M",
+      "R"
+    ],
+    [
+      "P",
+      "E",
+      "A",
+      null,
+      "A",
+      "I"
+    ],
+    [
+      "A",
+      "R",
+      "R",
+      "E",
+      "S",
+      "T"
+    ],
+    [
+      null,
+      "A",
+      "N",
+      null,
+      "A",
+      "E"
+    ],
+    [
+      null,
+      "L",
+      null,
+      null,
+      "L",
+      null
+    ],
+    [
+      null,
+      "A",
+      null,
+      "T",
+      "A",
+      "N"
+    ]
+  ]
+}

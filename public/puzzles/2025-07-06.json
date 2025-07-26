@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-06",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "MUMBAI",
+      "clue": "Bollywood's bustling city.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "BANYAN",
+      "clue": "Sacred fig tree known for sprawling roots in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "EMBANK",
+      "clue": "Build a protective wall along a river.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "ORBS",
+      "clue": "Mystical spheres gazed upon by astrologers.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "YAKS",
+      "clue": "Himalayan beasts of burden.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AMO",
+      "clue": "Prefix for 'love' in Latin.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ACE",
+      "clue": "One in a deck of cards.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "CUR",
+      "clue": "A surly or cowardly dog.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 11,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ANT",
+      "clue": "Small insect that lives in a colony.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "M",
+      "O",
+      null,
+      "B",
+      "Y"
+    ],
+    [
+      "C",
+      "U",
+      "R",
+      null,
+      "A",
+      "A"
+    ],
+    [
+      "E",
+      "M",
+      "B",
+      "A",
+      "N",
+      "K"
+    ],
+    [
+      null,
+      "B",
+      "S",
+      null,
+      "Y",
+      "S"
+    ],
+    [
+      null,
+      "A",
+      null,
+      null,
+      "A",
+      null
+    ],
+    [
+      null,
+      "I",
+      null,
+      "A",
+      "N",
+      "T"
+    ]
+  ]
+}

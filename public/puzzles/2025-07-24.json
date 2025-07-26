@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-24",
+  "words": [
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "GANGES",
+      "clue": "Sacred river flowing through India.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "INGOT",
+      "clue": "Metal bar found in treasure and trade.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "BRACE",
+      "clue": "Support for a joint or a pair of items.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "TIGER",
+      "clue": "India's national animal, known for its stripes.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 5,
+      "answer": "ARENA",
+      "clue": "A place for sports or grand events.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "MASSE",
+      "clue": "In billiards, a shot that bends around a ball; sounds like 'mass' in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "TAM",
+      "clue": "A Scottish cap that rhymes with 'ram'.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "IRA",
+      "clue": "An acronym often associated with retirement savings in the U.S.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ENS",
+      "clue": "Short for a naval rank; often seen in typography.",
+      "startPosition": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "RAE",
+      "clue": "Sounds like a ray of sunshine, yet not a light.",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "I",
+      "B",
+      null,
+      "T",
+      "A",
+      "M"
+    ],
+    [
+      "N",
+      "R",
+      null,
+      "I",
+      "R",
+      "A"
+    ],
+    [
+      "G",
+      "A",
+      "N",
+      "G",
+      "E",
+      "S"
+    ],
+    [
+      "O",
+      "C",
+      null,
+      "E",
+      "N",
+      "S"
+    ],
+    [
+      "T",
+      "E",
+      null,
+      "R",
+      "A",
+      "E"
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ]
+}

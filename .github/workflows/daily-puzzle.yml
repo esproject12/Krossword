@@ -1,0 +1,45 @@
+name: Generate Daily Crossword
+
+on:
+  schedule:
+    # Runs every day at 18:31 UTC, which is 00:01 Indian Standard Time (IST).
+    - cron: "31 18 * * *"
+  # Allows you to run this workflow manually from the Actions tab for testing
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate_puzzle:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # We check out the main branch because that's where the puzzle will be committed.
+          ref: main
+          fetch-depth: 0 # Fetches all history to find yesterday's puzzle
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate new puzzle file
+        run: node scripts/generate.js
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "feat(bot): ✨ Add daily crossword"
+          file_pattern: "public/puzzles/*.json"
+          # CRITICAL CHANGE: The bot now commits directly to the main branch.
+          branch: main

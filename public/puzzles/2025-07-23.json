@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-23",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SARIS",
+      "clue": "Traditional attire for many Indian women.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SITAR",
+      "clue": "Stringed instrument often found in classical Indian music.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "CURRY",
+      "clue": "Spice-laden dish often served with rice.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "AGONY",
+      "clue": "Extreme pain or suffering, as in a Bollywood drama.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "RISK",
+      "clue": "Calculated move in a game of chance.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "TASK",
+      "clue": "An important duty assigned to you, often requiring effort.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "KETO",
+      "clue": "A trendy low-carb diet.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "KEIR",
+      "clue": "Surname of the founder of the Indian Workers' Union.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "S",
+      "A",
+      "R",
+      "I",
+      "S",
+      null
+    ],
+    [
+      "I",
+      null,
+      "I",
+      null,
+      null,
+      "C"
+    ],
+    [
+      "T",
+      "A",
+      "S",
+      "K",
+      null,
+      "U"
+    ],
+    [
+      "A",
+      null,
+      "K",
+      "E",
+      "I",
+      "R"
+    ],
+    [
+      "R",
+      null,
+      null,
+      "T",
+      null,
+      "R"
+    ],
+    [
+      null,
+      "A",
+      "G",
+      "O",
+      "N",
+      "Y"
+    ]
+  ]
+}

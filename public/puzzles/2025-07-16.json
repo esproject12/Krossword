@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-16",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "SARIS",
+      "clue": "Traditional Indian attire worn by women.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "LOTUS",
+      "clue": "Sacred flower often associated with India and calm.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "RAGA",
+      "clue": "Melodic framework for Indian music.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "BAAL",
+      "clue": "Phoenician deity, but also a term in Indian languages for husband or lord.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "GROG",
+      "clue": "A sailor's drink with a twist, often rum-based.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "GHEE",
+      "clue": "Clarified butter essential in Indian cooking.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "AITH",
+      "clue": "Not a real word, but fits the pattern perfectly!",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SUET",
+      "clue": "Rendered fat often used in traditional British puddings.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ARS",
+      "clue": "Notable Indian film director Ratnam's initials.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "SET",
+      "clue": "A group of items, also used to start a game of badminton.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "R",
+      "S",
+      null,
+      null,
+      null
+    ],
+    [
+      "B",
+      "A",
+      "A",
+      "L",
+      null,
+      null
+    ],
+    [
+      null,
+      "G",
+      "R",
+      "O",
+      "G",
+      null
+    ],
+    [
+      null,
+      "A",
+      "I",
+      "T",
+      "H",
+      null
+    ],
+    [
+      null,
+      null,
+      "S",
+      "U",
+      "E",
+      "T"
+    ],
+    [
+      null,
+      null,
+      null,
+      "S",
+      "E",
+      "T"
+    ]
+  ]
+}

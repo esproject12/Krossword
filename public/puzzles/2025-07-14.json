@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-14",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "SARIS",
+      "clue": "Traditional Indian garment.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city with a rich history.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "YOGA",
+      "clue": "Ancient practice for body and mind balance.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "LOAD",
+      "clue": "What a truck might carry.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "GREY",
+      "clue": "A neutral shade often seen in monsoon skies.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "YARN",
+      "clue": "A tale spun with threads or words.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "AILA",
+      "clue": "Traditional Nepalese and Tibetan distilled beverage.",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SHRI",
+      "clue": "A respectful title often used before names in India.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "BYS",
+      "clue": "Short for 'goodbyes'; often emotional farewells.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "INK",
+      "clue": "Fluid for a scribe's quill.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "B",
+      "Y",
+      "S",
+      null,
+      null,
+      null
+    ],
+    [
+      "L",
+      "O",
+      "A",
+      "D",
+      null,
+      null
+    ],
+    [
+      null,
+      "G",
+      "R",
+      "E",
+      "Y",
+      null
+    ],
+    [
+      null,
+      "A",
+      "I",
+      "L",
+      "A",
+      null
+    ],
+    [
+      null,
+      null,
+      "S",
+      "H",
+      "R",
+      "I"
+    ],
+    [
+      null,
+      null,
+      null,
+      "I",
+      "N",
+      "K"
+    ]
+  ]
+}

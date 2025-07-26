@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-01",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "BENGAL",
+      "clue": "Indian region known for its tigers and sweets.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "BOMBAY",
+      "clue": "Old name for India's bustling metropolis.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "ENIGMA",
+      "clue": "A puzzling mystery with six letters.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SPIN",
+      "clue": "A rapid rotation, or a tale that might be told in Bollywood.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "CHAT",
+      "clue": "Type of informal talk; also a spicy street snack in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ABS",
+      "clue": "Muscles you might sweat over at the gym.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ARE",
+      "clue": "The plural form of India's smallest unit.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "REP",
+      "clue": "Short for representative in politics or sales.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "RYE",
+      "clue": "Grain used in Indian bread.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "B",
+      "S",
+      null,
+      "B",
+      "C"
+    ],
+    [
+      "R",
+      "E",
+      "P",
+      null,
+      "O",
+      "H"
+    ],
+    [
+      "E",
+      "N",
+      "I",
+      "G",
+      "M",
+      "A"
+    ],
+    [
+      null,
+      "G",
+      "N",
+      null,
+      "B",
+      "T"
+    ],
+    [
+      null,
+      "A",
+      null,
+      null,
+      "A",
+      null
+    ],
+    [
+      null,
+      "L",
+      null,
+      "R",
+      "Y",
+      "E"
+    ]
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-08",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "TIGER",
+      "clue": "India's national animal, known for its stripes.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "CURRY",
+      "clue": "Spicy dish loved in India.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "CHAT",
+      "clue": "Type of Indian snack, often spicy and tangy.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "CHIC",
+      "clue": "Stylishly elegant, often spotted on fashion runways.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "AGUE",
+      "clue": "Feverish fit, perhaps not uncommon in monsoon India.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "EMIT",
+      "clue": "Release a sound or light.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "TERM",
+      "clue": "Word for a period, not an office.",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "RRIP",
+      "clue": "A sound of tearing fabric, twice over.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ACT",
+      "clue": "Something done or performed.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "YTD",
+      "clue": "Abbreviation for year-to-date.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "C",
+      "T",
+      null,
+      null,
+      null
+    ],
+    [
+      "C",
+      "H",
+      "I",
+      "C",
+      null,
+      null
+    ],
+    [
+      null,
+      "A",
+      "G",
+      "U",
+      "E",
+      null
+    ],
+    [
+      null,
+      "T",
+      "E",
+      "R",
+      "M",
+      null
+    ],
+    [
+      null,
+      null,
+      "R",
+      "R",
+      "I",
+      "P"
+    ],
+    [
+      null,
+      null,
+      null,
+      "Y",
+      "T",
+      "D"
+    ]
+  ]
+}

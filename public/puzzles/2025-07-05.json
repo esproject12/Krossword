@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-05",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city known for its Red Fort.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DURGA",
+      "clue": "Hindu goddess with a lion's heart.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "SAREE",
+      "clue": "Traditional garment with pleats and pallu.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "CACHE",
+      "clue": "Hidden stash or old memory storage.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "LASS",
+      "clue": "A young girl, perhaps seen at an Indian festival.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "RASH",
+      "clue": "Quick decision or Indian mild curry.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "HOLC",
+      "clue": "Home Loan Corporation, briefly.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SOUR",
+      "clue": "Tamarind taste often found in Indian cuisine.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "D",
+      "E",
+      "L",
+      "H",
+      "I",
+      null
+    ],
+    [
+      "U",
+      null,
+      "A",
+      null,
+      null,
+      "S"
+    ],
+    [
+      "R",
+      "A",
+      "S",
+      "H",
+      null,
+      "A"
+    ],
+    [
+      "G",
+      null,
+      "S",
+      "O",
+      "U",
+      "R"
+    ],
+    [
+      "A",
+      null,
+      null,
+      "L",
+      null,
+      "E"
+    ],
+    [
+      null,
+      "C",
+      "A",
+      "C",
+      "H",
+      "E"
+    ]
+  ]
+}

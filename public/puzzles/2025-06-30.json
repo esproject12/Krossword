@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-06-30",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city with a historic charm in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "DALIT",
+      "clue": "Member of a marginalized group in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "GANGA",
+      "clue": "Sacred river of India.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 21,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "COBRA",
+      "clue": "This hooded reptile is often found in Indian folklore.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "LASS",
+      "clue": "Young girl, often seen in Scottish folklore.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "LUSH",
+      "clue": "Verdant landscapes, often seen in Kerala.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 12,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "HERB",
+      "clue": "Coriander or mint in Indian cuisine.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 15,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SEWN",
+      "clue": "Stitched together, often in a sari.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "D",
+      "E",
+      "L",
+      "H",
+      "I",
+      null
+    ],
+    [
+      "A",
+      null,
+      "A",
+      null,
+      null,
+      "G"
+    ],
+    [
+      "L",
+      "U",
+      "S",
+      "H",
+      null,
+      "A"
+    ],
+    [
+      "I",
+      null,
+      "S",
+      "E",
+      "W",
+      "N"
+    ],
+    [
+      "T",
+      null,
+      null,
+      "R",
+      null,
+      "G"
+    ],
+    [
+      null,
+      "C",
+      "O",
+      "B",
+      "R",
+      "A"
+    ]
+  ]
+}

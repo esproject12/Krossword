@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-07",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "GANDHI",
+      "clue": "His peaceful path changed a nation.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "SAREES",
+      "clue": "Indian attire that's six yards of style.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "INTERN",
+      "clue": "A temporary position in a company, often for students.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "RITE",
+      "clue": "Ceremonial act, often seen in Indian rituals.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "POND",
+      "clue": "Small body of water; found in gardens or villages.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AGR",
+      "clue": "Prefix for 'culture' or 'business'.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AMI",
+      "clue": "French word for a friend.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "MAI",
+      "clue": "French May, in English.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 11,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ASP",
+      "clue": "A venomous snake associated with Cleopatra.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "G",
+      "R",
+      null,
+      "S",
+      "P"
+    ],
+    [
+      "M",
+      "A",
+      "I",
+      null,
+      "A",
+      "O"
+    ],
+    [
+      "I",
+      "N",
+      "T",
+      "E",
+      "R",
+      "N"
+    ],
+    [
+      null,
+      "D",
+      "E",
+      null,
+      "E",
+      "D"
+    ],
+    [
+      null,
+      "H",
+      null,
+      null,
+      "E",
+      null
+    ],
+    [
+      null,
+      "I",
+      null,
+      "A",
+      "S",
+      "P"
+    ]
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-09",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "BRASS",
+      "clue": "Metal often used in Indian musical instruments.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "SARIS",
+      "clue": "Traditional Indian attire often draped.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "RANI",
+      "clue": "Indian queen in a royal tale.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "JARS",
+      "clue": "Vessels for Indian pickles.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "NAAM",
+      "clue": "Hindi for 'name', often heard in Bollywood songs.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "MOAT",
+      "clue": "A defensive water feature seen around ancient Indian forts.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "ISRO",
+      "clue": "India's space agency with a stellar reputation.",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "SIAM",
+      "clue": "Former kingdom in Southeast Asia.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ORB",
+      "clue": "Spherical celestial body.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "STY",
+      "clue": "Messy pigpen",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "O",
+      "R",
+      "B",
+      null,
+      null,
+      null
+    ],
+    [
+      "J",
+      "A",
+      "R",
+      "S",
+      null,
+      null
+    ],
+    [
+      null,
+      "N",
+      "A",
+      "A",
+      "M",
+      null
+    ],
+    [
+      null,
+      "I",
+      "S",
+      "R",
+      "O",
+      null
+    ],
+    [
+      null,
+      null,
+      "S",
+      "I",
+      "A",
+      "M"
+    ],
+    [
+      null,
+      null,
+      null,
+      "S",
+      "T",
+      "Y"
+    ]
+  ]
+}
