@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-29",
+  "words": [
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "KABABS",
+      "clue": "Skewered treats preferred by many in Delhi.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "YOKED",
+      "clue": "Bound together, like oxen in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "PLAID",
+      "clue": "Patterned fabric often seen in kilts or school uniforms.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "DRAMA",
+      "clue": "A tale often performed on stage or screen.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 5,
+      "answer": "UMBRA",
+      "clue": "Shadow seen during a solar eclipse.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "BASIL",
+      "clue": "Herb often used in Italian pasta sauces.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "DUB",
+      "clue": "To give a title, often used in voice-over translation.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "RMA",
+      "clue": "Abbreviation for a commonly used return merchandise policy in retail.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "MRI",
+      "clue": "A scan with a magnetic touch, often found in hospitals.",
+      "startPosition": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "AAL",
+      "clue": "Indian spice commonly used in cooking.",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "Y",
+      "P",
+      null,
+      "D",
+      "U",
+      "B"
+    ],
+    [
+      "O",
+      "L",
+      null,
+      "R",
+      "M",
+      "A"
+    ],
+    [
+      "K",
+      "A",
+      "B",
+      "A",
+      "B",
+      "S"
+    ],
+    [
+      "E",
+      "I",
+      null,
+      "M",
+      "R",
+      "I"
+    ],
+    [
+      "D",
+      "D",
+      null,
+      "A",
+      "A",
+      "L"
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ]
+}
