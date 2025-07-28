@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-27",
+  "words": [
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "SAMOSA",
+      "clue": "Triangular Indian snack with a spicy filling.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "MUSIC",
+      "clue": "Tunes that can be classical or Bollywood.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "GUAVA",
+      "clue": "Tropical fruit enjoyed in India, often pink inside.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "CLOUD",
+      "clue": "Monsoon brings these in abundance.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 5,
+      "answer": "MASSE",
+      "clue": "Crucial shot in billiards, also a large group gathering.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "GRANT",
+      "clue": "A formal permission or a common surname in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "CMG",
+      "clue": "Abbreviation for a promising career move in medicine.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "LAR",
+      "clue": "Short for a unit of currency in Bhutan, often overshadowed by the rupee.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "USN",
+      "clue": "Not quite the Indian Navy, but close!",
+      "startPosition": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "DET",
+      "clue": "Part of a police department, short for detective, sometimes found in movies.",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "M",
+      "G",
+      null,
+      "C",
+      "M",
+      "G"
+    ],
+    [
+      "U",
+      "U",
+      null,
+      "L",
+      "A",
+      "R"
+    ],
+    [
+      "S",
+      "A",
+      "M",
+      "O",
+      "S",
+      "A"
+    ],
+    [
+      "I",
+      "V",
+      null,
+      "U",
+      "S",
+      "N"
+    ],
+    [
+      "C",
+      "A",
+      null,
+      "D",
+      "E",
+      "T"
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-28",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "RIVER",
+      "clue": "Ganges or Yamuna, flowing through India.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "DELHI",
+      "clue": "Capital city known for its vibrant culture and history.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "CASH",
+      "clue": "What you might exchange for rupees.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "MAID",
+      "clue": "Domestic helper or a chess piece's move with a different name.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "SVEN",
+      "clue": "Common Scandinavian name that fits perfectly.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "NEEM",
+      "clue": "Indian tree with medicinal uses.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "HELE",
+      "clue": "A journey or pilgrimage, especially in historical English contexts.",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "RHEA",
+      "clue": "A flightless bird and an Indian mythology goddess.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "OCR",
+      "clue": "Text recognition software often used for scanning documents.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "IMP",
+      "clue": "Mischievous little creature, often found in tales.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "O",
+      "C",
+      "R",
+      null,
+      null,
+      null
+    ],
+    [
+      "M",
+      "A",
+      "I",
+      "D",
+      null,
+      null
+    ],
+    [
+      null,
+      "S",
+      "V",
+      "E",
+      "N",
+      null
+    ],
+    [
+      null,
+      "H",
+      "E",
+      "L",
+      "E",
+      null
+    ],
+    [
+      null,
+      null,
+      "R",
+      "H",
+      "E",
+      "A"
+    ],
+    [
+      null,
+      null,
+      null,
+      "I",
+      "M",
+      "P"
+    ]
+  ]
+}
