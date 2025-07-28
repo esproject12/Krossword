@@ -1,5 +1,4 @@
-// src/components/CrosswordGrid.tsx (Full code with correct styling)
-
+// src/components/CrosswordGrid.tsx (with logging)
 import React, { useRef, useEffect, useMemo } from "react";
 import type {
   UserGrid,
@@ -37,7 +36,6 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
   onCellKeyDown,
   isMobile = false,
 }) => {
-  // --- THIS LINE IS FOR DEBUGGING AND CAN BE REMOVED LATER ---
   console.log("%c[CrosswordGrid] Render Pass", "color: purple");
 
   const { gridSize, solutionGrid, words } = crosswordData;
@@ -54,7 +52,7 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
       console.log(
         `%c[CrosswordGrid] DIAGNOSIS - Rendered size: Width=${rect.width.toFixed(
           2
-        )}px, Height=${rect.height.toFixed(2)}px`,
+        )}, Height=${rect.height.toFixed(2)}`,
         "color: purple; font-weight: bold"
       );
     }
@@ -62,6 +60,9 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
 
   useEffect(() => {
     if (activeCell) {
+      console.log(
+        `[CrosswordGrid] useEffect focusing cell: {row: ${activeCell.row}, col: ${activeCell.col}}`
+      );
       inputRefs.current[activeCell.row]?.[activeCell.col]?.focus();
     }
   }, [activeCell]);
@@ -112,19 +113,12 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
     }
   };
 
+  console.log("[CrosswordGrid] About to render grid cells.");
   return (
     <div
       ref={gridRef}
-      className="grid gap-0.5 bg-gray-500 p-0.5 shadow-lg rounded"
-      // --- THIS STYLE BLOCK IS THE ONLY CHANGE ---
-      // It restores the good visual design.
-      style={{
-        gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-        aspectRatio: "1 / 1",
-        width: "100%",
-        maxWidth: "450px",
-        maxHeight: "100%",
-      }}
+      className="grid gap-px bg-gray-500 p-px shadow-lg rounded"
+      style={{ gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))` }}
     >
       {userGrid.map((rowArr, rowIndex) =>
         rowArr.map((cellValue, colIndex) => {
