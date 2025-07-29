@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-07-30",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "BANGLE",
+      "clue": "Ornamental wrist accessory often worn in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "GANGES",
+      "clue": "Sacred river flowing through India.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "ONLINE",
+      "clue": "Connected in the digital world, just like India's IT boom.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "BOLT",
+      "clue": "A quick escape or a metal fastener.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "HEEL",
+      "clue": "Foot's back, or a shoe's boost.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ABB",
+      "clue": "Prefix for famous Indian architecture and design.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AGO",
+      "clue": "In the past, not just recently.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "GAO",
+      "clue": "An acronym for an Indian administrative office, but here a valid 3-letter word.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 11,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ASH",
+      "clue": "What remains after Diwali fireworks.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "B",
+      "B",
+      null,
+      "G",
+      "H"
+    ],
+    [
+      "G",
+      "A",
+      "O",
+      null,
+      "A",
+      "E"
+    ],
+    [
+      "O",
+      "N",
+      "L",
+      "I",
+      "N",
+      "E"
+    ],
+    [
+      null,
+      "G",
+      "T",
+      null,
+      "G",
+      "L"
+    ],
+    [
+      null,
+      "L",
+      null,
+      null,
+      "E",
+      null
+    ],
+    [
+      null,
+      "E",
+      null,
+      "A",
+      "S",
+      "H"
+    ]
+  ]
+}
