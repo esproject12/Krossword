@@ -6,11 +6,26 @@
     <title>Dodo Krossword</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
+      /* body {
         margin: 0;
         font-family: sans-serif;
         background-color: #f3f4f6;
-      }
+      } */ 
+       
+  html, body, #root {
+    height: 100%; /* Ensure parent elements can provide a height context */
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    /* The Fix: Use dynamic viewport height and prevent overflow */
+    height: 100dvh; 
+    font-family: sans-serif;
+    background-color: #f3f4f6;
+    overflow: hidden; /* Prevent any accidental body scroll */
+  }
+  /* ... rest of styles */
+
       /* Custom scrollbar for webkit browsers */
       ::-webkit-scrollbar {
         width: 8px;

@@ -23,7 +23,7 @@ import ClueList from "./components/ClueList";
 import Toolbar from "./components/Toolbar";
 import Timer from "./components/Timer";
 import { useMediaQuery } from "./hooks/useMediaQuery";
-import { useWindowHeight } from "./hooks/useWindowHeight";
+// import { useWindowHeight } from "./hooks/useWindowHeight";
 import ClueBar from "./components/ClueBar";
 import OnScreenKeyboard from "./components/OnScreenKeyboard";
 
@@ -51,7 +51,7 @@ const CrosswordGame: React.FC<{
   console.log("%c[CrosswordGame] Render Pass", "color: orange;");
 
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const windowHeight = useWindowHeight();
+ //  const windowHeight = useWindowHeight();
 
   console.log(
     `[CrosswordGame] isMobile: ${isMobile}, windowHeight: ${Math.round(
@@ -453,7 +453,7 @@ const CrosswordGame: React.FC<{
 
   return (
     <div
-      style={{ height: windowHeight }}
+      // style={{ height: windowHeight }}
       className="w-screen bg-gray-50 flex flex-col"
     >
       <header ref={headerRef} className="text-center py-2 px-2 flex-shrink-0">
