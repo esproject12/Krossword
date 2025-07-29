@@ -65,7 +65,7 @@ const CrosswordGame: React.FC<{
   const mobileGridContainerRef = useRef<HTMLDivElement>(null);
   const mobileFooterRef = useRef<HTMLElement>(null);
 
-  useLayoutEffect(() => {
+  /* useLayoutEffect(() => {
     const timerId = setTimeout(() => {
       if (isMobile && mobileMainRef.current && headerRef.current) {
         console.log(
@@ -106,7 +106,7 @@ const CrosswordGame: React.FC<{
     }, 500);
 
     return () => clearTimeout(timerId);
-  }, [isMobile, windowHeight]);
+  }, [isMobile, windowHeight]); */
 
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
