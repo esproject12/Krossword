@@ -6,11 +6,7 @@
     <title>Dodo Krossword</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* body {
-        margin: 0;
-        font-family: sans-serif;
-        background-color: #f3f4f6;
-      } */ 
+      
        
   html, body, #root {
     height: 100%; /* Ensure parent elements can provide a height context */
@@ -24,7 +20,13 @@
     background-color: #f3f4f6;
     overflow: hidden; /* Prevent any accidental body scroll */
   }
-  /* ... rest of styles */
+  /* This targets devices that are likely phones (including iPhone) */
+  @media (pointer: coarse) and (max-width: 768px) {
+    body {
+      height: 100dvh;
+      overflow: auto;
+    }
+  }
 
       /* Custom scrollbar for webkit browsers */
       ::-webkit-scrollbar {
