@@ -23,7 +23,6 @@ import ClueList from "./components/ClueList";
 import Toolbar from "./components/Toolbar";
 import Timer from "./components/Timer";
 import { useMediaQuery } from "./hooks/useMediaQuery";
-// import { useWindowHeight } from "./hooks/useWindowHeight";
 import ClueBar from "./components/ClueBar";
 import OnScreenKeyboard from "./components/OnScreenKeyboard";
 
@@ -51,62 +50,8 @@ const CrosswordGame: React.FC<{
   console.log("%c[CrosswordGame] Render Pass", "color: orange;");
 
   const isMobile = useMediaQuery("(max-width: 768px)");
- //  const windowHeight = useWindowHeight();
-
-  console.log(
-    `[CrosswordGame] isMobile: ${isMobile}, windowHeight: ${Math.round(
-      windowHeight
-    )}px`
-  );
 
   const headerRef = useRef<HTMLElement>(null);
-  const mobileMainRef = useRef<HTMLElement>(null);
-  const mobileTimerRef = useRef<HTMLDivElement>(null);
-  const mobileGridContainerRef = useRef<HTMLDivElement>(null);
-  const mobileFooterRef = useRef<HTMLElement>(null);
-
-  /* useLayoutEffect(() => {
-    const timerId = setTimeout(() => {
-      if (isMobile && mobileMainRef.current && headerRef.current) {
-        console.log(
-          `%c--- LAYOUT DIAGNOSTIC REPORT ---`,
-          "color: blue; font-weight: bold; font-size: 14px;"
-        );
-
-        const appContainerHeight = windowHeight;
-        const headerHeight = headerRef.current.offsetHeight;
-        const mainContainerHeight = mobileMainRef.current.offsetHeight;
-        const totalRenderedHeight = headerHeight + mainContainerHeight;
-
-        console.log(
-          `Window/App Container Height: ${Math.round(appContainerHeight)}px`
-        );
-        console.log("------------------------------------");
-        console.log(`Header Height:              ${headerHeight}px`);
-        console.log(`Main Container Height:      ${mainContainerHeight}px`);
-        console.log("------------------------------------");
-        console.log(`SUM of Heights:             ${totalRenderedHeight}px`);
-
-        if (
-          Math.round(totalRenderedHeight) >
-          Math.round(appContainerHeight) + 1
-        ) {
-          // Add 1px buffer for subpixel rounding
-          console.error(
-            `%cSCROLL/OVERLAP DETECTED! Total height (${totalRenderedHeight}px) is greater than screen height (${appContainerHeight}px).`,
-            "color: red; font-size: 14px; font-weight: bold;"
-          );
-        } else {
-          console.log(
-            `%cLayout OK. Total height (${totalRenderedHeight}px) fits within screen height (${appContainerHeight}px).`,
-            "color: green; font-size: 14px;"
-          );
-        }
-      }
-    }, 500);
-
-    return () => clearTimeout(timerId);
-  }, [isMobile, windowHeight]); */
 
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
@@ -452,10 +397,7 @@ const CrosswordGame: React.FC<{
     );
 
   return (
-    <div
-      // style={{ height: windowHeight }}
-      className="w-screen bg-gray-50 flex flex-col"
-    >
+    <div className="w-screen h-full bg-gray-50 flex flex-col">
       <header ref={headerRef} className="text-center py-2 px-2 flex-shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
           Dodo Krossword
@@ -471,21 +413,12 @@ const CrosswordGame: React.FC<{
       </header>
 
       {isMobile ? (
-        <main
-          ref={mobileMainRef}
-          className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0"
-        >
-          <div
-            ref={mobileTimerRef}
-            className="w-full flex justify-center flex-shrink-0"
-          >
+        <main className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0">
+          <div className="w-full flex justify-center flex-shrink-0">
             <Timer time={time} />
           </div>
 
-          <div
-            ref={mobileGridContainerRef}
-            className="w-full flex items-center justify-center min-h-0"
-          >
+          <div className="w-full flex items-center justify-center min-h-0">
             <CrosswordGrid
               crosswordData={crosswordData}
               userGrid={userGrid}
@@ -499,10 +432,7 @@ const CrosswordGame: React.FC<{
             />
           </div>
 
-          <footer
-            ref={mobileFooterRef}
-            className="w-full flex flex-col gap-2 flex-shrink-0"
-          >
+          <footer className="w-full flex flex-col gap-2 flex-shrink-0">
             <ClueBar
               activeWord={activeWord}
               activeDirection={activeDirection}
