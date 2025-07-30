@@ -23,7 +23,7 @@ const KeyboardButton: React.FC<
 > = ({ children, onClick, className = "", flex = 1 }) => (
   <button
     onClick={onClick}
-    className={`h-12 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
+    className={`h-10 sm:h-12 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
     style={{ flex: `${flex}` }}
   >
     {children}
@@ -110,7 +110,7 @@ const OnScreenKeyboard: React.FC<OnScreenKeyboardProps> = ({
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-0.5 sm:gap-1">
           {keys.map((row, rowIndex) => (
             <div key={rowIndex} className="flex justify-center gap-1 w-full">
               {rowIndex === 1 && <div style={{ flex: 0.5 }} />}
