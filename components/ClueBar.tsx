@@ -42,18 +42,16 @@ const ClueBar: React.FC<ClueBarProps> = ({
 return (
   <div
     ref={ref}
-    // Default is small, 'tall:' prefix makes it larger
+    // Default is small. 'tall:' prefix makes classes larger on tall screens.
     className="w-full h-14 tall:h-16 p-1.5 tall:p-2 flex items-center justify-between text-xs tall:text-sm bg-blue-600 text-white rounded-lg shadow-md"
   >
     <button
       onClick={onPrevClue}
-      // Default is small, 'tall:' prefix makes it larger
       className="p-1 tall:p-1.5 rounded-full hover:bg-blue-700"
       aria-label="Previous clue"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        // Default is small, 'tall:' prefix makes it larger
         className="h-4 w-4 tall:h-5 tall:w-5"
         fill="none"
         viewBox="0 0 24 24"
@@ -75,13 +73,11 @@ return (
     </div>
     <button
       onClick={onNextClue}
-      // Default is small, 'tall:' prefix makes it larger
       className="p-1 tall:p-1.5 rounded-full hover:bg-blue-700"
       aria-label="Next clue"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        // Default is small, 'tall:' prefix makes it larger
         className="h-4 w-4 tall:h-5 tall:w-5"
         fill="none"
         viewBox="0 0 24 24"

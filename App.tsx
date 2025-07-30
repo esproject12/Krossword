@@ -414,42 +414,51 @@ const mobileGridContainerRef = useRef<HTMLDivElement>(null);
       </header>
 
       {isMobile ? (
-        <main className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0">
-          <div className="w-full flex justify-center flex-shrink-0">
-            <Timer time={time} />
-          </div>
+        <main  
+        ref={mobileMainRef}
+  className="flex-grow flex flex-col gap-2 px-2 pb-2 min-h-0"
+>
+  <div className="w-full flex justify-center flex-shrink-0">
+    <Timer time={time} />
+  </div>
 
-          <div ref={mobileGridContainerRef} className="w-full h-full flex items-center justify-center min-h-0">
-            
-            <CrosswordGrid
-              crosswordData={crosswordData}
-              userGrid={userGrid}
-              activeCell={activeCell}
-              activeDirection={activeDirection}
-              cellCheckGrid={cellCheckGrid}
-              onCellChange={handleCellChange}
-              onCellClick={handleCellClick}
-              onCellKeyDown={handleKeyDown}
-              isMobile={isMobile}
-            />
-          </div>
+  {/* This is the key change: flex-grow tells this section to expand and fill space */}
+  <div
+    ref={mobileGridContainerRef}
+    className="w-full flex-grow flex items-center justify-center min-h-0"
+  >
+    <CrosswordGrid
+      crosswordData={crosswordData}
+      userGrid={userGrid}
+      activeCell={activeCell}
+      activeDirection={activeDirection}
+      cellCheckGrid={cellCheckGrid}
+      onCellChange={handleCellChange}
+      onCellClick={handleCellClick}
+      onCellKeyDown={handleKeyDown}
+      isMobile={isMobile}
+    />
+  </div>
 
-          <footer className="w-full flex flex-col gap-2 flex-shrink-0">
-            <ClueBar
-              activeWord={activeWord}
-              activeDirection={activeDirection}
-              onPrevClue={() => handleClueNavigation(false)}
-              onNextClue={() => handleClueNavigation(true)}
-            />
-            <OnScreenKeyboard
-              onKeyPress={handleOnScreenKeyPress}
-              onCheckPuzzle={handleCheckPuzzle}
-              onRevealWord={handleRevealWord}
-              onRevealPuzzle={handleRevealPuzzle}
-              onClearPuzzle={handleClearPuzzle}
-              isPuzzleSolved={isPuzzleSolved}
-            />
-          </footer>
+  <footer
+    ref={mobileFooterRef}
+    className="w-full flex flex-col gap-2 flex-shrink-0"
+  >
+    <ClueBar
+      activeWord={activeWord}
+      activeDirection={activeDirection}
+      onPrevClue={() => handleClueNavigation(false)}
+      onNextClue={() => handleClueNavigation(true)}
+    />
+    <OnScreenKeyboard
+      onKeyPress={handleOnScreenKeyPress}
+      onCheckPuzzle={handleCheckPuzzle}
+      onRevealWord={handleRevealWord}
+      onRevealPuzzle={handleRevealPuzzle}
+      onClearPuzzle={handleClearPuzzle}
+      isPuzzleSolved={isPuzzleSolved}
+    />
+  </footer>
         </main>
       ) : (
         <main className="flex flex-col lg:flex-row gap-4 md:gap-6 items-start justify-center flex-grow p-4 overflow-y-auto">

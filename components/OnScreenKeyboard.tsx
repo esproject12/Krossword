@@ -16,14 +16,14 @@ interface OnScreenKeyboardProps extends ToolbarProps {
 
 const KeyboardButton: React.FC<
   React.PropsWithChildren<{
-    onClick: () => void;
+   onClick: () => void;
     className?: string;
     flex?: number | string;
   }>
 > = ({ children, onClick, className = "", flex = 1 }) => (
   <button
     onClick={onClick}
-    // Default height is h-10, 'tall:' prefix makes it h-12
+    // Default height is h-10. 'tall:' prefix makes it h-12 on tall screens.
     className={`h-10 tall:h-12 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
     style={{ flex: `${flex}` }}
   >
