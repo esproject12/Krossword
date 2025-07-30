@@ -54,6 +54,7 @@ const CrosswordGame: React.FC<{
   const headerRef = useRef<HTMLElement>(null);
 const mobileGridContainerRef = useRef<HTMLDivElement>(null);
 const mobileMainRef = useRef<HTMLElement>(null);
+const mobileFooterRef = useRef<HTMLElement>(null);
 
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
