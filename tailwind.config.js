@@ -10,7 +10,7 @@ export default {
     extend: {
       screens: {
         // This creates our custom 'tall:' variant for screens 800px or taller
-        'tall': { 'raw': '(min-height: 800px)' },
+        'tall': { 'raw': '(min-height: 740px)' },
       },
     },
   },
