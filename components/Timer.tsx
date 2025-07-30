@@ -29,7 +29,7 @@ const Timer: React.FC<TimerProps> = ({ time }) => {
   return (
     <div
       ref={ref}
-      className="text-xl font-mono text-gray-700 bg-white px-4 py-2 rounded-md shadow-sm border"
+      className="text-lg font-mono text-gray-700 bg-white px-3 py-1 rounded-md shadow-sm border"
     >
       {formatTime(time)}
     </div>
