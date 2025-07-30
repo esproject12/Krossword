@@ -20,13 +20,17 @@
     background-color: #f3f4f6;
     overflow: hidden; /* Prevent any accidental body scroll */
   }
-  /* This targets devices that are likely phones (including iPhone) */
-  @media (pointer: coarse) and (max-width: 768px) {
-    body {
-      height: 100dvh;
-      overflow: auto;
+  /*
+    This query targets devices that are very likely small iPhones.
+    - (max-width: 400px): Catches devices with a width of 400px or less.
+    - (pointer: coarse): Ensures it's a touch-screen device.
+  */
+  @media (max-width: 400px) and (pointer: coarse) {
+    .main-header {
+      display: none; /* Hide the header completely */
     }
   }
+  
 
       /* Custom scrollbar for webkit browsers */
       ::-webkit-scrollbar {
