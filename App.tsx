@@ -418,7 +418,8 @@ const CrosswordGame: React.FC<{
             <Timer time={time} />
           </div>
 
-          <div className="w-full flex items-center justify-center min-h-0">
+          <div ref={mobileGridContainerRef} className="w-full h-full flex items-center justify-center min-h-0">
+            
             <CrosswordGrid
               crosswordData={crosswordData}
               userGrid={userGrid}
