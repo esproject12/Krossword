@@ -52,6 +52,7 @@ const CrosswordGame: React.FC<{
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const headerRef = useRef<HTMLElement>(null);
+const mobileGridContainerRef = useRef<HTMLDivElement>(null);
 
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
