@@ -418,7 +418,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       {isMobile ? (
         <main  
         ref={mobileMainRef}
-  className="flex-grow flex flex-col gap-2 px-2 pb-2 min-h-0"
+  className="flex-grow flex flex-col gap-2 px-2 pb-2"
 >
   <div className="w-full flex justify-center flex-shrink-0">
     <Timer time={time} />
@@ -427,7 +427,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
   {/* This is the key change: flex-grow tells this section to expand and fill space */}
   <div
     ref={mobileGridContainerRef}
-    className="w-full flex-grow flex items-center justify-center min-h-0"
+    className="w-full flex-1 flex items-center justify-center min-h-0"
   >
     <CrosswordGrid
       crosswordData={crosswordData}
