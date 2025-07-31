@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-01",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "SPICES",
+      "clue": "Essentials for a flavorful Indian curry.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "GANGES",
+      "clue": "Famous river flowing through India and Bangladesh.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "DIVINE",
+      "clue": "Heavenly, like many Indian experiences.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "PAVE",
+      "clue": "Prepare the way for India's roads.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "REED",
+      "clue": "Instrument material and a common sight by rivers.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ASP",
+      "clue": "This snake slithers into many an ancient Indian tale.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AID",
+      "clue": "Help in three letters, often essential in emergencies.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "IPA",
+      "clue": "Type of beer, often hoppy, not just a linguistic term.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 11,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ASH",
+      "clue": "Remnant of a fire, or a tree found in India.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "S",
+      "P",
+      null,
+      "G",
+      "R"
+    ],
+    [
+      "I",
+      "P",
+      "A",
+      null,
+      "A",
+      "E"
+    ],
+    [
+      "D",
+      "I",
+      "V",
+      "I",
+      "N",
+      "E"
+    ],
+    [
+      null,
+      "C",
+      "E",
+      null,
+      "G",
+      "D"
+    ],
+    [
+      null,
+      "E",
+      null,
+      null,
+      "E",
+      null
+    ],
+    [
+      null,
+      "S",
+      null,
+      "A",
+      "S",
+      "H"
+    ]
+  ]
+}
