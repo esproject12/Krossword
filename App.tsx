@@ -400,7 +400,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     );
 
   return (
-    <div className="w-screen h-full bg-gray-50 flex flex-col">
+    <div className="w-screen h-dvh bg-gray-50 flex flex-col">
         <header ref={headerRef} className="main-header text-center py-2 px-2 flex-shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
           Dodo Krossword
