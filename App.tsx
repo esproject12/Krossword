@@ -59,59 +59,64 @@ const CrosswordGame: React.FC<{
   const mobileFooterRef = useRef<HTMLElement>(null);
 
   // --- DIAGNOSTIC HOOK (STAYS IN PLACE) ---
-  useLayoutEffect(() => {
-    const timerId = setTimeout(() => {
-      if (isMobile && headerRef.current && mobileMainRef.current && mobileGridContainerRef.current && mobileFooterRef.current) {
-        console.clear();
-        console.log(
-          `%c--- VIVO PHONE LAYOUT DIAGNOSTIC REPORT ---`,
-          "color: #FF6F00; font-weight: bold; font-size: 16px;"
-        );
+  // DELETE your current useLayoutEffect and REPLACE it with this entire block.
 
-        const appContainer = document.querySelector('.h-dvh');
-        const appContainerHeight = appContainer ? appContainer.offsetHeight : 'Not Found';
+  useLayoutEffect(() => {
+    const calculateAndFixLayout = () => {
+      if (isMobile && headerRef.current && mobileMainRef.current && mobileGridContainerRef.current && mobileFooterRef.current) {
+        
+        const viewportHeight = window.innerHeight;
         const headerHeight = headerRef.current.offsetHeight;
-        const mainContainerHeight = mobileMainRef.current.offsetHeight;
-        const timerContainer = mobileMainRef.current.children[0] as HTMLElement;
+
+        const mainContainer = mobileMainRef.current;
+        const timerContainer = mainContainer.children[0] as HTMLElement;
         const gridContainer = mobileGridContainerRef.current;
         const footerContainer = mobileFooterRef.current;
+
         const timerHeight = timerContainer.offsetHeight;
-        const gridHeight = gridContainer.offsetHeight;
         const footerHeight = footerContainer.offsetHeight;
-        const sumOfChildren = timerHeight + gridHeight + footerHeight;
+        
+        // --- THE CALCULATION ---
+        // We find the total height of all non-flexible elements.
+        // We also account for the padding/margins inside <main> (pb-2 is 8px)
+        const totalNonFlexibleHeight = headerHeight + timerHeight + footerHeight + 8; // 8px for pb-2
+        
+        // The correct height for the grid is whatever is left over.
+        const correctGridHeight = viewportHeight - totalNonFlexibleHeight;
 
-        console.log(`[Screen] Viewport Height (dvh):        ${window.innerHeight}px`);
-        console.log('--------------------------------------------------');
-        console.log(`[App Container] <div class="h-dvh">:    ${appContainerHeight}px`);
-        console.log(`[Header] <header>:                      ${headerHeight}px`);
-        console.log(`[Main] <main class="flex-col">:         ${mainContainerHeight}px`);
-        console.log('--------------------------------------------------');
-        console.log(`  - [Timer Container]:                  ${timerHeight}px`);
-        console.log(`  - [Grid Container] (flex-1):          ${gridHeight}px`);
-        console.log(`  - [Footer Container]:                 ${footerHeight}px`);
-        console.log('--------------------------------------------------');
-        console.log(`  SUM of <main>'s children:             ${sumOfChildren}px`);
+        // --- THE FIX ---
+        // We apply this calculated height directly to the grid container.
+        gridContainer.style.height = `${correctGridHeight}px`;
 
-        if (Math.abs(mainContainerHeight - sumOfChildren) > 5) {
-            console.error(
-              `%cLAYOUT FAILURE: The sum of children (${sumOfChildren}px) does not match the <main> container height (${mainContainerHeight}px). Flexbox may not be working as expected.`,
-              "color: red; font-size: 14px;"
-            );
-        } else if (gridHeight < 200) {
-            console.warn(
-              `%cLAYOUT WARNING: The grid container height (${gridHeight}px) is very small. The 'flex-1' property is likely not getting enough space to expand into.`,
-              "color: orange; font-size: 14px;"
-            );
+        // --- THE VERIFICATION (Logging) ---
+        console.clear();
+        console.log(`%c--- ACTIVE LAYOUT FIX REPORT ---`, "color: #4CAF50; font-weight: bold; font-size: 16px;");
+        console.log(`[Screen] Viewport Height:            ${viewportHeight}px`);
+        console.log(`[Header] Header Height:             -${headerHeight}px`);
+        console.log(`[Timer] Timer Height:                -${timerHeight}px`);
+        console.log(`[Footer] Footer Height:              -${footerHeight}px`);
+        console.log(`[Spacing] Bottom Padding:            -8px`);
+        console.log('--------------------------------------------------');
+        console.log(`[Grid] CALCULATED CORRECT HEIGHT:   = ${correctGridHeight}px`);
+
+        if (correctGridHeight < 100) {
+          console.error("Layout Fix Error: Calculated grid height is too small. Check measurements.");
         } else {
-             console.log(
-              `%cLAYOUT OK: Flexbox seems to be distributing space correctly.`,
-              "color: green; font-size: 14px;"
-            );
+          console.log("Layout fix applied successfully.");
         }
       }
-    }, 1000);
+    };
 
-    return () => clearTimeout(timerId);
+    // Run the fix after a short delay to ensure all elements have rendered
+    const timerId = setTimeout(calculateAndFixLayout, 500);
+
+    // Also run it on resize for robustness
+    window.addEventListener('resize', calculateAndFixLayout);
+
+    return () => {
+      clearTimeout(timerId);
+      window.removeEventListener('resize', calculateAndFixLayout);
+    };
   }, [isMobile]);
   
   const [crosswordData] = useState<CrosswordData>(initialData);
