@@ -503,8 +503,8 @@ const CrosswordGame: React.FC<{
         <main
           ref={mobileMainRef}
           // --- THE FIX ---
-          // REMOVED 'gap-2' from <main>
-          className="flex-grow flex flex-col px-2 pb-2"
+          // from old code
+          className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0"
         >
           <div className="w-full flex justify-center flex-shrink-0">
             <Timer time={time} />
