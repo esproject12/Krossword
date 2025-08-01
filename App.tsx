@@ -43,6 +43,8 @@ interface CachedCrossword {
 }
 const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28";
 
+// PASTE THIS ENTIRE CODE BLOCK TO REPLACE THE EXISTING CrosswordGame COMPONENT
+
 const CrosswordGame: React.FC<{
   initialData: CrosswordData;
   error?: string | null;
@@ -52,16 +54,15 @@ const CrosswordGame: React.FC<{
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const headerRef = useRef<HTMLElement>(null);
-const mobileGridContainerRef = useRef<HTMLDivElement>(null);
-const mobileMainRef = useRef<HTMLElement>(null);
-const mobileFooterRef = useRef<HTMLElement>(null);
+  const mobileMainRef = useRef<HTMLElement>(null);
+  const mobileGridContainerRef = useRef<HTMLDivElement>(null);
+  const mobileFooterRef = useRef<HTMLElement>(null);
 
-// PASTE THIS ENTIRE HOOK INTO YOUR CrosswordGame COMPONENT
-
+  // --- DIAGNOSTIC HOOK (STAYS IN PLACE) ---
   useLayoutEffect(() => {
     const timerId = setTimeout(() => {
       if (isMobile && headerRef.current && mobileMainRef.current && mobileGridContainerRef.current && mobileFooterRef.current) {
-        console.clear(); // Clear previous logs for a clean report
+        console.clear();
         console.log(
           `%c--- VIVO PHONE LAYOUT DIAGNOSTIC REPORT ---`,
           "color: #FF6F00; font-weight: bold; font-size: 16px;"
@@ -69,14 +70,11 @@ const mobileFooterRef = useRef<HTMLElement>(null);
 
         const appContainer = document.querySelector('.h-dvh');
         const appContainerHeight = appContainer ? appContainer.offsetHeight : 'Not Found';
-
         const headerHeight = headerRef.current.offsetHeight;
         const mainContainerHeight = mobileMainRef.current.offsetHeight;
-
         const timerContainer = mobileMainRef.current.children[0] as HTMLElement;
         const gridContainer = mobileGridContainerRef.current;
         const footerContainer = mobileFooterRef.current;
-
         const timerHeight = timerContainer.offsetHeight;
         const gridHeight = gridContainer.offsetHeight;
         const footerHeight = footerContainer.offsetHeight;
@@ -111,7 +109,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
             );
         }
       }
-    }, 1000); // Wait 1 second for everything to settle
+    }, 1000);
 
     return () => clearTimeout(timerId);
   }, [isMobile]);
@@ -143,6 +141,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
   const [time, setTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
   const findWordAtCell = useCallback(
     (
       cell: CellPosition,
@@ -168,13 +167,16 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     },
     [crosswordData]
   );
+
   const activeWord = useMemo(() => {
     if (!activeCell) return null;
     return findWordAtCell(activeCell, activeDirection);
   }, [activeCell, activeDirection, findWordAtCell]);
+
   const startTimer = () => {
     if (!isTimerRunning && !isPuzzleSolved) setIsTimerRunning(true);
   };
+
   const checkPuzzleSolved = useCallback(() => {
     if (!userGrid) return false;
     for (let r = 0; r < crosswordData.gridSize; r++) {
@@ -190,12 +192,14 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     }
     return true;
   }, [userGrid, crosswordData]);
+
   useEffect(() => {
     if (checkPuzzleSolved()) {
       setIsPuzzleSolved(true);
       setIsTimerRunning(false);
     }
   }, [userGrid, checkPuzzleSolved]);
+
   useEffect(() => {
     if (isTimerRunning && !isPuzzleSolved) {
       timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
@@ -206,6 +210,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [isTimerRunning, isPuzzleSolved]);
+
   const getWordPath = useCallback((word: WordDefinition): CellPosition[] => {
     const path: CellPosition[] = [];
     for (let i = 0; i < word.length; i++) {
@@ -223,6 +228,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     }
     return path;
   }, []);
+
   const findNextEditableCell = useCallback(
     (
       word: WordDefinition,
@@ -251,6 +257,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     },
     [userGrid, getWordPath]
   );
+
   const moveToNextCell = () => {
     if (!activeCell || !activeWord) return;
     const wordPath = getWordPath(activeWord);
@@ -261,6 +268,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       setActiveCell(wordPath[currentIndex + 1]);
     }
   };
+
   const moveToPrevCell = () => {
     if (!activeCell || !activeWord) return;
     const wordPath = getWordPath(activeWord);
@@ -271,6 +279,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       setActiveCell(wordPath[currentIndex - 1]);
     }
   };
+
   const handleCellChange = (row: number, col: number, value: string) => {
     if (!userGrid || isPuzzleSolved) return;
     startTimer();
@@ -302,6 +311,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       }
     }
   };
+
   const handleCellClick = (row: number, col: number) => {
     if (crosswordData.solutionGrid[row][col] === null) return;
     const isSameCell = activeCell?.row === row && activeCell?.col === col;
@@ -315,16 +325,19 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     setActiveCell({ row, col });
     setActiveDirection(newDirection);
   };
+
   const handleClueSelect = (word: WordDefinition) => {
     const firstEmpty = findNextEditableCell(word, { row: -1, col: -1 }, true);
     setActiveDirection(word.orientation);
     setActiveCell(firstEmpty || word.startPosition);
   };
+
   const getCluesByDirection = (direction: Orientation) => {
     return crosswordData.words
       .filter((w) => w.orientation === direction)
       .sort((a, b) => a.id - b.id);
   };
+
   const handleClueNavigation = (forward: boolean) => {
     if (!activeWord) return;
     const currentClues = getCluesByDirection(activeDirection);
@@ -336,6 +349,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       handleClueSelect(currentClues[nextIndex]);
     }
   };
+
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLInputElement>,
     row: number,
@@ -380,6 +394,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
         break;
     }
   };
+
   const handleOnScreenKeyPress = (key: string) => {
     if (!activeCell || isPuzzleSolved) return;
     startTimer();
@@ -393,6 +408,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       handleCellChange(activeCell.row, activeCell.col, key);
     }
   };
+
   const handleCheckPuzzle = () => {
     if (!userGrid) return;
     const newCheckGrid = userGrid.map((row, rIdx) =>
@@ -406,6 +422,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     );
     setCellCheckGrid(newCheckGrid);
   };
+
   const handleRevealWord = () => {
     if (!activeWord || !userGrid || !cellCheckGrid) return;
     startTimer();
@@ -426,6 +443,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     setUserGrid(newUserGrid);
     setCellCheckGrid(newCheckGrid);
   };
+
   const handleRevealPuzzle = () => {
     startTimer();
     setUserGrid(crosswordData.solutionGrid.map((r) => [...r]));
@@ -436,6 +454,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
     );
     setIsPuzzleSolved(true);
   };
+
   const handleClearPuzzle = () => {
     setUserGrid(
       crosswordData.solutionGrid.map((row) =>
@@ -461,7 +480,7 @@ const mobileFooterRef = useRef<HTMLElement>(null);
 
   return (
     <div className="w-screen h-dvh bg-gray-50 flex flex-col">
-        <header ref={headerRef} className="main-header text-center py-2 px-2 flex-shrink-0">
+      <header ref={headerRef} className="main-header text-center py-2 px-2 flex-shrink-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
           Dodo Krossword
         </h1>
@@ -476,51 +495,54 @@ const mobileFooterRef = useRef<HTMLElement>(null);
       </header>
 
       {isMobile ? (
-        <main  
-        ref={mobileMainRef}
-  className="flex-grow flex flex-col gap-2 px-2 pb-2"
->
-  <div className="w-full flex justify-center flex-shrink-0">
-    <Timer time={time} />
-  </div>
+        <main
+          ref={mobileMainRef}
+          // --- THE FIX ---
+          // REMOVED 'gap-2' from <main>
+          className="flex-grow flex flex-col px-2 pb-2"
+        >
+          <div className="w-full flex justify-center flex-shrink-0">
+            <Timer time={time} />
+          </div>
 
-  {/* This is the key change: flex-grow tells this section to expand and fill space */}
-  <div
-    ref={mobileGridContainerRef}
-    className="w-full flex-1 flex items-center justify-center min-h-0"
-  >
-    <CrosswordGrid
-      crosswordData={crosswordData}
-      userGrid={userGrid}
-      activeCell={activeCell}
-      activeDirection={activeDirection}
-      cellCheckGrid={cellCheckGrid}
-      onCellChange={handleCellChange}
-      onCellClick={handleCellClick}
-      onCellKeyDown={handleKeyDown}
-      isMobile={isMobile}
-    />
-  </div>
+          <div
+            ref={mobileGridContainerRef}
+            // ADDED 'mt-2' to restore visual spacing
+            className="w-full flex-1 flex items-center justify-center min-h-0 mt-2"
+          >
+            <CrosswordGrid
+              crosswordData={crosswordData}
+              userGrid={userGrid}
+              activeCell={activeCell}
+              activeDirection={activeDirection}
+              cellCheckGrid={cellCheckGrid}
+              onCellChange={handleCellChange}
+              onCellClick={handleCellClick}
+              onCellKeyDown={handleKeyDown}
+              isMobile={isMobile}
+            />
+          </div>
 
-  <footer
-    ref={mobileFooterRef}
-    className="w-full flex flex-col gap-2 flex-shrink-0"
-  >
-    <ClueBar
-      activeWord={activeWord}
-      activeDirection={activeDirection}
-      onPrevClue={() => handleClueNavigation(false)}
-      onNextClue={() => handleClueNavigation(true)}
-    />
-    <OnScreenKeyboard
-      onKeyPress={handleOnScreenKeyPress}
-      onCheckPuzzle={handleCheckPuzzle}
-      onRevealWord={handleRevealWord}
-      onRevealPuzzle={handleRevealPuzzle}
-      onClearPuzzle={handleClearPuzzle}
-      isPuzzleSolved={isPuzzleSolved}
-    />
-  </footer>
+          <footer
+            ref={mobileFooterRef}
+            // ADDED 'mt-2' to restore visual spacing
+            className="w-full flex flex-col gap-2 flex-shrink-0 mt-2"
+          >
+            <ClueBar
+              activeWord={activeWord}
+              activeDirection={activeDirection}
+              onPrevClue={() => handleClueNavigation(false)}
+              onNextClue={() => handleClueNavigation(true)}
+            />
+            <OnScreenKeyboard
+              onKeyPress={handleOnScreenKeyPress}
+              onCheckPuzzle={handleCheckPuzzle}
+              onRevealWord={handleRevealWord}
+              onRevealPuzzle={handleRevealPuzzle}
+              onClearPuzzle={handleClearPuzzle}
+              isPuzzleSolved={isPuzzleSolved}
+            />
+          </footer>
         </main>
       ) : (
         <main className="flex flex-col lg:flex-row gap-4 md:gap-6 items-start justify-center flex-grow p-4 overflow-y-auto">
