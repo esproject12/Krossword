@@ -56,6 +56,66 @@ const mobileGridContainerRef = useRef<HTMLDivElement>(null);
 const mobileMainRef = useRef<HTMLElement>(null);
 const mobileFooterRef = useRef<HTMLElement>(null);
 
+// PASTE THIS ENTIRE HOOK INTO YOUR CrosswordGame COMPONENT
+
+  useLayoutEffect(() => {
+    const timerId = setTimeout(() => {
+      if (isMobile && headerRef.current && mobileMainRef.current && mobileGridContainerRef.current && mobileFooterRef.current) {
+        console.clear(); // Clear previous logs for a clean report
+        console.log(
+          `%c--- VIVO PHONE LAYOUT DIAGNOSTIC REPORT ---`,
+          "color: #FF6F00; font-weight: bold; font-size: 16px;"
+        );
+
+        const appContainer = document.querySelector('.h-dvh');
+        const appContainerHeight = appContainer ? appContainer.offsetHeight : 'Not Found';
+
+        const headerHeight = headerRef.current.offsetHeight;
+        const mainContainerHeight = mobileMainRef.current.offsetHeight;
+
+        const timerContainer = mobileMainRef.current.children[0] as HTMLElement;
+        const gridContainer = mobileGridContainerRef.current;
+        const footerContainer = mobileFooterRef.current;
+
+        const timerHeight = timerContainer.offsetHeight;
+        const gridHeight = gridContainer.offsetHeight;
+        const footerHeight = footerContainer.offsetHeight;
+        const sumOfChildren = timerHeight + gridHeight + footerHeight;
+
+        console.log(`[Screen] Viewport Height (dvh):        ${window.innerHeight}px`);
+        console.log('--------------------------------------------------');
+        console.log(`[App Container] <div class="h-dvh">:    ${appContainerHeight}px`);
+        console.log(`[Header] <header>:                      ${headerHeight}px`);
+        console.log(`[Main] <main class="flex-col">:         ${mainContainerHeight}px`);
+        console.log('--------------------------------------------------');
+        console.log(`  - [Timer Container]:                  ${timerHeight}px`);
+        console.log(`  - [Grid Container] (flex-1):          ${gridHeight}px`);
+        console.log(`  - [Footer Container]:                 ${footerHeight}px`);
+        console.log('--------------------------------------------------');
+        console.log(`  SUM of <main>'s children:             ${sumOfChildren}px`);
+
+        if (Math.abs(mainContainerHeight - sumOfChildren) > 5) {
+            console.error(
+              `%cLAYOUT FAILURE: The sum of children (${sumOfChildren}px) does not match the <main> container height (${mainContainerHeight}px). Flexbox may not be working as expected.`,
+              "color: red; font-size: 14px;"
+            );
+        } else if (gridHeight < 200) {
+            console.warn(
+              `%cLAYOUT WARNING: The grid container height (${gridHeight}px) is very small. The 'flex-1' property is likely not getting enough space to expand into.`,
+              "color: orange; font-size: 14px;"
+            );
+        } else {
+             console.log(
+              `%cLAYOUT OK: Flexbox seems to be distributing space correctly.`,
+              "color: green; font-size: 14px;"
+            );
+        }
+      }
+    }, 1000); // Wait 1 second for everything to settle
+
+    return () => clearTimeout(timerId);
+  }, [isMobile]);
+  
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
     initialData.solutionGrid.map((row) => row.map((cell) => (cell ? "" : null)))
