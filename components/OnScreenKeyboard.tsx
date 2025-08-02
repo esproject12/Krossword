@@ -24,7 +24,7 @@ const KeyboardButton: React.FC<
   <button
     onClick={onClick}
     // Default height is h-10. 'tall:' prefix makes it h-12 on tall screens.
-    className={`h-12 tall:h-14 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
+    className={`h-11 tall:h-14 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
     style={{ flex: `${flex}` }}
   >
     {children}
@@ -37,7 +37,7 @@ const HintButton: React.FC<
   <button
     onClick={onClick}
     disabled={disabled}
-    className="h-12 w-full rounded-md font-semibold text-white bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
+    className="h-11 w-full rounded-md font-semibold text-white bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm"
   >
     {children}
   </button>
@@ -111,7 +111,7 @@ const OnScreenKeyboard: React.FC<OnScreenKeyboardProps> = ({
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-1 tall:gap-1.5">
+        <div className="flex flex-col gap-0.75 tall:gap-1.5">
           {keys.map((row, rowIndex) => (
             <div key={rowIndex} className="flex justify-center gap-1 w-full">
               {rowIndex === 1 && <div style={{ flex: 0.5 }} />}
