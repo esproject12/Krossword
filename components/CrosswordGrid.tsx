@@ -117,11 +117,11 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
   return (
     <div
       ref={gridRef}
-      // className="grid gap-px bg-gray-500 p-px shadow-lg rounded"
-      className="grid w-full aspect-square bg-gray-500 p-px shadow-lg rounded"
+      className="grid gap-px bg-gray-500 p-px shadow-lg rounded"
+      //className="grid w-full aspect-square bg-gray-500 p-px shadow-lg rounded"
   style={{
     gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-    gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))` // <-- ADD THIS LINE 
+    //gridTemplateRows: `repeat(${gridSize}, minmax(0, 1fr))` // <-- ADD THIS LINE 
     }}
     >
       {userGrid.map((rowArr, rowIndex) =>
