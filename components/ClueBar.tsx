@@ -43,9 +43,9 @@ return (
   <div
     ref={ref}
     // Default is small. 'tall:' prefix makes classes larger on tall screens.
-    className="w-full p-1 tall:p-3 h-16 tall:h-18 flex items-center justify-between text-sm tall:text-sm bg-blue-600 text-white rounded-lg shadow-md"
+    //className="w-full p-1 tall:p-3 h-16 tall:h-18 flex items-center justify-between text-sm tall:text-sm bg-blue-600 text-white rounded-lg shadow-md"
   
-    //className="w-full h-14 tall:h-16 p-1.5 tall:p-2 flex items-center justify-between text-xs tall:text-sm bg-blue-600 text-white rounded-lg shadow-md"
+    className="w-full h-14 tall:h-16 p-1.5 tall:p-2 flex items-center justify-between text-xs tall:text-sm bg-blue-600 text-white rounded-lg shadow-md"
   >
     <button
       onClick={onPrevClue}
@@ -54,7 +54,7 @@ return (
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-5 w-5 tall:h-6 tall:w-6"
+        className="h-4 w-4 tall:h-6 tall:w-6"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -80,7 +80,7 @@ return (
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="h-4 w-4 tall:h-5 tall:w-5"
+        className="h-3 w-3 tall:h-5 tall:w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
