@@ -500,12 +500,11 @@ const CrosswordGame: React.FC<{
       </header>
 
       {isMobile ? (
+        //className="flex-grow flex flex-col gap-2 px-2 pb-2">
         <main
-          ref={mobileMainRef}
-          // --- THE FIX ---
-          // removed gap 2
-          className="flex-grow flex flex-col gap-2 px-2 pb-2"
-        >
+          ref={mobileMainRef} 
+          className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0">
+          
           <div className="w-full flex justify-center flex-shrink-0">
             <Timer time={time} />
           </div>
