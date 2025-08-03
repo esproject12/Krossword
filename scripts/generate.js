@@ -204,13 +204,6 @@ function buildPuzzle(template, filledSlots, date) {
     solutionGrid,
   };
 }
-function printGrid(grid) {
-  console.log("--- Current Grid State ---");
-  console.log(
-    grid.map((row) => row.map((cell) => cell || "_").join(" ")).join("\n")
-  );
-  console.log("--------------------------");
-}
 
 // ADD THIS HELPER FUNCTION TO generate.js
 
