@@ -212,6 +212,16 @@ function printGrid(grid) {
   console.log("--------------------------");
 }
 
+// ADD THIS HELPER FUNCTION TO generate.js
+
+function printGrid(grid) {
+  console.log("--- Current Grid State ---");
+  console.log(
+    grid.map((row) => row.map((cell) => cell || "_").join(" ")).join("\n")
+  );
+  console.log("--------------------------");
+}
+
 // PASTE THIS ENTIRE FUNCTION TO REPLACE YOUR OLD ONE
 
 async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], themes) {
@@ -220,7 +230,7 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], th
   const openai = new OpenAI({ apiKey });
   const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
   const failedGridCache = new Set();
-  const wordDetails = {}; // Store details of placed words
+  const wordDetails = {};
 
   async function solve(slotIndex, currentGrid, usedWords) {
     if (slotIndex >= sortedSlots.length) {
@@ -237,7 +247,6 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], th
     let currentWordPattern = "";
     let constraints = [];
 
-    // --- NEW: EXPLAIN THE INTERSECTING WORDS ---
     for (let i = 0; i < slot.length; i++) {
       const r = slot.start.row + (slot.orientation === "DOWN" ? i : 0);
       const c = slot.start.col + (slot.orientation === "ACROSS" ? i : 0);
@@ -247,36 +256,27 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], th
         const intersectingSlotKey = `${slot.orientation === 'ACROSS' ? 'DOWN' : 'ACROSS'}-${r}-${c}`;
         const intersectingWordDetail = wordDetails[intersectingSlotKey];
         if (intersectingWordDetail) {
-           constraints.push(`The letter at index ${i} must be '${char}' to intersect with the word "${intersectingWordDetail.answer}" (clue: "${intersectingWordDetail.clue}").`);
+           constraints.push(`The letter at index ${i} must be '${char}' to intersect with "${intersectingWordDetail.answer}".`);
         } else {
            constraints.push(`The letter at index ${i} must be '${char}'.`);
         }
       }
     }
     
-    console.log(`> Attempting to fill slot #${slotIndex} (${slot.orientation}, len=${slot.length}, pattern=${currentWordPattern})`);
+    console.log(`> Attempting to fill slot #${slotIndex} (${slot.orientation}, len=${slot.length}, pattern=${currentWordPattern}), try 1`);
 
     const system_prompt = "You are a crossword puzzle word generator. You only respond with a single, valid JSON object and nothing else.";
-    
-    // --- FINAL, CORRECTED "ESCAPE HATCH" PROMPT ---
     const user_prompt = `Your primary goal is to find a list of 5 common English words that are EXACTLY ${slot.length} letters long and perfectly match the pattern "${currentWordPattern}". ${constraints.join(" ")}
-
-Your secondary, but very important, goal is to make these words fit one of today's themes: [${themes.join(", ")}].
-
-Prioritize finding words that fit the letter pattern above all else. For each word in your list, try to find a themed word. If you cannot find a themed word that fits the pattern, provide a common, non-themed English word that fits instead. This is better than failing. Provide a clever, short clue for each suggested word.
-
+Your secondary goal is to make these words fit one of today's themes: [${themes.join(", ")}].
+Prioritize finding words that fit the pattern above all else. If you can find a themed word, that is ideal. If not, provide a common, non-themed English word that fits. Provide a clever, short clue for each suggested word.
 Do NOT use any of these words: ${[...usedWords, ...yesterdaysWords].join(", ")}.
-
 Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD1", "clue": "Clue1"}, {"answer": "WORD2", "clue": "Clue2"} ] }`;
     
     try {
       await sleep(API_DELAY_MS);
       const completion = await openai.chat.completions.create({
         model: OPENAI_MODEL_NAME,
-        messages: [
-          { role: "system", content: system_prompt },
-          { role: "user", content: user_prompt },
-        ],
+        messages: [ { role: "system", content: system_prompt }, { role: "user", content: user_prompt } ],
         response_format: { type: "json_object" },
         temperature: 0.8,
       });
@@ -292,19 +292,25 @@ Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD
       for (const candidate of answers) {
         const { answer, clue } = candidate;
         if (!answer || !clue) continue;
-
         const upperAnswer = answer.toUpperCase();
 
-        if (upperAnswer.length !== slot.length || usedWords.has(upperAnswer) || !isValidWord(upperAnswer)) continue;
+        if (usedWords.has(upperAnswer)) continue;
+        if (upperAnswer.length !== slot.length) {
+          console.log(`    > Validation for "${upperAnswer}": FAILED (Incorrect length)`);
+          continue;
+        }
         
         let patternMismatch = false;
         for (let i = 0; i < upperAnswer.length; i++) {
           if (currentWordPattern[i] !== "_" && currentWordPattern[i] !== upperAnswer[i]) {
+            console.log(`    > Validation for "${upperAnswer}": FAILED (Pattern mismatch. Expected '${currentWordPattern[i]}' at index ${i} but got '${upperAnswer[i]}')`);
             patternMismatch = true;
             break;
           }
         }
         if (patternMismatch) continue;
+        
+        if (!isValidWord(upperAnswer)) continue; // isValidWord now contains its own console.log
 
         let newGrid = currentGrid.map((r) => [...r]);
         let r_check = slot.start.row, c_check = slot.start.col;
@@ -313,9 +319,10 @@ Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD
           if (slot.orientation === "ACROSS") c_check++; else r_check++;
         }
         
-        console.log(`  + Trying candidate "${upperAnswer}" for slot #${slotIndex}.`);
-        
-        // Store the word detail for better context in subsequent calls
+        // --- DETAILED LOGS RE-ADDED ---
+        console.log(`  + ACCEPT: "${upperAnswer}" for slot #${slotIndex}.`);
+        printGrid(newGrid);
+
         const slotKey = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
         wordDetails[slotKey] = { answer: upperAnswer, clue };
 
@@ -324,8 +331,9 @@ Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD
         if (result !== null) {
           return [{ ...slot, answer: upperAnswer, clue }, ...result];
         }
-        // If the path failed, remove the word detail before trying the next candidate
+        
         delete wordDetails[slotKey];
+        console.log(`  - BACKTRACK: Path failed after placing "${upperAnswer}". Retrying with next candidate for slot #${slotIndex}.`);
       }
       
       console.log(` < FAILED: None of the AI's candidates for slot #${slotIndex} led to a solution. Backtracking...`);
@@ -344,6 +352,7 @@ Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD
   if (!solution) throw new Error("Could not find a valid interlocking puzzle solution after all attempts.");
   return solution;
 }
+
 
 async function main() {
   loadDictionary();
