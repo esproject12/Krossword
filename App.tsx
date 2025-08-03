@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useLayoutEffect,
 } from "react";
-import { fetchPreGeneratedCrossword } from "./services/geminiService";
+import { fetchPreGeneratedCrossword } from "./services/puzzleService";
 import type {
   CrosswordData,
   UserGrid,

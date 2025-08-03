@@ -1,3 +1,7 @@
+// Add these two lines to the VERY TOP of generate.js
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Definitive version with all smart enhancements, including failed-state caching.
 import OpenAI from "openai";
 import fs from "fs";
