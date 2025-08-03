@@ -1,0 +1,191 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-03",
+  "words": [
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 6,
+      "answer": "GANDHI",
+      "clue": "Surname of a prominent Indian independence leader.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 6,
+      "answer": "MYSORE",
+      "clue": "A city known for its silk and palaces.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "ENLIST",
+      "clue": "To formally join the armed forces.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "BALI",
+      "clue": "A demon king from Indian mythology",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 4,
+      "answer": "BETA",
+      "clue": "Second state or stage; also a common tech phase.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "RGB",
+      "clue": "Color model used in Indian digital cinema.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "RAE",
+      "clue": "A diminutive Scottish form of Rachel.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "AAA",
+      "clue": "Top credit rating level.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 11,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "VET",
+      "clue": "Animal doctor, briefly.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "R",
+      "G",
+      "B",
+      null,
+      "M",
+      "B"
+    ],
+    [
+      "A",
+      "A",
+      "A",
+      null,
+      "Y",
+      "E"
+    ],
+    [
+      "E",
+      "N",
+      "L",
+      "I",
+      "S",
+      "T"
+    ],
+    [
+      null,
+      "D",
+      "I",
+      null,
+      "O",
+      "A"
+    ],
+    [
+      null,
+      "H",
+      null,
+      null,
+      "R",
+      null
+    ],
+    [
+      null,
+      "I",
+      null,
+      "V",
+      "E",
+      "T"
+    ]
+  ]
+}
