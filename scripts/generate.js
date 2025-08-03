@@ -16,6 +16,35 @@ const MAX_WORD_RETRIES = 3;
 const MINIMUM_WORDS = 8;
 const API_DELAY_MS = 1000;
 
+// --- NEW: MASTER THEME LIST ---
+const MASTER_THEME_LIST = [
+  "Indian Cuisine & Spices",
+  "Bollywood & Indian Cinema",
+  "Famous Indian Celebrities",
+  "Indian Music & Dance",
+  "Festivals of India",
+  "Traditional Indian Attire & Crafts",
+  "Hindu Mythology & Epics",
+  "Indian History & Freedom Struggle",
+  "Travel & Famous Landmarks of India",
+  "Flora & Fauna of India",
+  "Indian Fruits & Vegetables",
+  "Rivers, Mountains & Natural Wonders",
+  "Sports in India",
+  "Indian Startups & Technology",
+  "Common Hindi & Regional Words",
+  "Means of Transport in India",
+  "Indian Inventions & Mathematics",
+  "Traditional Indian Games",
+];
+
+// In scripts/generate.js, right after the MASTER_THEME_LIST
+
+function selectRandomThemes(themes, count = 4) {
+  const shuffled = [...themes].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
+
 // --- HELPER FUNCTION ---
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -183,7 +212,7 @@ function printGrid(grid) {
   console.log("--------------------------");
 }
 
-async function generateCrosswordWithBacktracking(slots, yesterdaysWords = []) {
+async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], themes) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("CRITICAL: OPENAI_API_KEY secret is not set.");
   const openai = new OpenAI({ apiKey });
@@ -222,8 +251,17 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = []) {
       }
 
       const system_prompt =
-        "You are a crossword puzzle word generator. You only respond with a single, valid JSON object and nothing else. Follow all instructions precisely.";
-      const base_prompt = `Provide a common English word that is EXACTLY ${slot.length} letters long and perfectly matches the pattern "${currentWordPattern}". This is your most important instruction. Also provide a clever, short clue. The word should ideally be India-themed if a common one fits, but a valid word of the correct length and pattern is the top priority.`;
+  "You are a crossword puzzle word generator. You only respond with a single, valid JSON object and nothing else. Follow all instructions precisely.";
+      
+// --- MODIFICATION START ---
+
+// 1. Create a new prompt part for our daily themes.
+const theme_prompt = `The word MUST be related to ONE of the following themes for today: [${themes.join(", ")}]. If a themed word is impossible to find, a common non-themed English word is a last-resort alternative.`;
+
+// 2. The base_prompt remains, but the theme part is removed as it's now handled by theme_prompt.
+const base_prompt = `Provide a common English word that is EXACTLY ${slot.length} letters long and perfectly matches the pattern "${currentWordPattern}". This is your most important instruction. Also provide a clever, short clue. A valid word of the correct length and pattern is the top priority.`;
+
+
 
       const exclusion_list = [
         ...usedWords,
@@ -234,9 +272,10 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = []) {
         ? `Do NOT use any of these words: ${exclusion_list}.`
         : "";
 
-      const user_prompt = `${base_prompt} ${constraints.join(
-        " "
-      )} ${exclusion_prompt} Your response must be in this exact JSON format: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
+      // 3. Assemble the final user_prompt with the new theme_prompt included.
+const user_prompt = `${base_prompt} ${theme_prompt} ${constraints.join(
+  " "
+)} ${exclusion_prompt} Your response must be in this exact JSON format: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
 
       console.log(
         `> Attempting to fill slot #${slotIndex} (${slot.orientation}, len=${
@@ -382,6 +421,12 @@ async function main() {
     validTemplates[Math.floor(Math.random() * validTemplates.length)];
   const slots = findSlots(chosenTemplate);
 
+  // --- NEW: RANDOMLY SELECT 4 THEMES FOR TODAY ---
+  const dailyThemes = selectRandomThemes(MASTER_THEME_LIST, 4);
+  console.log("--- Today's Mini-Theme ---");
+  dailyThemes.forEach(theme => console.log(`- ${theme}`));
+  console.log("--------------------------");
+
   let yesterdaysWords = [];
   try {
     const yesterday = new Date(istDate);
@@ -407,7 +452,8 @@ async function main() {
     try {
       const filledSlots = await generateCrosswordWithBacktracking(
         slots,
-        yesterdaysWords
+        yesterdaysWords,
+        dailyThemes // <-- Pass the array of 4 themes
       );
       const finalPuzzleData = buildPuzzle(
         chosenTemplate,
