@@ -212,14 +212,15 @@ function printGrid(grid) {
   console.log("--------------------------");
 }
 
+// PASTE THIS ENTIRE FUNCTION TO REPLACE YOUR OLD ONE
+
 async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], themes) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("CRITICAL: OPENAI_API_KEY secret is not set.");
   const openai = new OpenAI({ apiKey });
   const sortedSlots = [...slots].sort((a, b) => b.length - a.length);
-
-  // --- ENHANCEMENT 3: Persistent cache for failed grid states ---
   const failedGridCache = new Set();
+  const wordDetails = {}; // Store details of placed words
 
   async function solve(slotIndex, currentGrid, usedWords) {
     if (slotIndex >= sortedSlots.length) {
@@ -227,169 +228,120 @@ async function generateCrosswordWithBacktracking(slots, yesterdaysWords = [], th
       return [];
     }
 
-    // --- ENHANCEMENT 3: Check the cache on entry ---
     const gridKey = currentGrid.flat().join("");
     if (failedGridCache.has(gridKey)) {
-      return null; // This grid state is a known dead end, fail immediately.
+      return null;
     }
 
     const slot = sortedSlots[slotIndex];
-    const failedWordsForSlot = new Set();
-    for (let attempt = 0; attempt < MAX_WORD_RETRIES; attempt++) {
-      let constraints = [];
-      let currentWordPattern = "";
-      for (let i = 0; i < slot.length; i++) {
-        const r = slot.start.row + (slot.orientation === "DOWN" ? i : 0);
-        const c = slot.start.col + (slot.orientation === "ACROSS" ? i : 0);
-        const char = currentGrid[r][c];
-        currentWordPattern += char || "_";
-        if (char) {
-          constraints.push(
-            `The letter at index ${i} (0-indexed) must be '${char}'.`
-          );
+    let currentWordPattern = "";
+    let constraints = [];
+
+    // --- NEW: EXPLAIN THE INTERSECTING WORDS ---
+    for (let i = 0; i < slot.length; i++) {
+      const r = slot.start.row + (slot.orientation === "DOWN" ? i : 0);
+      const c = slot.start.col + (slot.orientation === "ACROSS" ? i : 0);
+      const char = currentGrid[r][c];
+      currentWordPattern += char || "_";
+      if (char) {
+        const intersectingSlotKey = `${slot.orientation === 'ACROSS' ? 'DOWN' : 'ACROSS'}-${r}-${c}`;
+        const intersectingWordDetail = wordDetails[intersectingSlotKey];
+        if (intersectingWordDetail) {
+           constraints.push(`The letter at index ${i} must be '${char}' to intersect with the word "${intersectingWordDetail.answer}" (clue: "${intersectingWordDetail.clue}").`);
+        } else {
+           constraints.push(`The letter at index ${i} must be '${char}'.`);
         }
       }
+    }
+    
+    console.log(`> Attempting to fill slot #${slotIndex} (${slot.orientation}, len=${slot.length}, pattern=${currentWordPattern})`);
 
-      const system_prompt =
-  "You are a crossword puzzle word generator. You only respond with a single, valid JSON object and nothing else. Follow all instructions precisely.";
+    const system_prompt = "You are a crossword puzzle word generator. You only respond with a single, valid JSON object and nothing else.";
+    
+    // --- FINAL, CORRECTED "ESCAPE HATCH" PROMPT ---
+    const user_prompt = `Your primary goal is to find a list of 5 common English words that are EXACTLY ${slot.length} letters long and perfectly match the pattern "${currentWordPattern}". ${constraints.join(" ")}
+
+Your secondary, but very important, goal is to make these words fit one of today's themes: [${themes.join(", ")}].
+
+Prioritize finding words that fit the letter pattern above all else. For each word in your list, try to find a themed word. If you cannot find a themed word that fits the pattern, provide a common, non-themed English word that fits instead. This is better than failing. Provide a clever, short clue for each suggested word.
+
+Do NOT use any of these words: ${[...usedWords, ...yesterdaysWords].join(", ")}.
+
+Your response must be in this exact JSON format: { "answers": [ {"answer": "WORD1", "clue": "Clue1"}, {"answer": "WORD2", "clue": "Clue2"} ] }`;
+    
+    try {
+      await sleep(API_DELAY_MS);
+      const completion = await openai.chat.completions.create({
+        model: OPENAI_MODEL_NAME,
+        messages: [
+          { role: "system", content: system_prompt },
+          { role: "user", content: user_prompt },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.8,
+      });
+
+      const responseContent = completion.choices[0]?.message?.content;
+      if (!responseContent) throw new Error("OpenAI returned an empty response.");
       
-// --- MODIFICATION START ---
+      const { answers } = JSON.parse(responseContent);
+      if (!answers || !Array.isArray(answers) || answers.length === 0) {
+        throw new Error("AI response was not a valid list of answers.");
+      }
 
-// 1. Create a new prompt part for our daily themes.
-const theme_prompt = `The word MUST be related to ONE of the following themes for today: [${themes.join(", ")}]. If a themed word is impossible to find, a common non-themed English word is a last-resort alternative.`;
-
-// 2. The base_prompt remains, but the theme part is removed as it's now handled by theme_prompt.
-const base_prompt = `Provide a common English word that is EXACTLY ${slot.length} letters long and perfectly matches the pattern "${currentWordPattern}". This is your most important instruction. Also provide a clever, short clue. A valid word of the correct length and pattern is the top priority.`;
-
-
-
-      const exclusion_list = [
-        ...usedWords,
-        ...failedWordsForSlot,
-        ...yesterdaysWords,
-      ].join(", ");
-      const exclusion_prompt = exclusion_list
-        ? `Do NOT use any of these words: ${exclusion_list}.`
-        : "";
-
-      // 3. Assemble the final user_prompt with the new theme_prompt included.
-const user_prompt = `${base_prompt} ${theme_prompt} ${constraints.join(
-  " "
-)} ${exclusion_prompt} Your response must be in this exact JSON format: {"answer": "THEWORD", "clue": "Your clever clue here."}`;
-
-      console.log(
-        `> Attempting to fill slot #${slotIndex} (${slot.orientation}, len=${
-          slot.length
-        }, pattern=${currentWordPattern}), try ${attempt + 1}`
-      );
-      try {
-        await sleep(API_DELAY_MS);
-        const completion = await openai.chat.completions.create({
-          model: OPENAI_MODEL_NAME,
-          messages: [
-            { role: "system", content: system_prompt },
-            { role: "user", content: user_prompt },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.8,
-        });
-        const responseContent = completion.choices[0]?.message?.content;
-        if (!responseContent)
-          throw new Error("OpenAI returned an empty response.");
-        const { answer, clue } = JSON.parse(responseContent);
-        if (!answer || !clue)
-          throw new Error("AI response missing 'answer' or 'clue'.");
+      for (const candidate of answers) {
+        const { answer, clue } = candidate;
+        if (!answer || !clue) continue;
 
         const upperAnswer = answer.toUpperCase();
 
+        if (upperAnswer.length !== slot.length || usedWords.has(upperAnswer) || !isValidWord(upperAnswer)) continue;
+        
         let patternMismatch = false;
         for (let i = 0; i < upperAnswer.length; i++) {
-          if (
-            currentWordPattern[i] !== "_" &&
-            currentWordPattern[i] !== upperAnswer[i]
-          ) {
-            console.log(
-              `    > Validation for "${upperAnswer}": FAILED (Pattern mismatch. Expected '${currentWordPattern[i]}' at index ${i} but got '${upperAnswer[i]}')`
-            );
+          if (currentWordPattern[i] !== "_" && currentWordPattern[i] !== upperAnswer[i]) {
             patternMismatch = true;
             break;
           }
         }
-        if (patternMismatch) {
-          failedWordsForSlot.add(upperAnswer);
-          continue;
-        }
+        if (patternMismatch) continue;
 
-        if (upperAnswer.length !== slot.length) {
-          failedWordsForSlot.add(upperAnswer);
-          continue;
-        }
-        if (usedWords.has(upperAnswer)) {
-          failedWordsForSlot.add(upperAnswer);
-          continue;
-        }
-        if (!isValidWord(upperAnswer)) {
-          failedWordsForSlot.add(upperAnswer);
-          continue;
-        }
-
-        let canPlace = true;
         let newGrid = currentGrid.map((r) => [...r]);
-        let r_check = slot.start.row,
-          c_check = slot.start.col;
-        for (let i = 0; i < upperAnswer.length; i++) {
-          const existing = newGrid[r_check][c_check];
-          if (existing && existing !== upperAnswer[i]) {
-            canPlace = false;
-            break;
-          }
-          newGrid[r_check][c_check] = upperAnswer[i];
-          if (slot.orientation === "ACROSS") c_check++;
-          else r_check++;
+        let r_check = slot.start.row, c_check = slot.start.col;
+        for (const char of upperAnswer) {
+          newGrid[r_check][c_check] = char;
+          if (slot.orientation === "ACROSS") c_check++; else r_check++;
         }
-        if (!canPlace) {
-          failedWordsForSlot.add(upperAnswer);
-          continue;
-        }
+        
+        console.log(`  + Trying candidate "${upperAnswer}" for slot #${slotIndex}.`);
+        
+        // Store the word detail for better context in subsequent calls
+        const slotKey = `${slot.orientation}-${slot.start.row}-${slot.start.col}`;
+        wordDetails[slotKey] = { answer: upperAnswer, clue };
 
-        console.log(`  + ACCEPT: "${upperAnswer}" for slot #${slotIndex}.`);
-        printGrid(newGrid);
-
-        const result = await solve(
-          slotIndex + 1,
-          newGrid,
-          new Set(usedWords).add(upperAnswer)
-        );
+        const result = await solve(slotIndex + 1, newGrid, new Set(usedWords).add(upperAnswer));
 
         if (result !== null) {
           return [{ ...slot, answer: upperAnswer, clue }, ...result];
-        } else {
-          console.log(
-            `  - BACKTRACK: Path failed after placing "${upperAnswer}". Retrying for slot #${slotIndex}.`
-          );
-          failedWordsForSlot.add(upperAnswer);
         }
-      } catch (e) {
-        console.warn(
-          `    > Inner attempt failed for slot #${slotIndex}: ${e.message}`
-        );
+        // If the path failed, remove the word detail before trying the next candidate
+        delete wordDetails[slotKey];
       }
-    }
-    console.log(
-      ` < FAILED to find word for slot #${slotIndex}. Backtracking...`
-    );
+      
+      console.log(` < FAILED: None of the AI's candidates for slot #${slotIndex} led to a solution. Backtracking...`);
+      failedGridCache.add(gridKey);
+      return null;
 
-    // --- ENHANCEMENT 3: Store the failed grid state in the cache ---
-    failedGridCache.add(gridKey);
-    return null;
+    } catch (e) {
+      console.warn(`    > API call or parsing failed for slot #${slotIndex}: ${e.message}. Backtracking...`);
+      failedGridCache.add(gridKey);
+      return null;
+    }
   }
 
-  const initialGrid = Array(6)
-    .fill(null)
-    .map(() => Array(6).fill(null));
+  const initialGrid = Array(6).fill(null).map(() => Array(6).fill(null));
   const solution = await solve(0, initialGrid, new Set(yesterdaysWords));
-  if (!solution)
-    throw new Error("Could not find a valid interlocking puzzle solution.");
+  if (!solution) throw new Error("Could not find a valid interlocking puzzle solution after all attempts.");
   return solution;
 }
 
