@@ -6,9 +6,9 @@ A modern, responsive, and daily mini crossword puzzle with a delightful Indian c
 
 ✨ Key Features
 
-Daily Puzzles: A new, unique crossword puzzle is generated automatically every day.
+Daily Puzzles: A new, unique crossword puzzle is generated automatically every day with a fresh, random "mini-theme."
 
-Indian Theme: Clues and answers are inspired by Indian culture, history, cuisine, and general knowledge.
+Indian Theme: Clues and answers are inspired by a rich palette of 18+ topics, including Indian culture, history, cuisine, and general knowledge.
 
 Fully Responsive & Adaptive Design:
 
@@ -25,12 +25,6 @@ Custom On-Screen Keyboard: A comfortable, thumb-friendly keyboard that responsiv
 "Flippable" Hint Panel: Game actions are neatly tucked away under a "💡" button on the keyboard, maximizing grid visibility.
 
 Focused Clue Bar: Displays only the active clue, reducing cognitive load on smaller screens.
-
-Smart Keyboard Navigation:
-
-Arrow keys for intuitive movement on desktop.
-
-Automatic cursor advancement after typing a letter.
 
 Game Tools:
 
@@ -54,20 +48,22 @@ The application is designed with a highly performant and cost-effective static-f
 
 1. Backend Generation (Daily Job)
 
-A Node.js script (scripts/generate.js) is designed to be run once per day via an automated scheduler (like a GitHub Action or a cron job).
+A Node.js script (scripts/generate.js) is designed to be run once per day via an automated scheduler (like a GitHub Action).
 
-This script uses template-based generation and an intelligent backtracking algorithm, guided by the OpenAI API (GPT-4o), to create a valid, high-quality 6x6 crossword puzzle.
+Intelligent Theming: Each day, the script randomly selects four unique themes (e.g., "Indian Cuisine," "Bollywood," "Mythology," "Sports") from a master list of 18+ topics to create a unique "mini-theme" for the puzzle.
 
-The script handles complex logic like word validation, retries, and ensuring all words are fully interlocking.
+Advanced AI Collaboration: The script uses an intelligent backtracking algorithm, guided by the OpenAI API (GPT-4o). For each empty slot in the crossword, it asks the AI for a list of 5 candidate words that fit the letter pattern and one of the day's themes.
+
+Robust Validation: The script then iterates through the AI's suggestions, picking the first word that passes a series of rigorous checks: it must be in the custom dictionary, not be a repeat, and fit the interlocking letters perfectly. This "AI proposes, script disposes" model makes the generation process highly reliable.
 
 The final puzzle is saved as a static JSON file (e.g., public/puzzles/2025-08-03.json).
 
 Dictionary & Validation:
-A key part of the generation process is word validation. Every answer suggested by the AI is checked against a custom, curated dictionary to ensure quality and relevance. This dictionary consists of:
+Every answer is checked against a custom, curated dictionary of over 41,000 words to ensure quality and relevance. This includes:
 
-english_words.txt: A base vocabulary of approximately 40,000 common English words.
+english_words.txt: A base vocabulary of common English words.
 
-indian_words.txt: A specialized list of over 2,300 words, including India-specific terms, names, and places to enrich the theme.
+indian_words.txt: A specialized, hand-curated list of India-specific terms, names, and places to enrich the theme.
 
 2. Frontend Application (Static Site)
 
@@ -77,7 +73,7 @@ When you open the app, it simply fetches the pre-generated JSON file for the cur
 
 The app never calls the OpenAI API directly during gameplay. This ensures a fast user experience, zero API costs for users, and enhanced security.
 
-Robust Cross-Browser Layout: The frontend uses modern CSS, including Dynamic Viewport Height (dvh) and CSS Grid, to create a stable, full-viewport layout that works consistently across all browsers and devices, eliminating the common layout issues found on mobile Safari.
+Robust Cross-Browser Layout: The frontend uses modern CSS, including Dynamic Viewport Height (dvh) and CSS Grid, to create a stable, full-viewport layout that works consistently across all browsers and devices.
 
 🛠️ Tech Stack
 
@@ -130,17 +126,15 @@ Use code with caution.
 Bash
 IGNORE_WHEN_COPYING_END
 
-The application will be available at http://localhost:5173. It will try to fetch today's puzzle and fall back to a sample if it's not found.
+The application will be available at http://localhost:5173.
 
 2. (Optional) Running the Puzzle Generation Script
 
 If you want to generate your own puzzles, you'll need an OpenAI API key.
 
-Create an environment file:
-Create a new file named .env in the root of the project.
+Create an environment file: Create a new file named .env in the root of the project.
 
-Add your API key:
-Add your OpenAI API key to the .env file. The dotenv package is used to load this key into the script.
+Add your API key: Add your OpenAI API key to the .env file. The dotenv package is used to load this key.
 
 Generated env
 OPENAI_API_KEY="sk-YourSecretApiKeyHere"
@@ -151,8 +145,7 @@ Use code with caution.
 Env
 IGNORE_WHEN_COPYING_END
 
-Run the generation script:
-Execute the script using tsx. This will generate a new puzzle for the current date and save it in the public/puzzles/ directory.
+Run the generation script: Execute the script using tsx. This will generate a new puzzle for the current date and save it in the public/puzzles/ directory.
 
 Generated bash
 npx tsx scripts/generate.js
@@ -164,7 +157,7 @@ Bash
 IGNORE_WHEN_COPYING_END
 Deployment
 
-This project is configured for easy deployment on platforms like Netlify, Vercel, or GitHub Pages.
+This project is configured for easy deployment on platforms like Netlify.
 
 Build Command: npm run build
 
