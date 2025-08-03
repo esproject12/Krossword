@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-04",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SPICE",
+      "clue": "Essential element in Indian cuisine.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "SWEET",
+      "clue": "Opposite of sour, often linked to festive treats.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "CURRY",
+      "clue": "A popular Indian dish with a blend of spices.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "CANDY",
+      "clue": "Sweet treat, often found in a Diwali gift box.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "ICON",
+      "clue": "A symbol of reverence or fame.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "EBON",
+      "clue": "Deep black, reminiscent of ebony wood.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "NEON",
+      "clue": "A bright, glowing gas often used in signs.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "NEAR",
+      "clue": "Close in proximity.",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "S",
+      "P",
+      "I",
+      "C",
+      "E",
+      null
+    ],
+    [
+      "W",
+      null,
+      "C",
+      null,
+      null,
+      "C"
+    ],
+    [
+      "E",
+      "B",
+      "O",
+      "N",
+      null,
+      "U"
+    ],
+    [
+      "E",
+      null,
+      "N",
+      "E",
+      "A",
+      "R"
+    ],
+    [
+      "T",
+      null,
+      null,
+      "O",
+      null,
+      "R"
+    ],
+    [
+      null,
+      "C",
+      "A",
+      "N",
+      "D",
+      "Y"
+    ]
+  ]
+}
