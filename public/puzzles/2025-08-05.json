@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-05",
+  "words": [
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "SITARS",
+      "clue": "Stringed instrument used in Indian classical music.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "EASEL",
+      "clue": "Artist's stand for holding work.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "DRIVE",
+      "clue": "A strong force or motivation; also related to cars",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "GUARD",
+      "clue": "Protector often seen in sports",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 5,
+      "answer": "ARRAY",
+      "clue": "A collection, often found in programming.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "MASSE",
+      "clue": "A shot in billiards where the cue ball is hit with extreme spin.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "GAM",
+      "clue": "A social gathering of whalers at sea.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "URA",
+      "clue": "Prefix meaning tail in biology.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "RAS",
+      "clue": "Title for a prince in Ethiopia, not India",
+      "startPosition": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "DYE",
+      "clue": "Color transformation or tinting process",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "E",
+      "D",
+      null,
+      "G",
+      "A",
+      "M"
+    ],
+    [
+      "A",
+      "R",
+      null,
+      "U",
+      "R",
+      "A"
+    ],
+    [
+      "S",
+      "I",
+      "T",
+      "A",
+      "R",
+      "S"
+    ],
+    [
+      "E",
+      "V",
+      null,
+      "R",
+      "A",
+      "S"
+    ],
+    [
+      "L",
+      "E",
+      null,
+      "D",
+      "Y",
+      "E"
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ]
+}
