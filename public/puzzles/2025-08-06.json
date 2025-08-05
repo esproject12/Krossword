@@ -1,0 +1,176 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-06",
+  "words": [
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "TRAIN",
+      "clue": "Common rail transport in India.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "TRUCK",
+      "clue": "Commonly used for transporting goods across India.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "SAREE",
+      "clue": "Elegant wrap worn in India.",
+      "startPosition": {
+        "row": 1,
+        "col": 5
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "HORSE",
+      "clue": "Four-legged ride popular in polo.",
+      "startPosition": {
+        "row": 5,
+        "col": 1
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "ACID",
+      "clue": "Type of chemical; in a pH lab, handle with care.",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "UNIT",
+      "clue": "A standard measure or quantity.",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 3
+      },
+      "length": 4,
+      "answer": "TOUR",
+      "clue": "A journey often taken by travelers.",
+      "startPosition": {
+        "row": 2,
+        "col": 3
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "DOUR",
+      "clue": "Stern in appearance or manner",
+      "startPosition": {
+        "row": 3,
+        "col": 2
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "T",
+      "R",
+      "A",
+      "I",
+      "N",
+      null
+    ],
+    [
+      "R",
+      null,
+      "C",
+      null,
+      null,
+      "S"
+    ],
+    [
+      "U",
+      "N",
+      "I",
+      "T",
+      null,
+      "A"
+    ],
+    [
+      "C",
+      null,
+      "D",
+      "O",
+      "U",
+      "R"
+    ],
+    [
+      "K",
+      null,
+      null,
+      "U",
+      null,
+      "E"
+    ],
+    [
+      null,
+      "H",
+      "O",
+      "R",
+      "S",
+      "E"
+    ]
+  ]
+}
