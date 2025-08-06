@@ -579,7 +579,8 @@ const [changeCounter, setChangeCounter] = useState(0);
                 {activeWord?.clue || "Select a cell to begin."}
               </div>
               <Timer time={time} />
-            </div>
+            </div >
+            <div className="w-full max-w-xl mx-auto">
             <CrosswordGrid
               crosswordData={crosswordData}
               userGrid={userGrid}
