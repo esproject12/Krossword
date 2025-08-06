@@ -36,7 +36,7 @@ const Cell: React.FC<CellProps> = ({
 }) => {
   if (isBlackSquare) {
     return (
-      <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-800 border border-gray-700"></div>
+      <div className="bg-gray-800 border border-gray-700"></div>;
     );
   }
 
