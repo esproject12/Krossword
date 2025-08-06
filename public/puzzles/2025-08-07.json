@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-07",
+  "words": [
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 2
+      },
+      "length": 5,
+      "answer": "PLAIN",
+      "clue": "Flat and simple, not themed",
+      "startPosition": {
+        "row": 0,
+        "col": 2
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "INDUS",
+      "clue": "River giving India its name.",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "RAMA",
+      "clue": "Legendary prince and hero of the Indian epic Ramayana.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 0
+      },
+      "length": 4,
+      "answer": "MALI",
+      "clue": "West African nation intersecting history and desert.",
+      "startPosition": {
+        "row": 1,
+        "col": 0
+      }
+    },
+    {
+      "id": 6,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "MANE",
+      "clue": "Lion's hairdo.",
+      "startPosition": {
+        "row": 2,
+        "col": 1
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "DOWN",
+      "start": {
+        "row": 2,
+        "col": 4
+      },
+      "length": 4,
+      "answer": "EELS",
+      "clue": "Slippery, elongated fish.",
+      "startPosition": {
+        "row": 2,
+        "col": 4
+      }
+    },
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 1
+      },
+      "length": 4,
+      "answer": "AIDE",
+      "clue": "Assistant found in office settings",
+      "startPosition": {
+        "row": 3,
+        "col": 1
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 2
+      },
+      "length": 4,
+      "answer": "NULL",
+      "clue": "Empty or void value.",
+      "startPosition": {
+        "row": 4,
+        "col": 2
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 3,
+      "answer": "ARP",
+      "clue": "A sound of a plucked string.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 5,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "SSS",
+      "clue": "A repetitive sound often made for emphasis.",
+      "startPosition": {
+        "row": 5,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "A",
+      "R",
+      "P",
+      null,
+      null,
+      null
+    ],
+    [
+      "M",
+      "A",
+      "L",
+      "I",
+      null,
+      null
+    ],
+    [
+      null,
+      "M",
+      "A",
+      "N",
+      "E",
+      null
+    ],
+    [
+      null,
+      "A",
+      "I",
+      "D",
+      "E",
+      null
+    ],
+    [
+      null,
+      null,
+      "N",
+      "U",
+      "L",
+      "L"
+    ],
+    [
+      null,
+      null,
+      null,
+      "S",
+      "S",
+      "S"
+    ]
+  ]
+}
