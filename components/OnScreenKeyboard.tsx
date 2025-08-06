@@ -24,8 +24,7 @@ const KeyboardButton: React.FC<
   <button
     onClick={onClick}
     // Default height is h-10. 'tall:' prefix makes it h-12 on tall screens.
-    // We keep your responsive heights and add the new background, border, and active state classes.
-    className={`h-10 tall:h-14 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-gray-200 shadow-[0_4px_0_0_#9ca3af] active:shadow-[0_1px_0_0_#9ca3af] active:translate-y-1 active:bg-gray-300 transition-all ${className}`}
+    className={`h-10 tall:h-14 rounded-md font-semibold text-gray-800 flex items-center justify-center bg-white shadow-sm ${className}`}
     style={{ flex: `${flex}` }}
   >
     {children}
