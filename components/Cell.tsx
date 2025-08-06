@@ -15,7 +15,8 @@ interface CellProps {
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef?: React.RefCallback<HTMLInputElement>;
   isMobile: boolean; // New prop
-   isLastChanged: boolean;
+  isLastChanged: boolean;
+  changeCounter: number;
 }
 
 const Cell: React.FC<CellProps> = ({
@@ -31,6 +32,7 @@ const Cell: React.FC<CellProps> = ({
   inputRef,
   isMobile, // New prop
   isLastChanged,
+  changeCounter,
 }) => {
   if (isBlackSquare) {
     return (
@@ -71,6 +73,8 @@ const Cell: React.FC<CellProps> = ({
         onKeyDown={onKeyDown}
         // This is key: on mobile, make the input readOnly to suppress the native keyboard
         readOnly={isMobile}
+        // --- ADD THE KEY PROP HERE ---
+        key={isLastChanged ? changeCounter : undefined}
         // 4. APPLY THE ANIMATION CLASS TO THE INPUT
         className={`w-full h-full text-center p-0 m-0 border-0 bg-transparent text-inherit ${animationClass}`}
         aria-label={`cell input ${clueNumber ? `clue ${clueNumber}` : ""}`}
