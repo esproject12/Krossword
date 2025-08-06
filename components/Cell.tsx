@@ -47,7 +47,8 @@ const Cell: React.FC<CellProps> = ({
   if (checkState === "correct") cellBgColor = "bg-green-200";
 
   const baseClasses =
-    "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 border border-gray-400 text-gray-800 font-bold text-lg sm:text-xl md:text-2xl flex items-center justify-center relative crossword-cell";
+    "border border-gray-400 text-gray-800 font-bold text-lg sm:text-xl md:text-2xl flex items-center justify-center relative crossword-cell";
+    
   const ringClass = isActive ? "ring-2 ring-blue-500 z-10" : "";
 
   // 3. DEFINE THE ANIMATION CLASS
