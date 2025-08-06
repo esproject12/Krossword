@@ -144,6 +144,9 @@ const CrosswordGame: React.FC<{
   });
   const [isPuzzleSolved, setIsPuzzleSolved] = useState<boolean>(false);
   const [time, setTime] = useState(0);
+  // --- ADD THIS NEW STATE ---
+  const [lastChangedCell, setLastChangedCell] = useState<CellPosition | null>(null);
+
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -297,6 +300,7 @@ const CrosswordGame: React.FC<{
       rIdx === row ? r.map((c, cIdx) => (cIdx === col ? upperValue : c)) : r
     );
     setUserGrid(newUserGrid);
+    setLastChangedCell({ row, col }); // <-- ADD THIS LINE
     if (cellCheckGrid) {
       const newCheckGrid = cellCheckGrid.map((r, rIdx) =>
         rIdx === row
@@ -402,6 +406,10 @@ const CrosswordGame: React.FC<{
 
   const handleOnScreenKeyPress = (key: string) => {
     if (!activeCell || isPuzzleSolved) return;
+     // --- ADD THIS LINE FOR HAPTIC FEEDBACK ---
+  if (window.navigator.vibrate) {
+    window.navigator.vibrate(5); // A very short, crisp vibration
+  }
     startTimer();
     if (key === "BACKSPACE") {
       if (userGrid?.[activeCell.row]?.[activeCell.col]) {
@@ -411,6 +419,7 @@ const CrosswordGame: React.FC<{
       }
     } else {
       handleCellChange(activeCell.row, activeCell.col, key);
+      setLastChangedCell({ row: activeCell.row, col: activeCell.col }); // <-- ADD THIS LINE
     }
   };
 
@@ -522,6 +531,7 @@ const CrosswordGame: React.FC<{
               onCellChange={handleCellChange}
               onCellClick={handleCellClick}
               onCellKeyDown={handleKeyDown}
+              lastChangedCell={lastChangedCell} // <-- ADD THIS PROP
               isMobile={isMobile}
             />
           </div>

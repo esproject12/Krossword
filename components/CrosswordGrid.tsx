@@ -23,6 +23,7 @@ interface CrosswordGridProps {
     col: number
   ) => void;
   isMobile?: boolean;
+  lastChangedCell: CellPosition | null;
 }
 
 const CrosswordGrid: React.FC<CrosswordGridProps> = ({
@@ -35,6 +36,7 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
   onCellClick,
   onCellKeyDown,
   isMobile = false,
+  lastChangedCell,
 }) => {
   console.log("%c[CrosswordGrid] Render Pass", "color: purple");
 
@@ -151,6 +153,7 @@ const CrosswordGrid: React.FC<CrosswordGridProps> = ({
                 inputRefs.current[rowIndex][colIndex] = el;
               }}
               isMobile={isMobile}
+              isLastChanged={lastChangedCell?.row === rowIndex && lastChangedCell?.col === colIndex} // <-- PASS IT DOWN HERE
             />
           );
         })

@@ -15,6 +15,7 @@ interface CellProps {
   onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   inputRef?: React.RefCallback<HTMLInputElement>;
   isMobile: boolean; // New prop
+   isLastChanged: boolean;
 }
 
 const Cell: React.FC<CellProps> = ({
@@ -29,6 +30,7 @@ const Cell: React.FC<CellProps> = ({
   onKeyDown,
   inputRef,
   isMobile, // New prop
+  isLastChanged,
 }) => {
   if (isBlackSquare) {
     return (
@@ -45,6 +47,9 @@ const Cell: React.FC<CellProps> = ({
   const baseClasses =
     "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 border border-gray-400 text-gray-800 font-bold text-lg sm:text-xl md:text-2xl flex items-center justify-center relative crossword-cell";
   const ringClass = isActive ? "ring-2 ring-blue-500 z-10" : "";
+
+  // 3. DEFINE THE ANIMATION CLASS
+  const animationClass = isLastChanged ? 'animate-pop' : '';
 
   return (
     <div
@@ -66,7 +71,8 @@ const Cell: React.FC<CellProps> = ({
         onKeyDown={onKeyDown}
         // This is key: on mobile, make the input readOnly to suppress the native keyboard
         readOnly={isMobile}
-        className="w-full h-full text-center p-0 m-0 border-0 bg-transparent text-inherit"
+        // 4. APPLY THE ANIMATION CLASS TO THE INPUT
+        className={`w-full h-full text-center p-0 m-0 border-0 bg-transparent text-inherit ${animationClass}`}
         aria-label={`cell input ${clueNumber ? `clue ${clueNumber}` : ""}`}
       />
     </div>
