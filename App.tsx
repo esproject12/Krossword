@@ -1,4 +1,4 @@
-// Krossword-main/App.tsx (Final Diagnostic Version with CSS Grid)
+// Krossword-main/App.tsx (Final, Complete, and Polished Version)
 
 import React, {
   useState,
@@ -6,7 +6,6 @@ import React, {
   useCallback,
   useRef,
   useMemo,
-  useLayoutEffect,
 } from "react";
 import { fetchPreGeneratedCrossword } from "./services/puzzleService";
 import type {
@@ -28,29 +27,25 @@ import OnScreenKeyboard from "./components/OnScreenKeyboard";
 
 const getTodayDateString = (): string => {
   const now = new Date();
-  const istDateString = now.toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata",
-  });
+  const istDateString = now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
   const istDate = new Date(istDateString);
   const year = istDate.getFullYear();
   const month = String(istDate.getMonth() + 1).padStart(2, "0");
   const day = String(istDate.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+
 interface CachedCrossword {
   date: string;
   data: CrosswordData;
 }
-const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28";
 
-// PASTE THIS ENTIRE CODE BLOCK TO REPLACE THE EXISTING CrosswordGame COMPONENT
+const SAMPLE_PUZZLE_DATE_STRING = "2024-07-28";
 
 const CrosswordGame: React.FC<{
   initialData: CrosswordData;
   error?: string | null;
 }> = ({ initialData, error }) => {
-  console.log("%c[CrosswordGame] Render Pass", "color: orange;");
-
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const headerRef = useRef<HTMLElement>(null);
@@ -58,67 +53,6 @@ const CrosswordGame: React.FC<{
   const mobileGridContainerRef = useRef<HTMLDivElement>(null);
   const mobileFooterRef = useRef<HTMLElement>(null);
 
-  // --- DIAGNOSTIC HOOK (STAYS IN PLACE) ---
-  // DELETE your current useLayoutEffect and REPLACE it with this entire block.
-
-  useLayoutEffect(() => {
-    const calculateAndFixLayout = () => {
-      if (isMobile && headerRef.current && mobileMainRef.current && mobileGridContainerRef.current && mobileFooterRef.current) {
-        
-        const viewportHeight = window.innerHeight;
-        const headerHeight = headerRef.current.offsetHeight;
-
-        const mainContainer = mobileMainRef.current;
-        const timerContainer = mainContainer.children[0] as HTMLElement;
-        const gridContainer = mobileGridContainerRef.current;
-        const footerContainer = mobileFooterRef.current;
-
-        const timerHeight = timerContainer.offsetHeight;
-        const footerHeight = footerContainer.offsetHeight;
-        
-        // --- THE CALCULATION ---
-        // We find the total height of all non-flexible elements.
-        // We also account for the padding/margins inside <main> (pb-2 is 8px)
-        const totalNonFlexibleHeight = headerHeight + timerHeight + footerHeight + 8; // 8px for pb-2
-        
-        // The correct height for the grid is whatever is left over.
-        const correctGridHeight = viewportHeight - totalNonFlexibleHeight;
-
-        // --- THE FIX ---
-        // We apply this calculated height directly to the grid container.
-        gridContainer.style.height = `${correctGridHeight}px`;
-
-        // --- THE VERIFICATION (Logging) ---
-        console.clear();
-        console.log(`%c--- ACTIVE LAYOUT FIX REPORT ---`, "color: #4CAF50; font-weight: bold; font-size: 16px;");
-        console.log(`[Screen] Viewport Height:            ${viewportHeight}px`);
-        console.log(`[Header] Header Height:             -${headerHeight}px`);
-        console.log(`[Timer] Timer Height:                -${timerHeight}px`);
-        console.log(`[Footer] Footer Height:              -${footerHeight}px`);
-        console.log(`[Spacing] Bottom Padding:            -8px`);
-        console.log('--------------------------------------------------');
-        console.log(`[Grid] CALCULATED CORRECT HEIGHT:   = ${correctGridHeight}px`);
-
-        if (correctGridHeight < 100) {
-          console.error("Layout Fix Error: Calculated grid height is too small. Check measurements.");
-        } else {
-          console.log("Layout fix applied successfully.");
-        }
-      }
-    };
-
-    // Run the fix after a short delay to ensure all elements have rendered
-    const timerId = setTimeout(calculateAndFixLayout, 500);
-
-    // Also run it on resize for robustness
-    window.addEventListener('resize', calculateAndFixLayout);
-
-    return () => {
-      clearTimeout(timerId);
-      window.removeEventListener('resize', calculateAndFixLayout);
-    };
-  }, [isMobile]);
-  
   const [crosswordData] = useState<CrosswordData>(initialData);
   const [userGrid, setUserGrid] = useState<UserGrid>(() =>
     initialData.solutionGrid.map((row) => row.map((cell) => (cell ? "" : null)))
@@ -144,19 +78,13 @@ const CrosswordGame: React.FC<{
   });
   const [isPuzzleSolved, setIsPuzzleSolved] = useState<boolean>(false);
   const [time, setTime] = useState(0);
-  // --- ADD THIS NEW STATE ---
-  const [lastChangedCell, setLastChangedCell] = useState<CellPosition | null>(null);
-// --- ADD THIS NEW LINE ---
-const [changeCounter, setChangeCounter] = useState(0);
-
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [lastChangedCell, setLastChangedCell] = useState<CellPosition | null>(null);
+  const [changeCounter, setChangeCounter] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const findWordAtCell = useCallback(
-    (
-      cell: CellPosition,
-      direction: Orientation
-    ): WordDefinition | undefined => {
+    (cell: CellPosition, direction: Orientation): WordDefinition | undefined => {
       if (!crosswordData || !cell) return undefined;
       return crosswordData.words.find((word) => {
         if (word.orientation !== direction) return false;
@@ -225,33 +153,19 @@ const [changeCounter, setChangeCounter] = useState(0);
     const path: CellPosition[] = [];
     for (let i = 0; i < word.length; i++) {
       if (word.orientation === "ACROSS") {
-        path.push({
-          row: word.startPosition.row,
-          col: word.startPosition.col + i,
-        });
+        path.push({ row: word.startPosition.row, col: word.startPosition.col + i });
       } else {
-        path.push({
-          row: word.startPosition.row + i,
-          col: word.startPosition.col,
-        });
+        path.push({ row: word.startPosition.row + i, col: word.startPosition.col });
       }
     }
     return path;
   }, []);
 
   const findNextEditableCell = useCallback(
-    (
-      word: WordDefinition,
-      fromCell: CellPosition | null,
-      searchForward: boolean = true
-    ): CellPosition | null => {
+    (word: WordDefinition, fromCell: CellPosition | null, searchForward: boolean = true): CellPosition | null => {
       if (!userGrid) return null;
       const wordPath = getWordPath(word);
-      let startIndex = fromCell
-        ? wordPath.findIndex(
-            (p) => p.row === fromCell.row && p.col === fromCell.col
-          )
-        : -1;
+      let startIndex = fromCell ? wordPath.findIndex((p) => p.row === fromCell.row && p.col === fromCell.col) : -1;
       if (searchForward) {
         for (let i = startIndex + 1; i < wordPath.length; i++) {
           const pos = wordPath[i];
@@ -271,9 +185,7 @@ const [changeCounter, setChangeCounter] = useState(0);
   const moveToNextCell = () => {
     if (!activeCell || !activeWord) return;
     const wordPath = getWordPath(activeWord);
-    const currentIndex = wordPath.findIndex(
-      (p) => p.row === activeCell.row && p.col === activeCell.col
-    );
+    const currentIndex = wordPath.findIndex((p) => p.row === activeCell.row && p.col === activeCell.col);
     if (currentIndex !== -1 && currentIndex < wordPath.length - 1) {
       setActiveCell(wordPath[currentIndex + 1]);
     }
@@ -282,9 +194,7 @@ const [changeCounter, setChangeCounter] = useState(0);
   const moveToPrevCell = () => {
     if (!activeCell || !activeWord) return;
     const wordPath = getWordPath(activeWord);
-    const currentIndex = wordPath.findIndex(
-      (p) => p.row === activeCell.row && p.col === activeCell.col
-    );
+    const currentIndex = wordPath.findIndex((p) => p.row === activeCell.row && p.col === activeCell.col);
     if (currentIndex > 0) {
       setActiveCell(wordPath[currentIndex - 1]);
     }
@@ -302,17 +212,12 @@ const [changeCounter, setChangeCounter] = useState(0);
       rIdx === row ? r.map((c, cIdx) => (cIdx === col ? upperValue : c)) : r
     );
     setUserGrid(newUserGrid);
-
-    setLastChangedCell({ row, col }); // <-- ADD THIS LINE
-    // --- ADD THIS NEW LINE ---
-  setChangeCounter(c => c + 1); // This increments the counter on every change
-  
+    setLastChangedCell({ row, col });
+    setChangeCounter(c => c + 1);
     if (cellCheckGrid) {
       const newCheckGrid = cellCheckGrid.map((r, rIdx) =>
         rIdx === row
-          ? r.map((c, cIdx) =>
-              cIdx === col ? ("unchecked" as CellCheckState) : c
-            )
+          ? r.map((c, cIdx) => (cIdx === col ? ("unchecked" as CellCheckState) : c))
           : r
       );
       setCellCheckGrid(newCheckGrid);
@@ -358,18 +263,12 @@ const [changeCounter, setChangeCounter] = useState(0);
     const currentClues = getCluesByDirection(activeDirection);
     const currentIndex = currentClues.findIndex((w) => w.id === activeWord.id);
     if (currentIndex !== -1) {
-      const nextIndex =
-        (currentIndex + (forward ? 1 : -1) + currentClues.length) %
-        currentClues.length;
+      const nextIndex = (currentIndex + (forward ? 1 : -1) + currentClues.length) % currentClues.length;
       handleClueSelect(currentClues[nextIndex]);
     }
   };
 
-  const handleKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-    row: number,
-    col: number
-  ) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, row: number, col: number) => {
     if (isPuzzleSolved) return;
     if (event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
       startTimer();
@@ -377,22 +276,10 @@ const [changeCounter, setChangeCounter] = useState(0);
     }
     event.preventDefault();
     switch (event.key) {
-      case "ArrowUp":
-        setActiveDirection("DOWN");
-        moveToPrevCell();
-        break;
-      case "ArrowDown":
-        setActiveDirection("DOWN");
-        moveToNextCell();
-        break;
-      case "ArrowLeft":
-        setActiveDirection("ACROSS");
-        moveToPrevCell();
-        break;
-      case "ArrowRight":
-        setActiveDirection("ACROSS");
-        moveToNextCell();
-        break;
+      case "ArrowUp": setActiveDirection("DOWN"); moveToPrevCell(); break;
+      case "ArrowDown": setActiveDirection("DOWN"); moveToNextCell(); break;
+      case "ArrowLeft": setActiveDirection("ACROSS"); moveToPrevCell(); break;
+      case "ArrowRight": setActiveDirection("ACROSS"); moveToNextCell(); break;
       case "Backspace":
         startTimer();
         if (userGrid?.[row]?.[col]) {
@@ -412,10 +299,9 @@ const [changeCounter, setChangeCounter] = useState(0);
 
   const handleOnScreenKeyPress = (key: string) => {
     if (!activeCell || isPuzzleSolved) return;
-     // --- ADD THIS LINE FOR HAPTIC FEEDBACK ---
-  if (window.navigator.vibrate) {
-    window.navigator.vibrate(15); // A very short, crisp vibration
-  }
+    if (window.navigator.vibrate) {
+        window.navigator.vibrate(20);
+    }
     startTimer();
     if (key === "BACKSPACE") {
       if (userGrid?.[activeCell.row]?.[activeCell.col]) {
@@ -425,7 +311,6 @@ const [changeCounter, setChangeCounter] = useState(0);
       }
     } else {
       handleCellChange(activeCell.row, activeCell.col, key);
-      setLastChangedCell({ row: activeCell.row, col: activeCell.col }); // <-- ADD THIS LINE
     }
   };
 
@@ -435,9 +320,7 @@ const [changeCounter, setChangeCounter] = useState(0);
       row.map((cell, cIdx) => {
         if (crosswordData.solutionGrid[rIdx][cIdx] === null) return null;
         if (!cell) return "unchecked";
-        return cell.toUpperCase() === crosswordData.solutionGrid[rIdx][cIdx]
-          ? "correct"
-          : "incorrect";
+        return cell.toUpperCase() === crosswordData.solutionGrid[rIdx][cIdx] ? "correct" : "incorrect";
       })
     );
     setCellCheckGrid(newCheckGrid);
@@ -501,33 +384,17 @@ const [changeCounter, setChangeCounter] = useState(0);
   return (
     <div className="w-screen h-dvh bg-gray-50 flex flex-col">
       <header ref={headerRef} className="main-header text-center py-2 px-2 flex-shrink-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">
-          Dodo Krossword
-        </h1>
-        <p className="text-base text-gray-600 mt-1 hidden sm:block">
-          {crosswordData.title}
-        </p>
-        {error && (
-          <p className="text-sm text-red-500 mt-1 bg-red-100 p-1 rounded-md shadow">
-            Note: {error}
-          </p>
-        )}
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-700 tracking-tight">Dodo Krossword</h1>
+        <p className="text-base text-gray-600 mt-1 hidden sm:block">{crosswordData.title}</p>
+        {error && <p className="text-sm text-red-500 mt-1 bg-red-100 p-1 rounded-md shadow">Note: {error}</p>}
       </header>
 
-      {isMobile ?(
-        <main
-          ref={mobileMainRef} 
-          className="flex-grow flex flex-col gap-2 px-2 pb-2">
-        
+      {isMobile ? (
+        <main ref={mobileMainRef} className="flex-grow grid grid-rows-[auto,1fr,auto] gap-2 px-2 pb-2 min-h-0">
           <div className="w-full flex justify-center flex-shrink-0">
             <Timer time={time} />
           </div>
-
-          <div
-            ref={mobileGridContainerRef}
-            // ADDED 'mt-2' to restore visual spacing
-            className="w-full flex-1 flex items-center justify-center min-h-0 mt-2"
-          >
+          <div ref={mobileGridContainerRef} className="w-full flex items-center justify-center min-h-0">
             <CrosswordGrid
               crosswordData={crosswordData}
               userGrid={userGrid}
@@ -537,17 +404,12 @@ const [changeCounter, setChangeCounter] = useState(0);
               onCellChange={handleCellChange}
               onCellClick={handleCellClick}
               onCellKeyDown={handleKeyDown}
-              lastChangedCell={lastChangedCell} // <-- ADD THIS PROP
-              changeCounter={changeCounter} // <-- ADD THIS LINE
               isMobile={isMobile}
+              lastChangedCell={lastChangedCell}
+              changeCounter={changeCounter}
             />
           </div>
-
-          <footer
-            ref={mobileFooterRef}
-            // ADDED 'mt-2' to restore visual spacing
-            className="w-full flex flex-col gap-2 flex-shrink-0 mt-2"
-          >
+          <footer ref={mobileFooterRef} className="w-full flex flex-col gap-2 flex-shrink-0">
             <ClueBar
               activeWord={activeWord}
               activeDirection={activeDirection}
@@ -565,7 +427,6 @@ const [changeCounter, setChangeCounter] = useState(0);
           </footer>
         </main>
       ) : (
-        // --- DESKTOP LAYOUT (WITH CORRECTED STRUCTURE) ---
         <main className="flex flex-col lg:flex-row gap-4 md:gap-6 items-start justify-center flex-grow p-4 overflow-y-auto">
           <div className="w-full lg:w-auto flex flex-col items-center">
             <div className="w-full max-w-md flex justify-between items-center mb-3 gap-2">
@@ -580,8 +441,7 @@ const [changeCounter, setChangeCounter] = useState(0);
                 {activeWord?.clue || "Select a cell to begin."}
               </div>
               <Timer time={time} />
-            </div >
-
+            </div>
             <div className="w-full max-w-xl mx-auto">
               <CrosswordGrid
                 crosswordData={crosswordData}
@@ -593,6 +453,8 @@ const [changeCounter, setChangeCounter] = useState(0);
                 onCellClick={handleCellClick}
                 onCellKeyDown={handleKeyDown}
                 isMobile={isMobile}
+                lastChangedCell={lastChangedCell}
+                changeCounter={changeCounter}
               />
               <Toolbar
                 onCheckPuzzle={handleCheckPuzzle}
@@ -602,7 +464,6 @@ const [changeCounter, setChangeCounter] = useState(0);
                 isPuzzleSolved={isPuzzleSolved}
               />
             </div>
-            
           </div>
           <div className="w-full lg:flex-1 bg-white p-3 rounded-lg shadow-md overflow-y-auto">
             {isPuzzleSolved && (
@@ -628,12 +489,10 @@ const [changeCounter, setChangeCounter] = useState(0);
       )}
     </div>
   );
-  
+};
 
 const App: React.FC = () => {
-  const [crosswordData, setCrosswordData] = useState<CrosswordData | null>(
-    null
-  );
+  const [crosswordData, setCrosswordData] = useState<CrosswordData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
