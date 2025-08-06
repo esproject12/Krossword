@@ -565,6 +565,7 @@ const [changeCounter, setChangeCounter] = useState(0);
           </footer>
         </main>
       ) : (
+        // --- DESKTOP LAYOUT (WITH CORRECTED STRUCTURE) ---
         <main className="flex flex-col lg:flex-row gap-4 md:gap-6 items-start justify-center flex-grow p-4 overflow-y-auto">
           <div className="w-full lg:w-auto flex flex-col items-center">
             <div className="w-full max-w-md flex justify-between items-center mb-3 gap-2">
@@ -580,25 +581,28 @@ const [changeCounter, setChangeCounter] = useState(0);
               </div>
               <Timer time={time} />
             </div >
+
             <div className="w-full max-w-xl mx-auto">
-            <CrosswordGrid
-              crosswordData={crosswordData}
-              userGrid={userGrid}
-              activeCell={activeCell}
-              activeDirection={activeDirection}
-              cellCheckGrid={cellCheckGrid}
-              onCellChange={handleCellChange}
-              onCellClick={handleCellClick}
-              onCellKeyDown={handleKeyDown}
-              isMobile={isMobile}
-            />
-            <Toolbar
-              onCheckPuzzle={handleCheckPuzzle}
-              onRevealWord={handleRevealWord}
-              onRevealPuzzle={handleRevealPuzzle}
-              onClearPuzzle={handleClearPuzzle}
-              isPuzzleSolved={isPuzzleSolved}
-            />
+              <CrosswordGrid
+                crosswordData={crosswordData}
+                userGrid={userGrid}
+                activeCell={activeCell}
+                activeDirection={activeDirection}
+                cellCheckGrid={cellCheckGrid}
+                onCellChange={handleCellChange}
+                onCellClick={handleCellClick}
+                onCellKeyDown={handleKeyDown}
+                isMobile={isMobile}
+              />
+              <Toolbar
+                onCheckPuzzle={handleCheckPuzzle}
+                onRevealWord={handleRevealWord}
+                onRevealPuzzle={handleRevealPuzzle}
+                onClearPuzzle={handleClearPuzzle}
+                isPuzzleSolved={isPuzzleSolved}
+              />
+            </div>
+            
           </div>
           <div className="w-full lg:flex-1 bg-white p-3 rounded-lg shadow-md overflow-y-auto">
             {isPuzzleSolved && (
@@ -606,19 +610,8 @@ const [changeCounter, setChangeCounter] = useState(0);
                 className="p-3 mb-3 bg-green-100 text-green-700 rounded-md text-center font-semibold text-lg flex items-center justify-center"
                 role="alert"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 mr-2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Congratulations! You solved the puzzle in{" "}
                 {Math.floor(time / 60)}m {time % 60}s!
@@ -635,7 +628,7 @@ const [changeCounter, setChangeCounter] = useState(0);
       )}
     </div>
   );
-};
+  
 
 const App: React.FC = () => {
   const [crosswordData, setCrosswordData] = useState<CrosswordData | null>(
