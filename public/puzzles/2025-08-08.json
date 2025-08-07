@@ -1,0 +1,206 @@
+{
+  "gridSize": 6,
+  "title": "Indian Mini Crossword - 2025-08-08",
+  "words": [
+    {
+      "id": 8,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 2,
+        "col": 0
+      },
+      "length": 6,
+      "answer": "GANGES",
+      "clue": "Sacred river in India",
+      "startPosition": {
+        "row": 2,
+        "col": 0
+      }
+    },
+    {
+      "id": 1,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 0
+      },
+      "length": 5,
+      "answer": "YOGIS",
+      "clue": "Practitioners of ancient Indian spiritual exercises.",
+      "startPosition": {
+        "row": 0,
+        "col": 0
+      }
+    },
+    {
+      "id": 2,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 1
+      },
+      "length": 5,
+      "answer": "BHANG",
+      "clue": "A cannabis-infused drink consumed during Holi.",
+      "startPosition": {
+        "row": 0,
+        "col": 1
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 5,
+      "answer": "SUGAR",
+      "clue": "Sweetener derived from sugarcane, a staple in Indian cuisine.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 4,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 4
+      },
+      "length": 5,
+      "answer": "ARENA",
+      "clue": "Place for sports battles or spectacles.",
+      "startPosition": {
+        "row": 0,
+        "col": 4
+      }
+    },
+    {
+      "id": 5,
+      "orientation": "DOWN",
+      "start": {
+        "row": 0,
+        "col": 5
+      },
+      "length": 5,
+      "answer": "NESTS",
+      "clue": "Birds call these home.",
+      "startPosition": {
+        "row": 0,
+        "col": 5
+      }
+    },
+    {
+      "id": 3,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 0,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "SAN",
+      "clue": "Prefix for 'Francisco' or 'Antonio' in city names.",
+      "startPosition": {
+        "row": 0,
+        "col": 3
+      }
+    },
+    {
+      "id": 7,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 1,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "URE",
+      "clue": "Suffix for pressure or failure",
+      "startPosition": {
+        "row": 1,
+        "col": 3
+      }
+    },
+    {
+      "id": 9,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 3,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "ANT",
+      "clue": "Tiny insect often found in colonies.",
+      "startPosition": {
+        "row": 3,
+        "col": 3
+      }
+    },
+    {
+      "id": 10,
+      "orientation": "ACROSS",
+      "start": {
+        "row": 4,
+        "col": 3
+      },
+      "length": 3,
+      "answer": "RAS",
+      "clue": "Regal title in some African cultures.",
+      "startPosition": {
+        "row": 4,
+        "col": 3
+      }
+    }
+  ],
+  "solutionGrid": [
+    [
+      "Y",
+      "B",
+      null,
+      "S",
+      "A",
+      "N"
+    ],
+    [
+      "O",
+      "H",
+      null,
+      "U",
+      "R",
+      "E"
+    ],
+    [
+      "G",
+      "A",
+      "N",
+      "G",
+      "E",
+      "S"
+    ],
+    [
+      "I",
+      "N",
+      null,
+      "A",
+      "N",
+      "T"
+    ],
+    [
+      "S",
+      "G",
+      null,
+      "R",
+      "A",
+      "S"
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ]
+}
